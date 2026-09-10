@@ -1,7 +1,9 @@
 // src/app/[lang]/layout.tsx
 import type { ReactNode } from 'react'
+import type { Metadata } from 'next'
 import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google'
 import '@/app/globals.css'
+import { siteConfig } from '@/lib/config/site'
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -16,6 +18,12 @@ const jakarta = Plus_Jakarta_Sans({
   weight: ['400', '500', '600', '700'],
   variable: '--font-jakarta',
 })
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  title: { default: siteConfig.name, template: `%s · ${siteConfig.name}` },
+  applicationName: siteConfig.name,
+}
 
 export function generateStaticParams() {
   return [{ lang: 'es' }, { lang: 'en' }]
