@@ -12,6 +12,13 @@
 
 # testing
 /coverage
+/playwright-report
+/test-results
+/.lighthouseci
+
+# sdd / agent workspace
+/.superpowers
+*.stackdump
 
 # next.js
 /.next/
