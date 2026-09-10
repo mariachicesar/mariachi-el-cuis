@@ -44,7 +44,7 @@ export const CITIES: City[] = [
     },
   },
   {
-    slug: 'downey', name: 'Downey', lat: 33.927, lng: -118.1326,
+    slug: 'downey', name: 'Downey', lat: 33.9401, lng: -118.1332,
     neighborhoods: ['Downtown Downey', 'Rancho Estates'],
     blurb: {
       es: 'Downey es una de nuestras ciudades más solicitadas para bodas y galas. Tocamos en hoteles cerca del centro y en recepciones familiares por todo Rancho Estates.',

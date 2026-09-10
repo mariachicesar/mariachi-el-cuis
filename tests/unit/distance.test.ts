@@ -6,8 +6,8 @@ test('zero distance for identical points', () => {
   expect(haversineMiles({ lat: 34, lng: -118 }, { lat: 34, lng: -118 })).toBe(0)
 })
 
-test('downtown LA to Downey is roughly 11-13 miles', () => {
-  const d = haversineMiles({ lat: 34.0074, lng: -118.2587 }, { lat: 33.927, lng: -118.1326 })
-  expect(d).toBeGreaterThan(9)
-  expect(d).toBeLessThan(15)
+test('90011 base to Downey is roughly 8 miles', () => {
+  const d = haversineMiles({ lat: 34.0074, lng: -118.2587 }, { lat: 33.9401, lng: -118.1332 })
+  expect(d).toBeGreaterThan(7)
+  expect(d).toBeLessThan(11)
 })
