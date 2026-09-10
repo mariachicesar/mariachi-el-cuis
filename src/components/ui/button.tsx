@@ -9,6 +9,11 @@ const styles: Record<Variant, string> = {
   ghost: 'bg-charcoal-elevated text-crema-white hover:bg-charcoal-border',
 }
 
+/** Shared button styling for non-`<Link>` anchors (e.g. `tel:` / `wa.me`). */
+export function buttonClasses(variant: Variant = 'primary', className = '') {
+  return `inline-flex items-center justify-center gap-2 rounded px-6 py-3 text-sm transition-colors ${styles[variant]} ${className}`
+}
+
 export function Button({
   href,
   children,
@@ -21,10 +26,7 @@ export function Button({
   className?: string
 }) {
   return (
-    <Link
-      href={href}
-      className={`inline-flex items-center justify-center gap-2 rounded px-6 py-3 text-sm transition-colors ${styles[variant]} ${className}`}
-    >
+    <Link href={href} className={buttonClasses(variant, className)}>
       {children}
     </Link>
   )
