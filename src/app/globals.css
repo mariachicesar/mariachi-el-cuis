@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-surface: #131315;
+  --color-surface-container-lowest: #0e0e10;
+  --color-surface-container: #201f21;
+  --color-charcoal-surface: #1a1a1e;
+  --color-charcoal-elevated: #24242a;
+  --color-charcoal-border: #363640;
+  --color-burnished-gold: #efb049;
+  --color-primary: #ffd08a;
+  --color-primary-container: #efb049;
+  --color-on-primary: #442c00;
+  --color-fiesta-crimson: #c92a2a;
+  --color-crema-white: #fdfbf7;
+  --color-on-surface: #e5e1e4;
+  --color-on-surface-variant: #d5c4b0;
+  --color-muted-silver: #9ca3af;
+
+  --font-display: var(--font-playfair), Georgia, 'Times New Roman', serif;
+  --font-body: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root { color-scheme: dark; }
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4 { font-family: var(--font-display); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* visible focus for keyboard users */
+:focus-visible { outline: 2px solid var(--color-burnished-gold); outline-offset: 2px; }
