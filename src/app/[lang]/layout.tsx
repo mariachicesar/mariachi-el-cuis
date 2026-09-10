@@ -21,6 +21,8 @@ export function generateStaticParams() {
   return [{ lang: 'es' }, { lang: 'en' }]
 }
 
+export const dynamicParams = false
+
 export default async function RootLayout({
   children,
   params,
