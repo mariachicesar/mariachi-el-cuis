@@ -11,4 +11,6 @@ export const siteConfig = {
   baseLat: 34.0074,
   baseLng: -118.2587,
   serviceCountyLabel: 'Los Angeles County',
+  youtubeUrl: undefined as string | undefined,
+  instagramUrl: undefined as string | undefined,
 } as const
