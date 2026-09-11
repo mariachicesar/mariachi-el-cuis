@@ -22,3 +22,23 @@ test('email feature is on with key + recipient', () => {
 test('rejects a non-URL site url', () => {
   expect(() => parseEnv({ NEXT_PUBLIC_SITE_URL: 'not-a-url' })).toThrow()
 })
+
+test('treats a blank env value as unset instead of crashing', () => {
+  // Reproduces a real production failure: a host (e.g. Vercel) can present a
+  // declared-but-empty env var as '' rather than omitting the key.
+  expect(() =>
+    parseEnv({
+      NEXT_PUBLIC_SITE_URL: '',
+      RESEND_API_KEY: '   ',
+      CONTACT_TO_EMAIL: '',
+    }),
+  ).not.toThrow()
+
+  const { env, features } = parseEnv({
+    NEXT_PUBLIC_SITE_URL: '',
+    RESEND_API_KEY: '   ',
+    CONTACT_TO_EMAIL: '',
+  })
+  expect(env.NEXT_PUBLIC_SITE_URL).toBe('http://localhost:3000')
+  expect(features.email).toBe(false)
+})
