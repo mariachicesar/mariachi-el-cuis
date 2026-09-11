@@ -63,10 +63,10 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
         </p>
         <div className="flex gap-4">
           <Link href={link('/terms')} className="transition-colors hover:text-burnished-gold">
-            Terms
+            {dict.footer.terms}
           </Link>
           <Link href={link('/privacy')} className="transition-colors hover:text-burnished-gold">
-            Privacy
+            {dict.footer.privacy}
           </Link>
         </div>
       </div>
