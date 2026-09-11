@@ -29,7 +29,7 @@ const COPY = {
     occasionsLabel: 'Momentos que cubrimos',
     pricingHeading: 'Precios',
     pricingIntro: 'Las reglas completas, tal como se aplican a cada cotización:',
-    tableCaption: 'Resumen de tarifas (dólares estadounidenses)',
+    tableCaption: 'Resumen de tarifas',
     colOption: 'Opción',
     colRate: 'Tarifa',
     colWhen: 'Cuándo aplica',
@@ -42,9 +42,9 @@ const COPY = {
       weekendWhen: 'Sábado y domingo, comenzando a las 3:00 PM o más tarde',
       deposit: 'Depósito para apartar',
       depositWhen: 'Se resta del total; el saldo se paga el día del evento',
-      flat: 'fijo',
-      perHour: 'por hora',
-      usd: 'USD',
+      flat: ' fijo',
+      perHour: ' por hora',
+      none: '',
     },
     faqHeading: 'Preguntas comunes',
     faqNote: 'Las reglas de precio y de cancelación están completas en la lista de arriba.',
@@ -61,7 +61,7 @@ const COPY = {
     occasionsLabel: 'Moments we cover',
     pricingHeading: 'Pricing',
     pricingIntro: 'The complete rules, exactly as they apply to every quote:',
-    tableCaption: 'Rate summary (US dollars)',
+    tableCaption: 'Rate summary',
     colOption: 'Option',
     colRate: 'Rate',
     colWhen: 'When it applies',
@@ -74,9 +74,9 @@ const COPY = {
       weekendWhen: 'Saturday & Sunday, starting 3:00 PM or later',
       deposit: 'Deposit to reserve',
       depositWhen: 'Applied to the total; the balance is paid on the event day',
-      flat: 'flat',
-      perHour: 'per hour',
-      usd: 'USD',
+      flat: ' flat',
+      perHour: '/hr',
+      none: '',
     },
     faqHeading: 'Common questions',
     faqNote: 'The full pricing and cancellation rules are in the list above.',
@@ -110,10 +110,7 @@ export default async function ServicesPage({ params }: { params: Promise<{ lang:
   const servicesUrl = alternatesFor('/services').languages[locale]!
   const homeUrl = alternatesFor('/').languages[locale]!
 
-  // Rate rows deliberately spell the currency out ("380 USD") so the exact
-  // "$380 / $500 / $550" strings live in exactly one place: the rules list.
-  const rate = (amount: number, unit: string) =>
-    `${amount} ${t.rows.usd}${unit ? ` ${unit}` : ''}`
+  const rate = (amount: number, unit: string) => `$${amount}${unit}`
   const rows = [
     {
       label: t.rows.package,
@@ -130,14 +127,14 @@ export default async function ServicesPage({ params }: { params: Promise<{ lang:
       rate: rate(PRICING.hourlyWeekend, t.rows.perHour),
       when: t.rows.weekendWhen,
     },
-    { label: t.rows.deposit, rate: rate(PRICING.deposit, ''), when: t.rows.depositWhen },
+    { label: t.rows.deposit, rate: rate(PRICING.deposit, t.rows.none), when: t.rows.depositWhen },
   ]
 
-  // The mandated Service-page FAQ schema covers the first five entries; the two
-  // pricing/cancellation answers are rendered verbatim as the pricing rules list
-  // above, so the visible Q&A block below only repeats the remaining ones.
-  const faqSchemaItems = FAQ.slice(0, 5).map((f) => ({ q: f.q[locale], a: f.a[locale] }))
+  // The FAQPage schema mirrors exactly the Q&A pairs rendered below it; the
+  // pricing and cancellation answers are covered by /faq, which carries all
+  // nine entries, and their content is visible here as the pricing rules list.
   const faqVisible = FAQ.slice(1, 4)
+  const faqSchemaItems = faqVisible.map((f) => ({ q: f.q[locale], a: f.a[locale] }))
 
   return (
     <main id="main">
