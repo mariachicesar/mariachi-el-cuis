@@ -15,7 +15,7 @@ export function GET() {
 - Phone: ${siteConfig.phoneDisplay}
 - WhatsApp: ${siteConfig.whatsappUrl}
 - Email: ${siteConfig.email}
-- Service area: ${siteConfig.serviceCountyLabel} only
+- Service area: ${siteConfig.serviceCountyLabel.en} only
 
 ## Pricing
 ${pricingLines('en').map((l) => `- ${l}`).join('\n')}

@@ -17,7 +17,7 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
       />
       <div className="relative mx-auto max-w-7xl px-6 py-20 md:py-28 lg:px-12">
         <p className="font-display text-sm uppercase tracking-widest text-burnished-gold">
-          {siteConfig.serviceCountyLabel}
+          {siteConfig.serviceCountyLabel[locale]}
         </p>
         <h1 className="mt-4 max-w-3xl font-display text-4xl leading-tight text-crema-white md:text-5xl">
           {es

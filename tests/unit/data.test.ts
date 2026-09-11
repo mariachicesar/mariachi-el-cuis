@@ -28,3 +28,17 @@ test('services + faq + repertoire have content', () => {
   expect(FAQ.length).toBeGreaterThanOrEqual(8)
   expect(REPERTOIRE.length).toBeGreaterThanOrEqual(40)
 })
+
+test('pricingLines mentions every PRICING dollar figure, both locales', () => {
+  for (const locale of ['es', 'en'] as const) {
+    const text = pricingLines(locale).join(' ')
+    for (const amount of [
+      PRICING.sevenSongsFlat,
+      PRICING.hourlyWeekday,
+      PRICING.hourlyWeekend,
+      PRICING.deposit,
+    ]) {
+      expect(text).toContain(`$${amount}`)
+    }
+  }
+})

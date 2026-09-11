@@ -15,8 +15,8 @@ export function ServiceAreaGrid({ locale }: { locale: Locale }) {
       </h2>
       <p className="mt-3 max-w-2xl text-on-surface-variant">
         {es
-          ? `Tarifa base en todo el ${siteConfig.serviceCountyLabel}. Las distancias son aproximadas desde nuestra base en el 90011.`
-          : `Base rate across ${siteConfig.serviceCountyLabel}. Distances are approximate, measured from our 90011 home base.`}
+          ? `Tocamos en todo el ${siteConfig.serviceCountyLabel.es}. Las distancias son aproximadas desde nuestra base en el 90011.`
+          : `We play across ${siteConfig.serviceCountyLabel.en}. Distances are approximate, measured from our 90011 home base.`}
       </p>
       <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {CITIES.map((city) => {

@@ -10,7 +10,7 @@ export const siteConfig = {
   baseZip: '90011',
   baseLat: 34.0074,
   baseLng: -118.2587,
-  serviceCountyLabel: 'Los Angeles County',
+  serviceCountyLabel: { es: 'Condado de Los Ángeles', en: 'Los Angeles County' },
   youtubeUrl: undefined as string | undefined,
   instagramUrl: undefined as string | undefined,
 } as const

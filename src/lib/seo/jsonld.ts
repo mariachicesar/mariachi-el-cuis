@@ -37,7 +37,7 @@ export function service(opts: { locale: Locale; url: string }) {
     '@type': 'Service',
     serviceType: opts.locale === 'es' ? 'Servicio de mariachi' : 'Mariachi band service',
     provider: ORG,
-    areaServed: { '@type': 'AdministrativeArea', name: siteConfig.serviceCountyLabel },
+    areaServed: { '@type': 'AdministrativeArea', name: siteConfig.serviceCountyLabel.en },
     url: opts.url,
   }
 }

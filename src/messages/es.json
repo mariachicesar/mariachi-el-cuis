@@ -1,5 +1,5 @@
 {
-  "nav": { "home": "Inicio", "musicians": "Músicos", "repertoire": "Repertorio", "media": "Media", "guides": "Guías", "quote": "Cotización", "menu": "Menú" },
+  "nav": { "home": "Inicio", "services": "Servicios", "musicians": "Músicos", "repertoire": "Repertorio", "media": "Media", "guides": "Guías", "quote": "Cotización", "menu": "Menú", "faq": "Preguntas frecuentes", "contact": "Contacto" },
   "cta": { "checkAvailability": "Consultar disponibilidad", "getQuote": "Obtener cotización", "call": "Llamar", "whatsapp": "Escríbenos por WhatsApp" },
   "footer": { "tagline": "Mariachi tradicional para celebraciones en Los Ángeles.", "areasHeading": "Áreas de servicio", "contactHeading": "Contacto", "rights": "Todos los derechos reservados.", "terms": "Términos", "privacy": "Privacidad" },
   "common": { "skipToContent": "Saltar al contenido", "languageName": "Español" }

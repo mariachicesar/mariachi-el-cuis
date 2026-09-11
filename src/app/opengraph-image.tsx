@@ -37,7 +37,7 @@ export default function Image() {
             color: '#D5C4B0',
           }}
         >
-          {siteConfig.serviceCountyLabel}
+          {siteConfig.serviceCountyLabel.en}
         </div>
       </div>
     ),

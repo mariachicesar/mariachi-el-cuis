@@ -6,6 +6,7 @@ export type NavItem = { href: string; label: string }
 export function navItems(dict: Dictionary): NavItem[] {
   return [
     { href: '/', label: dict.nav.home },
+    { href: '/services', label: dict.nav.services },
     { href: '/about', label: dict.nav.musicians },
     { href: '/repertoire', label: dict.nav.repertoire },
     { href: '/media', label: dict.nav.media },

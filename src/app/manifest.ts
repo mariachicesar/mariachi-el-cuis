@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: siteConfig.name,
     short_name: 'El Cuis',
-    description: `Traditional mariachi band serving ${siteConfig.serviceCountyLabel}.`,
+    description: `Traditional mariachi band serving ${siteConfig.serviceCountyLabel.en}.`,
     start_url: '/',
     display: 'standalone',
     background_color: '#131315',

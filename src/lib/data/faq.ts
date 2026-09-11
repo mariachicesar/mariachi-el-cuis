@@ -11,7 +11,7 @@ export const FAQ: FaqItem[] = [
   {
     q: { es: '¿A qué áreas van?', en: 'What areas do you serve?' },
     a: {
-      es: 'Damos cotización instantánea únicamente dentro del Condado de Los Ángeles. Para eventos fuera del condado o del estado, contáctenos y lo revisamos caso por caso.',
+      es: 'Damos cotización instantánea únicamente dentro del Condado de Los Ángeles. Para eventos fuera del condado o del estado, contáctanos y lo revisamos caso por caso.',
       en: 'We give instant quotes for Los Angeles County only. For events outside the county or state, contact us and we\'ll review it case by case.',
     },
   },
@@ -25,21 +25,21 @@ export const FAQ: FaqItem[] = [
   {
     q: { es: '¿Cómo aparto la fecha?', en: 'How do I hold the date?' },
     a: {
-      es: 'Un depósito de $100 aparta su fecha. El saldo se paga después, directamente al mariachi el día del evento.',
+      es: 'Un depósito de $100 aparta tu fecha. El saldo se paga después, directamente al mariachi el día del evento.',
       en: 'A $100 deposit holds your date. The balance is paid later, directly to the band on the event day.',
     },
   },
   {
     q: { es: '¿Cuál es la política de cancelación?', en: 'What is the cancellation policy?' },
     a: {
-      es: 'El depósito es reembolsable solo si cancela 7 días o más antes del evento. Dentro de los 7 días previos, el depósito no es reembolsable.',
+      es: 'El depósito es reembolsable solo si cancelas 7 días o más antes del evento. Dentro de los 7 días previos, el depósito no es reembolsable.',
       en: 'The deposit is refundable only if you cancel 7 or more days before the event. Within 7 days, the deposit is non-refundable.',
     },
   },
   {
     q: { es: '¿Por qué los sábados empiezan a las 3 PM?', en: 'Why do Saturdays start at 3 PM?' },
     a: {
-      es: 'Los sábados y domingos tomamos eventos que comienzan a las 3:00 PM o más tarde. Para eventos más temprano en fin de semana, contáctenos.',
+      es: 'Los sábados y domingos tomamos eventos que comienzan a las 3:00 PM o más tarde. Para eventos más temprano en fin de semana, contáctanos.',
       en: 'On Saturdays and Sundays we take events that start at 3:00 PM or later. For earlier weekend events, contact us.',
     },
   },
@@ -53,14 +53,14 @@ export const FAQ: FaqItem[] = [
   {
     q: { es: '¿Cómo se paga?', en: 'How do I pay?' },
     a: {
-      es: 'Pronto aceptaremos tarjeta, Zelle, Venmo y PayPal en línea. Por ahora, escríbanos por WhatsApp o llámenos y coordinamos el depósito.',
+      es: 'Pronto aceptaremos tarjeta, Zelle, Venmo y PayPal en línea. Por ahora, escríbenos por WhatsApp o llámanos y coordinamos el depósito.',
       en: 'We will soon accept card, Zelle, Venmo, and PayPal online. For now, message us on WhatsApp or call and we\'ll arrange the deposit.',
     },
   },
   {
     q: { es: '¿Puedo pedir canciones específicas?', en: 'Can I request specific songs?' },
     a: {
-      es: 'Sí. Envíe su lista al reservar y la preparamos. Tenemos más de cuarenta clásicos en el repertorio y aprendemos pedidos especiales con aviso.',
+      es: 'Sí. Envía tu lista al reservar y la preparamos. Tenemos más de cuarenta clásicos en el repertorio y aprendemos pedidos especiales con aviso.',
       en: 'Yes. Send your list when you book and we\'ll prepare it. We carry more than forty classics and learn special requests with notice.',
     },
   },

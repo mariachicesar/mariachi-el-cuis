@@ -25,7 +25,7 @@ export function pricingLines(locale: Locale): string[] {
     'Sábado y domingo: $550 por hora, comenzando a las 3:00 PM o más tarde.',
     'Mínimo de horas según la distancia: 2 horas dentro de 15 millas, 3 horas dentro de 30, 4 horas dentro de 50, y 1 hora más por cada 20 millas adicionales.',
     'El depósito es de $100 para reservar la fecha; el saldo se paga después directamente al mariachi.',
-    'Cancelación: el depósito es reembolsable solo si cancela 7 días o más antes del evento.',
+    'Cancelación: el depósito es reembolsable solo si cancelas 7 días o más antes del evento.',
     'Cotización instantánea únicamente dentro del Condado de Los Ángeles.',
   ]
   const en = [

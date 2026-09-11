@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { JsonLd } from '@/components/ui/json-ld'
 import { Section } from '@/components/ui/section'
 import { CITIES } from '@/lib/data/cities'
+import { GUIDES } from '@/lib/content/guides'
 import { pricingLines } from '@/lib/data/pricing'
 import { REPERTOIRE } from '@/lib/data/repertoire'
 import { getDictionary } from '@/lib/i18n/dictionaries'
@@ -108,7 +109,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         </ul>
       </Section>
 
-      {/* Guides teaser (Task 17 fills the real list) */}
+      {/* Guides teaser */}
       <Section className="bg-surface-container-lowest">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">
@@ -120,14 +121,20 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         </div>
         <p className="mt-3 max-w-2xl text-on-surface-variant">
           {es
-            ? 'Cómo planear el mariachi de tu evento: cuántas canciones, a qué hora empezar, cómo funciona una serenata sorpresa y qué se toca en una misa.'
-            : 'How to plan mariachi for your event: how many songs, what time to start, how a surprise serenata works, and what is played at a mass.'}
+            ? 'Cómo planear el mariachi de tu evento: precios, canciones de quinceañera, cómo funciona la reserva y dónde encaja en tu boda.'
+            : 'How to plan mariachi for your event: pricing, quinceañera songs, how booking works, and where it fits in your wedding.'}
         </p>
         <ul className="mt-4 grid gap-2 text-sm text-on-surface-variant sm:grid-cols-2">
-          <li>{es ? 'Cómo reservar mariachi para una boda' : 'How to book mariachi for a wedding'}</li>
-          <li>{es ? 'Cuántas canciones caben en una hora' : 'How many songs fit in an hour'}</li>
-          <li>{es ? 'Planear una serenata sorpresa' : 'Planning a surprise serenata'}</li>
-          <li>{es ? 'Música para una misa panamericana' : 'Music for a Panamerican mass'}</li>
+          {GUIDES.map((g) => (
+            <li key={g.slug}>
+              <Link
+                href={localizedPath(`/guides/${g.slug}`, locale)}
+                className="transition-colors hover:text-burnished-gold"
+              >
+                {g.title[locale]}
+              </Link>
+            </li>
+          ))}
         </ul>
       </Section>
 

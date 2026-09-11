@@ -27,6 +27,12 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
               {item.label}
             </Link>
           ))}
+          <Link href={link('/faq')} className={linkCls}>
+            {dict.nav.faq}
+          </Link>
+          <Link href={link('/contact')} className={linkCls}>
+            {dict.nav.contact}
+          </Link>
         </nav>
 
         <div className="flex flex-col gap-2">

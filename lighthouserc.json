@@ -10,7 +10,7 @@
         "http://localhost:3000/mariachi/downey",
         "http://localhost:3000/guides/mariachi-cost-los-angeles"
       ],
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "settings": { "preset": "desktop" }
     },
     "assert": {

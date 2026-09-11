@@ -49,7 +49,7 @@ const COPY = {
       {
         heading: 'Área de servicio',
         body: [
-          `Damos servicio en todo el ${siteConfig.serviceCountyLabel}. Eventos fuera de esta área pueden coordinarse, pero podrían tener costos adicionales de viaje.`,
+          `Damos servicio en todo el ${siteConfig.serviceCountyLabel.es}. Eventos fuera de esta área pueden coordinarse, pero podrían tener costos adicionales de viaje.`,
         ],
       },
       {
@@ -96,7 +96,7 @@ const COPY = {
       {
         heading: 'Service area',
         body: [
-          `We serve all of ${siteConfig.serviceCountyLabel}. Events outside this area can sometimes be arranged, but may carry additional travel costs.`,
+          `We serve all of ${siteConfig.serviceCountyLabel.en}. Events outside this area can sometimes be arranged, but may carry additional travel costs.`,
         ],
       },
       {
