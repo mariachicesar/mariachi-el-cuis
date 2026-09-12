@@ -55,7 +55,7 @@ test('sends the estimate email on a valid, geocodable submission in English', as
   const result = await sendEstimateEmailAction(
     { ok: false },
     formData({
-      eventDate: '2026-06-01',
+      eventDate: '2026-12-15',
       startTime: '15:00',
       durationHours: '1',
       packageType: 'seven_songs',
@@ -69,8 +69,8 @@ test('sends the estimate email on a valid, geocodable submission in English', as
   const call = sendMock.mock.calls[0]![0]!
   expect(call.to).toBe('customer@example.com')
   expect(call.subject).toBe('Your Mariachi El Cuis estimate')
-  expect(call.html).toContain('Your estimate')
-  expect(call.html).toContain('(626) 922-0091')
+  expect(call.html).toContain('Deposit required')
+  expect(call.html).toContain('>50<')
 })
 
 test('sends the estimate email with Spanish subject line', async () => {
@@ -86,7 +86,7 @@ test('sends the estimate email with Spanish subject line', async () => {
   const result = await sendEstimateEmailAction(
     { ok: false },
     formData({
-      eventDate: '2026-06-01',
+      eventDate: '2026-12-15',
       startTime: '15:00',
       durationHours: '1',
       packageType: 'seven_songs',
@@ -100,4 +100,6 @@ test('sends the estimate email with Spanish subject line', async () => {
   const call = sendMock.mock.calls[0]![0]!
   expect(call.to).toBe('cliente@example.com')
   expect(call.subject).toBe('Tu cotización de Mariachi El Cuis')
+  expect(call.html).toContain('Depósito requerido')
+  expect(call.html).toContain('>50<')
 })
