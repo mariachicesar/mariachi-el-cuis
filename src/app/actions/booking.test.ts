@@ -1,7 +1,7 @@
 import { afterEach, expect, test, vi } from 'vitest'
 
 vi.mock('@/lib/env', () => ({
-  features: { stripe: true, calendar: true },
+  features: { stripe: true, calendar: true, maps: true },
   env: { NEXT_PUBLIC_SITE_URL: 'https://mariachielcuis.com' },
 }))
 vi.mock('@/lib/geo/geocode', () => ({ geocodeAddress: vi.fn() }))

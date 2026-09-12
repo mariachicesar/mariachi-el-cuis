@@ -48,6 +48,7 @@ export async function startCheckoutAction(
   })
   if (!parsed.success) return { ok: false, error: 'validation' }
   if (!features.stripe) return { ok: false, error: 'not_configured' }
+  if (!features.maps) return { ok: false, error: 'not_configured' }
 
   const geocoded = await geocodeAddress(parsed.data.address)
   if (!geocoded) return { ok: false, error: 'address_not_found' }
