@@ -72,8 +72,8 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
             </h2>
             <p className="mt-2 text-on-surface-variant">
               {es
-                ? 'Lunes a viernes durante el día. Sábados y domingos a partir de las 3:00 PM.'
-                : 'Monday through Friday during the day. Saturdays and Sundays from 3:00 PM.'}
+                ? 'Lunes a viernes durante el día.'
+                : 'Monday through Friday during the day.'}
             </p>
             <p className="mt-1 text-sm text-muted-silver">{pricingLines(locale)[0]}</p>
           </div>

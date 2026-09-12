@@ -1,19 +1,41 @@
 'use client'
 import { useState } from 'react'
 
-export function VideoFacade({ videoId, title }: { videoId: string; title: string }) {
+type VideoFacadeProps =
+  | { title: string; youtubeId: string; src?: never; poster?: never }
+  | { title: string; src: string; poster: string; youtubeId?: never }
+
+export function VideoFacade(props: VideoFacadeProps) {
+  const { title } = props
   const [playing, setPlaying] = useState(false)
+
   if (playing) {
+    if (props.youtubeId) {
+      return (
+        <iframe
+          className="aspect-video w-full rounded-xl"
+          src={`https://www.youtube-nocookie.com/embed/${props.youtubeId}?autoplay=1`}
+          title={title}
+          allow="accelerated-download; autoplay; encrypted-media; picture-in-picture"
+          allowFullScreen
+        />
+      )
+    }
     return (
-      <iframe
-        className="aspect-video w-full rounded-xl"
-        src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`}
-        title={title}
-        allow="accelerated-download; autoplay; encrypted-media; picture-in-picture"
-        allowFullScreen
+      <video
+        className="aspect-video w-full rounded-xl bg-charcoal-elevated"
+        src={props.src}
+        poster={props.poster}
+        controls
+        autoPlay
       />
     )
   }
+
+  const posterSrc = props.youtubeId
+    ? `https://i.ytimg.com/vi/${props.youtubeId}/hqdefault.jpg`
+    : props.poster
+
   return (
     <button
       type="button"
@@ -22,7 +44,7 @@ export function VideoFacade({ videoId, title }: { videoId: string; title: string
       aria-label={`Play: ${title}`}
     >
       <img
-        src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
+        src={posterSrc}
         alt=""
         className="absolute inset-0 h-full w-full rounded-xl object-cover opacity-70"
         loading="lazy"

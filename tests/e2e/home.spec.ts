@@ -21,6 +21,12 @@ test('home: metadata, h1, json-ld, a11y', async ({ page }) => {
   await checkA11y(page)
 })
 
+test('home hero shows the real group photo', async ({ page }) => {
+  await page.goto('/')
+  const hero = page.locator('section img[src*="cuarteto-mariachi"]')
+  await expect(hero).toHaveCount(1)
+})
+
 test('home links to key routes', async ({ page }) => {
   await page.goto('/')
   for (const p of ['/book', '/services', '/repertoire']) {

@@ -14,9 +14,36 @@ export function generateStaticParams() {
   return [{ lang: 'es' }, { lang: 'en' }]
 }
 
-// Phase 1 ships with no video content yet. Real entries get added here once
-// the owner supplies footage; each entry is a YouTube video id + bilingual title.
-const MEDIA: { id: string; title: Record<Locale, string> }[] = []
+// Live performance clips, hosted on the group's S3 bucket (re-encoded to
+// web-friendly 720p H.264 — see docs/superpowers/ for the source originals).
+const ASSET_BASE = 'https://mariachiassets.s3.us-west-1.amazonaws.com/web'
+
+const MEDIA: { id: string; src: string; poster: string; title: Record<Locale, string> }[] = [
+  {
+    id: 'no-llega-el-olvido-1',
+    src: `${ASSET_BASE}/no-llega-el-olvido-1.mp4`,
+    poster: `${ASSET_BASE}/no-llega-el-olvido-1.jpg`,
+    title: { es: 'No Llega el Olvido — Toma 1', en: 'No Llega el Olvido — Take 1' },
+  },
+  {
+    id: 'no-llega-el-olvido-2',
+    src: `${ASSET_BASE}/no-llega-el-olvido-2.mp4`,
+    poster: `${ASSET_BASE}/no-llega-el-olvido-2.jpg`,
+    title: { es: 'No Llega el Olvido — Toma 2', en: 'No Llega el Olvido — Take 2' },
+  },
+  {
+    id: 'ay-amigo',
+    src: `${ASSET_BASE}/ay-amigo.mp4`,
+    poster: `${ASSET_BASE}/ay-amigo.jpg`,
+    title: { es: 'Ay Amigo', en: 'Ay Amigo' },
+  },
+  {
+    id: 'sihualteco',
+    src: `${ASSET_BASE}/sihualteco.mp4`,
+    poster: `${ASSET_BASE}/sihualteco.jpg`,
+    title: { es: 'Sihualteco', en: 'Sihualteco' },
+  },
+]
 
 const COPY = {
   es: {
@@ -88,7 +115,7 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
           <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {MEDIA.map((item) => (
               <li key={item.id}>
-                <VideoFacade videoId={item.id} title={item.title[locale]} />
+                <VideoFacade src={item.src} poster={item.poster} title={item.title[locale]} />
               </li>
             ))}
           </ul>

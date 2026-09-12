@@ -15,6 +15,11 @@ for (const { path, lang } of [
   })
 }
 
+test('header shows the real logo image, not text', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('banner').getByRole('img', { name: 'Mariachi El Cuis' })).toBeVisible()
+})
+
 test('locale switch preserves the path', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('link', { name: 'en', exact: true }).click()
