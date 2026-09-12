@@ -4,6 +4,13 @@ const schema = z.object({
   NEXT_PUBLIC_SITE_URL: z.url().default('http://localhost:3000'),
   RESEND_API_KEY: z.string().min(1).optional(),
   CONTACT_TO_EMAIL: z.email().optional(),
+  GOOGLE_MAPS_API_KEY: z.string().min(1).optional(),
+  GOOGLE_OAUTH_CLIENT_ID: z.string().min(1).optional(),
+  GOOGLE_OAUTH_CLIENT_SECRET: z.string().min(1).optional(),
+  GOOGLE_CALENDAR_REFRESH_TOKEN: z.string().min(1).optional(),
+  GOOGLE_CALENDAR_ID: z.string().min(1).optional(),
+  STRIPE_SECRET_KEY: z.string().min(1).optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
 })
 
 // Some hosts (e.g. Vercel) can present a declared-but-unfilled env var as an
@@ -21,10 +28,27 @@ export function parseEnv(source: Record<string, string | undefined>) {
     NEXT_PUBLIC_SITE_URL: normalizeOptional(source.NEXT_PUBLIC_SITE_URL),
     RESEND_API_KEY: normalizeOptional(source.RESEND_API_KEY),
     CONTACT_TO_EMAIL: normalizeOptional(source.CONTACT_TO_EMAIL),
+    GOOGLE_MAPS_API_KEY: normalizeOptional(source.GOOGLE_MAPS_API_KEY),
+    GOOGLE_OAUTH_CLIENT_ID: normalizeOptional(source.GOOGLE_OAUTH_CLIENT_ID),
+    GOOGLE_OAUTH_CLIENT_SECRET: normalizeOptional(source.GOOGLE_OAUTH_CLIENT_SECRET),
+    GOOGLE_CALENDAR_REFRESH_TOKEN: normalizeOptional(source.GOOGLE_CALENDAR_REFRESH_TOKEN),
+    GOOGLE_CALENDAR_ID: normalizeOptional(source.GOOGLE_CALENDAR_ID),
+    STRIPE_SECRET_KEY: normalizeOptional(source.STRIPE_SECRET_KEY),
+    STRIPE_WEBHOOK_SECRET: normalizeOptional(source.STRIPE_WEBHOOK_SECRET),
   })
   return {
     env,
-    features: { email: Boolean(env.RESEND_API_KEY && env.CONTACT_TO_EMAIL) },
+    features: {
+      email: Boolean(env.RESEND_API_KEY && env.CONTACT_TO_EMAIL),
+      maps: Boolean(env.GOOGLE_MAPS_API_KEY),
+      calendar: Boolean(
+        env.GOOGLE_OAUTH_CLIENT_ID &&
+          env.GOOGLE_OAUTH_CLIENT_SECRET &&
+          env.GOOGLE_CALENDAR_REFRESH_TOKEN &&
+          env.GOOGLE_CALENDAR_ID,
+      ),
+      stripe: Boolean(env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET),
+    },
   }
 }
 

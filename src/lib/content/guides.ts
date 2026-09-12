@@ -34,8 +34,8 @@ export const GUIDES = [
     dateModified: '2026-09-10',
     title: { es: 'Cómo funciona la reserva', en: 'How booking works' },
     description: {
-      es: 'Del primer mensaje al depósito de $100 y la confirmación de tu fecha.',
-      en: 'From first message to the $100 deposit and your confirmed date.',
+      es: 'Del primer mensaje al depósito y la confirmación de tu fecha.',
+      en: 'From first message to the deposit and your confirmed date.',
     },
   },
   {

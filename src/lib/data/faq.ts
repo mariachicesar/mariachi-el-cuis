@@ -25,8 +25,8 @@ export const FAQ: FaqItem[] = [
   {
     q: { es: '¿Cómo aparto la fecha?', en: 'How do I hold the date?' },
     a: {
-      es: 'Un depósito de $100 aparta tu fecha. El saldo se paga después, directamente al mariachi el día del evento.',
-      en: 'A $100 deposit holds your date. The balance is paid later, directly to the band on the event day.',
+      es: 'El depósito es de $50 por hora reservada (o $50 para el paquete de 7 canciones); si reservas con menos de 24 horas de anticipación, el mínimo es de $150. El saldo se paga después, directamente al mariachi el día del evento.',
+      en: 'The deposit is $50 per hour booked (or $50 for the 7-songs package); if you book less than 24 hours before the event, the minimum is $150. The balance is paid later, directly to the band on the event day.',
     },
   },
   {
@@ -53,8 +53,8 @@ export const FAQ: FaqItem[] = [
   {
     q: { es: '¿Cómo se paga?', en: 'How do I pay?' },
     a: {
-      es: 'Pronto aceptaremos tarjeta, Zelle, Venmo y PayPal en línea. Por ahora, escríbenos por WhatsApp o llámanos y coordinamos el depósito.',
-      en: 'We will soon accept card, Zelle, Venmo, and PayPal online. For now, message us on WhatsApp or call and we\'ll arrange the deposit.',
+      es: 'Puedes pagar el depósito en línea con tarjeta al reservar. El saldo se paga después directamente al mariachi (efectivo, Zelle o Venmo).',
+      en: 'You can pay the deposit online by card when you book. The balance is then paid directly to the band (cash, Zelle, or Venmo).',
     },
   },
   {
