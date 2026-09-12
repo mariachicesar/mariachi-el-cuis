@@ -5,6 +5,12 @@ vi.mock('@/lib/env', () => ({
   env: { NEXT_PUBLIC_SITE_URL: 'https://mariachielcuis.com' },
 }))
 vi.mock('@/lib/geo/geocode', () => ({ geocodeAddress: vi.fn() }))
+// The maps-disabled path returns before reaching calendar/stripe, but `./booking` still
+// statically imports the real `googleapis` and `stripe` SDKs. Mock them (as booking.test.ts
+// does) so this test doesn't pay for transforming those heavy dependencies — unmocked, that
+// transform intermittently exceeded the default test timeout under full-suite parallel load.
+vi.mock('@/lib/calendar/google', () => ({ createHoldEvent: vi.fn() }))
+vi.mock('@/lib/payments/stripe', () => ({ createDepositCheckoutSession: vi.fn() }))
 
 function formData(fields: Record<string, string>): FormData {
   const fd = new FormData()
