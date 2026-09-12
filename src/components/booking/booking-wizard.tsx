@@ -42,6 +42,17 @@ const COPY = {
     notConfigured: 'Por ahora, llámanos o escríbenos por WhatsApp para tu cotización.',
     contactRequired: 'Para esta fecha necesitamos coordinar contigo directamente.',
     callRequired: 'Necesitamos que nos llames para confirmar esta reserva.',
+    reserveUnavailable: 'Esta fecha y hora ya no está disponible — elige otro horario para reservar.',
+    noCalendarNotice: 'Confirmaremos la disponibilidad cuando te llamemos.',
+    noStripeNotice: 'Llámanos para confirmar y coordinar el depósito.',
+    errorValidation: 'Revisa los datos del formulario e intenta de nuevo.',
+    errorNotConfigured: 'Por ahora, llámanos o escríbenos por WhatsApp para tu cotización.',
+    errorAddressNotFound: 'No pudimos encontrar esa dirección — verifica que esté bien escrita.',
+    errorCallRequired: 'Necesitamos que nos llames para confirmar esta reserva.',
+    errorContactRequired: 'Para esta fecha necesitamos coordinar contigo directamente.',
+    errorSlotUnavailable: 'Esa fecha y hora ya está reservada — intenta otra.',
+    errorSendFailed: 'No pudimos enviar el correo — intenta de nuevo o llámanos.',
+    errorGeneric: 'Algo salió mal — por favor llámanos para confirmar tu reserva.',
   },
   en: {
     eventDate: 'Event date',
@@ -72,8 +83,55 @@ const COPY = {
     notConfigured: 'For now, please call us or message us on WhatsApp for your quote.',
     contactRequired: "We'll need to coordinate this date with you directly.",
     callRequired: 'Please call us to confirm this booking.',
+    reserveUnavailable: 'That date and time is no longer available — pick another time to reserve.',
+    noCalendarNotice: "We'll confirm availability when we call you.",
+    noStripeNotice: 'Call us to confirm and arrange the deposit.',
+    errorValidation: 'Please check the form fields and try again.',
+    errorNotConfigured: 'For now, please call us or message us on WhatsApp for your quote.',
+    errorAddressNotFound: "We couldn't find that address — please check it and try again.",
+    errorCallRequired: 'Please call us to confirm this booking.',
+    errorContactRequired: "We'll need to coordinate this date with you directly.",
+    errorSlotUnavailable: 'That date and time is already booked — try another.',
+    errorSendFailed: "We couldn't send the email — please try again or call us.",
+    errorGeneric: 'Something went wrong — please call us to confirm your booking.',
   },
 } as const
+
+type Copy = (typeof COPY)[Locale]
+
+function checkoutErrorMessage(t: Copy, error: StartCheckoutState['error']): string {
+  switch (error) {
+    case 'validation':
+      return t.errorValidation
+    case 'not_configured':
+      return t.errorNotConfigured
+    case 'address_not_found':
+      return t.errorAddressNotFound
+    case 'call_required':
+      return t.errorCallRequired
+    case 'contact_required':
+      return t.errorContactRequired
+    case 'slot_unavailable':
+      return t.errorSlotUnavailable
+    default:
+      return t.errorGeneric
+  }
+}
+
+function estimateErrorMessage(t: Copy, error: SendEstimateState['error']): string {
+  switch (error) {
+    case 'validation':
+      return t.errorValidation
+    case 'not_configured':
+      return t.errorNotConfigured
+    case 'address_not_found':
+      return t.errorAddressNotFound
+    case 'send_failed':
+      return t.errorSendFailed
+    default:
+      return t.errorGeneric
+  }
+}
 
 const inputCls =
   'mt-1 w-full rounded border border-charcoal-border bg-surface-container px-4 py-3 text-on-surface placeholder:text-muted-silver focus:border-burnished-gold focus:outline-none focus:ring-2 focus:ring-burnished-gold/40'
@@ -92,12 +150,20 @@ function EstimateSubmitButton({ label, pendingLabel }: { label: string; pendingL
   )
 }
 
-function ReserveSubmitButton({ label, pendingLabel }: { label: string; pendingLabel: string }) {
+function ReserveSubmitButton({
+  label,
+  pendingLabel,
+  disabled,
+}: {
+  label: string
+  pendingLabel: string
+  disabled?: boolean
+}) {
   const { pending } = useFormStatus()
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={pending || disabled}
       className="inline-flex items-center justify-center rounded bg-primary-container px-6 py-3 text-sm font-semibold uppercase tracking-wider text-on-primary transition-colors hover:bg-burnished-gold disabled:cursor-not-allowed disabled:opacity-60"
     >
       {pending ? pendingLabel : label}
@@ -131,7 +197,7 @@ export function BookingWizard({
   const [availability, setAvailability] = useState<{ checked: boolean; available?: boolean }>({
     checked: false,
   })
-  const [, startQuoteTransition] = useTransition()
+  const [isQuotePending, startQuoteTransition] = useTransition()
 
   const isWeekday = eventDate ? ![0, 6].includes(weekdayIndexOf(eventDate)) : true
 
@@ -180,13 +246,17 @@ export function BookingWizard({
         eventDate,
         startTime,
         calendarBlockMinutes: quote.calendarBlockMinutes,
-      }).then(setAvailability)
+      })
+        .then(setAvailability)
+        .catch(() => setAvailability({ checked: false }))
     }, effectDelayMs(canCheckAvailability))
     return () => clearTimeout(handle)
   }, [features.calendar, quote, eventDate, startTime])
 
   const [estimateState, estimateFormAction] = useActionState(sendEstimateEmailAction, estimateInitial)
   const [checkoutState, checkoutFormAction] = useActionState(startCheckoutAction, checkoutInitial)
+
+  const isSlotUnavailable = availability.checked && availability.available === false
 
   const hiddenQuoteFields = (
     <>
@@ -244,7 +314,10 @@ export function BookingWizard({
               type="radio"
               name="package"
               checked={packageType === 'seven_songs'}
-              onChange={() => setPackageType('seven_songs')}
+              onChange={() => {
+                setPackageType('seven_songs')
+                setDurationHours(1)
+              }}
             />
             {t.sevenSongs}
           </label>
@@ -292,6 +365,12 @@ export function BookingWizard({
 
       {!features.maps && <p className="text-on-surface-variant">{t.notConfigured}</p>}
 
+      {isQuotePending && (
+        <p role="status" aria-live="polite" className="text-on-surface-variant">
+          {t.checking}
+        </p>
+      )}
+
       {quote && (
         <div
           role="status"
@@ -309,10 +388,14 @@ export function BookingWizard({
               <p>
                 {t.balance}: ${quote.balanceDue}
               </p>
-              {availability.checked && (
-                <p className="mt-2 font-semibold">
-                  {availability.available ? t.available : t.unavailable}
-                </p>
+              {features.calendar ? (
+                availability.checked && (
+                  <p className="mt-2 font-semibold">
+                    {availability.available ? t.available : t.unavailable}
+                  </p>
+                )
+              ) : (
+                <p className="mt-2 text-on-surface-variant">{t.noCalendarNotice}</p>
               )}
             </>
           ) : (
@@ -370,7 +453,16 @@ export function BookingWizard({
             <input type="hidden" name="email" value={email} />
             <EstimateSubmitButton label={t.emailEstimate} pendingLabel={t.emailEstimatePending} />
             {estimateState.ok && <p role="status">{t.emailSent}</p>}
+            {!estimateState.ok && estimateState.error && (
+              <p role="alert" className="text-sm text-red-400">
+                {estimateErrorMessage(t, estimateState.error)}
+              </p>
+            )}
           </form>
+
+          {quote?.status === 'ok' && !features.stripe && (
+            <p className="text-on-surface-variant">{t.noStripeNotice}</p>
+          )}
 
           {quote?.status === 'ok' && features.stripe && (
             <div>
@@ -394,19 +486,26 @@ export function BookingWizard({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
-              <form action={checkoutFormAction} className="mt-4">
-                {hiddenQuoteFields}
-                <input type="hidden" name="email" value={email} />
-                <input type="hidden" name="name" value={name} />
-                <input type="hidden" name="phone" value={phone} />
-                <ReserveSubmitButton
-                  label={t.reserve(quote.deposit)}
-                  pendingLabel={t.reservePending}
-                />
-                {checkoutState.error && (
-                  <p className="mt-2 text-sm text-red-400">{checkoutState.error}</p>
-                )}
-              </form>
+              {isSlotUnavailable ? (
+                <p className="mt-4 text-sm font-semibold text-red-400">{t.reserveUnavailable}</p>
+              ) : (
+                <form action={checkoutFormAction} className="mt-4">
+                  {hiddenQuoteFields}
+                  <input type="hidden" name="email" value={email} />
+                  <input type="hidden" name="name" value={name} />
+                  <input type="hidden" name="phone" value={phone} />
+                  <ReserveSubmitButton
+                    label={t.reserve(quote.deposit)}
+                    pendingLabel={t.reservePending}
+                    disabled={isQuotePending}
+                  />
+                  {checkoutState.error && (
+                    <p className="mt-2 text-sm text-red-400">
+                      {checkoutErrorMessage(t, checkoutState.error)}
+                    </p>
+                  )}
+                </form>
+              )}
             </div>
           )}
         </div>

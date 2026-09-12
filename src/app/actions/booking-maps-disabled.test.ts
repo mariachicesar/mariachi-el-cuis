@@ -9,7 +9,10 @@ vi.mock('@/lib/geo/geocode', () => ({ geocodeAddress: vi.fn() }))
 // statically imports the real `googleapis` and `stripe` SDKs. Mock them (as booking.test.ts
 // does) so this test doesn't pay for transforming those heavy dependencies — unmocked, that
 // transform intermittently exceeded the default test timeout under full-suite parallel load.
-vi.mock('@/lib/calendar/google', () => ({ createHoldEvent: vi.fn() }))
+vi.mock('@/lib/calendar/google', () => ({
+  checkAvailability: vi.fn().mockResolvedValue(true),
+  createHoldEvent: vi.fn(),
+}))
 vi.mock('@/lib/payments/stripe', () => ({ createDepositCheckoutSession: vi.fn() }))
 
 function formData(fields: Record<string, string>): FormData {
