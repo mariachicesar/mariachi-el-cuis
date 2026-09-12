@@ -10,6 +10,7 @@ import { weekdayIndexOf } from '@/lib/quote/timezone'
 import type { QuoteResult } from '@/lib/quote/types'
 import { siteConfig } from '@/lib/config/site'
 import type { Locale } from '@/lib/i18n/locales'
+import { effectDelayMs } from './schedule'
 
 const COPY = {
   es: {
@@ -137,13 +138,19 @@ export function BookingWizard({
   // setQuote/setAvailability are only ever invoked from inside the
   // setTimeout callback (never synchronously in the effect body) — calling
   // setState synchronously within an effect body trips
-  // `react-hooks/set-state-in-effect` (cascading-render lint) even when
-  // it's just resetting to null/false on an early-return branch, so both
-  // the "reset" and "fetched" cases are folded into the same deferred
-  // callback below.
+  // `react-hooks/set-state-in-effect` (cascading-render lint). But the
+  // "reset to null/false because inputs just went stale" branch must not
+  // share the fetch's debounce delay — a stale quote/availability result
+  // would otherwise linger on screen for up to DEBOUNCE_MS after e.g. the
+  // address is cleared. `effectDelayMs` gives the reset branch a 0ms delay
+  // (still deferred, so the lint rule is satisfied) while the fetch branch
+  // keeps the real debounce.
   useEffect(() => {
+    const isValidQuoteInput =
+      features.maps && !!eventDate && !!startTime && address.trim().length >= 5
+
     const handle = setTimeout(() => {
-      if (!features.maps || !eventDate || !startTime || address.trim().length < 5) {
+      if (!isValidQuoteInput) {
         setQuote(null)
         return
       }
@@ -157,13 +164,15 @@ export function BookingWizard({
         })
         setQuote(result.ok ? result.quote : null)
       })
-    }, 500)
+    }, effectDelayMs(isValidQuoteInput))
     return () => clearTimeout(handle)
   }, [features.maps, eventDate, startTime, durationHours, packageType, address])
 
   useEffect(() => {
+    const canCheckAvailability = features.calendar && quote !== null && quote.status === 'ok'
+
     const handle = setTimeout(() => {
-      if (!features.calendar || !quote || quote.status !== 'ok') {
+      if (!canCheckAvailability || quote === null || quote.status !== 'ok') {
         setAvailability({ checked: false })
         return
       }
@@ -172,7 +181,7 @@ export function BookingWizard({
         startTime,
         calendarBlockMinutes: quote.calendarBlockMinutes,
       }).then(setAvailability)
-    }, 500)
+    }, effectDelayMs(canCheckAvailability))
     return () => clearTimeout(handle)
   }, [features.calendar, quote, eventDate, startTime])
 
