@@ -25,3 +25,9 @@ test('email contact shows the estimate button', async ({ page }) => {
   await page.getByLabel(/^email$/i).fill('customer@example.com')
   await expect(page.getByRole('button', { name: /email me this estimate/i })).toBeVisible()
 })
+
+test('booking success page renders a thank-you message', async ({ page }) => {
+  await page.goto('/en/book/success?session_id=cs_test_123')
+  await expect(page.locator('#main h1')).toBeVisible()
+  await checkA11y(page)
+})
