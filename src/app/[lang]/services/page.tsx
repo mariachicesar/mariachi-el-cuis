@@ -41,7 +41,7 @@ const COPY = {
       weekend: 'Por hora en fin de semana',
       weekendWhen: 'Sábado y domingo, comenzando a las 3:00 PM o más tarde',
       deposit: 'Depósito para apartar',
-      depositWhen: 'Se resta del total; el saldo se paga el día del evento',
+      depositWhen: `Se resta del total; mínimo $${PRICING.rushFlatDeposit} si reservas con menos de 24 h de anticipación`,
       flat: ' fijo',
       perHour: ' por hora',
       none: '',
@@ -73,7 +73,7 @@ const COPY = {
       weekend: 'Weekend hourly',
       weekendWhen: 'Saturday & Sunday, starting 3:00 PM or later',
       deposit: 'Deposit to reserve',
-      depositWhen: 'Applied to the total; the balance is paid on the event day',
+      depositWhen: `Applied to the total; minimum $${PRICING.rushFlatDeposit} if you book less than 24h ahead`,
       flat: ' flat',
       perHour: '/hr',
       none: '',
@@ -127,7 +127,11 @@ export default async function ServicesPage({ params }: { params: Promise<{ lang:
       rate: rate(PRICING.hourlyWeekend, t.rows.perHour),
       when: t.rows.weekendWhen,
     },
-    { label: t.rows.deposit, rate: rate(PRICING.deposit, t.rows.none), when: t.rows.depositWhen },
+    {
+      label: t.rows.deposit,
+      rate: `$${PRICING.depositPerHour}${t.rows.perHour}`,
+      when: t.rows.depositWhen,
+    },
   ]
 
   // The FAQPage schema mirrors exactly the Q&A pairs rendered below it; the

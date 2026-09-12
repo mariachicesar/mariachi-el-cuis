@@ -30,7 +30,7 @@ const COPY = {
       {
         heading: 'Depósito y saldo',
         body: [
-          'Un depósito de $100 aparta tu fecha y hora una vez confirmada la disponibilidad. El saldo restante se paga el día del evento, directamente al mariachi, antes o al comenzar la presentación.',
+          'El depósito es de $50 por cada hora reservada (o $50 para el paquete de 7 canciones), y aparta tu fecha y hora una vez confirmada la disponibilidad. Si reservas con menos de 24 horas de anticipación, el depósito mínimo es de $150. El saldo restante se paga el día del evento, directamente al mariachi, antes o al comenzar la presentación.',
         ],
       },
       {
@@ -77,7 +77,7 @@ const COPY = {
       {
         heading: 'Deposit and balance',
         body: [
-          'A $100 deposit reserves your date and time once availability is confirmed. The remaining balance is paid on the day of the event, directly to the band, before or at the start of the performance.',
+          'The deposit is $50 per hour booked (or $50 for the 7-songs package), and reserves your date and time once availability is confirmed. If you book less than 24 hours before the event, the minimum deposit is $150. The remaining balance is paid on the day of the event, directly to the band, before or at the start of the performance.',
         ],
       },
       {

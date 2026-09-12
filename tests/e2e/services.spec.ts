@@ -43,3 +43,9 @@ test('services page: localized canonical + hreflang', async ({ page }) => {
     'https://mariachielcuis.com/services',
   )
 })
+
+test('services page states the new deposit rule, not the old flat $100', async ({ page }) => {
+  await page.goto('/en/services')
+  await expect(page.getByText('$100', { exact: false })).toHaveCount(0)
+  await expect(page.getByText('$50', { exact: false }).first()).toBeVisible()
+})

@@ -9,7 +9,8 @@ test('pricing matches the spec', () => {
   expect(PRICING.hourlyWeekend).toBe(550)
   expect(PRICING.sevenSongsFlat).toBe(380)
   expect(PRICING.weekdayRadiusMi).toBe(25)
-  expect(PRICING.deposit).toBe(100)
+  expect(PRICING.depositPerHour).toBe(50)
+  expect(PRICING.rushFlatDeposit).toBe(150)
   expect(PRICING.cancellationRefundDays).toBe(7)
   expect(PRICING.minimumTable).toEqual([
     { maxMi: 15, hours: 2 },
@@ -36,7 +37,8 @@ test('pricingLines mentions every PRICING dollar figure, both locales', () => {
       PRICING.sevenSongsFlat,
       PRICING.hourlyWeekday,
       PRICING.hourlyWeekend,
-      PRICING.deposit,
+      PRICING.depositPerHour,
+      PRICING.rushFlatDeposit,
     ]) {
       expect(text).toContain(`$${amount}`)
     }
