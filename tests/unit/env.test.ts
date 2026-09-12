@@ -42,3 +42,32 @@ test('treats a blank env value as unset instead of crashing', () => {
   expect(env.NEXT_PUBLIC_SITE_URL).toBe('http://localhost:3000')
   expect(features.email).toBe(false)
 })
+
+test('maps feature is off without GOOGLE_MAPS_API_KEY', () => {
+  const { features } = parseEnv({})
+  expect(features.maps).toBe(false)
+})
+
+test('maps feature is on with the key', () => {
+  const { features } = parseEnv({ GOOGLE_MAPS_API_KEY: 'k' })
+  expect(features.maps).toBe(true)
+})
+
+test('calendar feature requires all four Google Calendar vars', () => {
+  expect(parseEnv({ GOOGLE_OAUTH_CLIENT_ID: 'a' }).features.calendar).toBe(false)
+  expect(
+    parseEnv({
+      GOOGLE_OAUTH_CLIENT_ID: 'a',
+      GOOGLE_OAUTH_CLIENT_SECRET: 'b',
+      GOOGLE_CALENDAR_REFRESH_TOKEN: 'c',
+      GOOGLE_CALENDAR_ID: 'd',
+    }).features.calendar,
+  ).toBe(true)
+})
+
+test('stripe feature requires both Stripe vars', () => {
+  expect(parseEnv({ STRIPE_SECRET_KEY: 'sk_x' }).features.stripe).toBe(false)
+  expect(
+    parseEnv({ STRIPE_SECRET_KEY: 'sk_x', STRIPE_WEBHOOK_SECRET: 'whsec_x' }).features.stripe,
+  ).toBe(true)
+})
