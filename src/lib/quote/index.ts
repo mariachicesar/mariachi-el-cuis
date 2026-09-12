@@ -27,8 +27,6 @@ export function getQuote(input: QuoteInput): QuoteResult {
   const isWeekend = dow === 0 || dow === 6
   const isWeekday = !isWeekend
   const weekdayLocalRate = isWeekday && distanceMi <= PRICING.weekdayRadiusMi
-  // Exemption from distance minimum: weekday local rate, BUT only for distances 15-25 excluding the boundaries
-  const hourlyMinimumExempt = weekdayLocalRate && distanceMi > 15.1 && distanceMi < 25
 
   if (isWeekend && minutesOf(startTime) < minutesOf(PRICING.weekendEarliestStart)) {
     return { status: 'contact_required', reason: 'weekend_early_start' }
@@ -42,8 +40,8 @@ export function getQuote(input: QuoteInput): QuoteResult {
 
   if (effectivePackage === 'seven_songs') {
     enforcedHours = 1
-  } else if (hourlyMinimumExempt) {
-    enforcedHours = durationHours // "no min" for weekday, 15<distanceMi<=25, hourly
+  } else if (weekdayLocalRate) {
+    enforcedHours = durationHours // "no min" for weekday, <=25mi, hourly
   } else {
     const minimum = minimumHoursFor(distanceMi)
     enforcedHours = Math.max(durationHours, minimum)

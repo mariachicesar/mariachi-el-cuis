@@ -62,7 +62,7 @@ test('weekday, seven_songs requested but distance > 25mi: forced to hourly', () 
 })
 
 test('distance-minimum boundaries: 14.9/15.0 -> 2h, 15.1 -> 3h', () => {
-  const base = { packageType: 'hourly' as const, durationHours: 1 }
+  const base = { eventDate: SATURDAY, startTime: '15:00', packageType: 'hourly' as const, durationHours: 1 }
   expect(getQuote(input({ ...base, distanceMi: 14.9 }))).toMatchObject({ enforcedHours: 2 })
   expect(getQuote(input({ ...base, distanceMi: 15.0 }))).toMatchObject({ enforcedHours: 2 })
   expect(getQuote(input({ ...base, distanceMi: 15.1 }))).toMatchObject({ enforcedHours: 3 })
@@ -85,12 +85,12 @@ test('distance-minimum boundaries: 49.9/50.0 -> 4h, 50.1 -> 5h, 70 -> 5h', () =>
 
 test('minimumApplied is only set when the minimum actually raised the hours', () => {
   const raised = getQuote(
-    input({ packageType: 'hourly', distanceMi: 10, durationHours: 1 }),
+    input({ eventDate: SATURDAY, startTime: '15:00', packageType: 'hourly', distanceMi: 10, durationHours: 1 }),
   ) as { minimumApplied?: unknown }
   expect(raised.minimumApplied).toEqual({ requested: 1, enforced: 2 })
 
   const notRaised = getQuote(
-    input({ packageType: 'hourly', distanceMi: 10, durationHours: 3 }),
+    input({ eventDate: SATURDAY, startTime: '15:00', packageType: 'hourly', distanceMi: 10, durationHours: 3 }),
   ) as { minimumApplied?: unknown }
   expect(notRaised.minimumApplied).toBeUndefined()
 })

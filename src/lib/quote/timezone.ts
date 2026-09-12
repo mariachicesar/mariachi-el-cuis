@@ -26,8 +26,8 @@ function laOffsetMinutesAt(instant: Date): number {
 
 /** `dateStr` "YYYY-MM-DD", `timeStr` "HH:mm" — both LA-local wall-clock values. */
 export function laWallTimeToUtc(dateStr: string, timeStr: string): Date {
-  const [y, m, d] = dateStr.split('-').map(Number)
-  const [hh, mm] = timeStr.split(':').map(Number)
+  const [y, m, d] = dateStr.split('-').map(Number) as [number, number, number]
+  const [hh, mm] = timeStr.split(':').map(Number) as [number, number]
   const naiveUtc = Date.UTC(y, m - 1, d, hh, mm, 0)
   // The offset barely varies within a single day, so computing it from the
   // naive (unshifted) guess is accurate except within seconds of a DST
@@ -38,6 +38,6 @@ export function laWallTimeToUtc(dateStr: string, timeStr: string): Date {
 
 /** 0=Sunday..6=Saturday, for the literal calendar date (not an instant). */
 export function weekdayIndexOf(dateStr: string): number {
-  const [y, m, d] = dateStr.split('-').map(Number)
+  const [y, m, d] = dateStr.split('-').map(Number) as [number, number, number]
   return new Date(Date.UTC(y, m - 1, d)).getUTCDay()
 }
