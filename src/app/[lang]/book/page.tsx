@@ -1,10 +1,12 @@
 import { MessageCircle, Phone } from 'lucide-react'
 import { notFound } from 'next/navigation'
+import { BookingWizard } from '@/components/booking/booking-wizard'
 import { Button, buttonClasses } from '@/components/ui/button'
 import { JsonLd } from '@/components/ui/json-ld'
 import { Section } from '@/components/ui/section'
 import { pricingLines } from '@/lib/data/pricing'
 import { siteConfig } from '@/lib/config/site'
+import { features } from '@/lib/env'
 import { isLocale, type Locale } from '@/lib/i18n/locales'
 import { alternatesFor, localizedPath } from '@/lib/i18n/paths'
 import { breadcrumb } from '@/lib/seo/jsonld'
@@ -23,8 +25,6 @@ const COPY = {
       'Obtén tu cotización de mariachi para el Condado de Los Ángeles. Escríbenos por WhatsApp o llámanos y te respondemos el mismo día.',
     intro:
       'Cuéntanos la fecha, la hora, la ciudad y cuántas horas necesitas, y te enviamos tu precio exacto.',
-    comingSoon:
-      'La cotización instantánea y el pago del depósito en línea llegarán pronto. Por ahora, escríbenos y te enviamos tu precio exacto el mismo día.',
     pricingHeading: 'Cómo calculamos el precio',
     ctaHeading: 'Empieza tu reserva',
     whatsappLabel: 'Escríbenos por WhatsApp',
@@ -38,8 +38,6 @@ const COPY = {
       'Get your mariachi quote for Los Angeles County. Message us on WhatsApp or call and we will reply the same day.',
     intro:
       'Tell us the date, time, city, and how many hours you need, and we will send you your exact price.',
-    comingSoon:
-      "Instant online quoting and deposit checkout are coming soon. For now, message us and we'll send your exact price the same day.",
     pricingHeading: 'How we calculate your price',
     ctaHeading: 'Start your booking',
     whatsappLabel: 'Message us on WhatsApp',
@@ -82,9 +80,10 @@ export default async function BookPage({ params }: { params: Promise<{ lang: str
       <Section className="border-b border-charcoal-border bg-surface-container-lowest">
         <h1 className="font-display text-3xl text-burnished-gold md:text-5xl">{t.title}</h1>
         <p className="mt-4 max-w-2xl text-on-surface-variant">{t.intro}</p>
-        <p className="mt-4 max-w-2xl rounded border border-charcoal-border bg-surface-container p-4 text-sm text-on-surface-variant">
-          {t.comingSoon}
-        </p>
+      </Section>
+
+      <Section>
+        <BookingWizard locale={locale} features={features} />
       </Section>
 
       <Section>

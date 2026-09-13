@@ -6,7 +6,7 @@ import { getQuote } from '@/lib/quote'
 import { laWallTimeToUtc } from '@/lib/quote/timezone'
 import { geocodeAddress } from '@/lib/geo/geocode'
 import { haversineMiles } from '@/lib/geo/distance'
-import { createHoldEvent } from '@/lib/calendar/google'
+import { checkAvailability, createHoldEvent } from '@/lib/calendar/google'
 import { createDepositCheckoutSession } from '@/lib/payments/stripe'
 import { siteConfig } from '@/lib/config/site'
 import { env, features } from '@/lib/env'
@@ -29,7 +29,16 @@ const inputSchema = z.object({
   locale: z.enum(['es', 'en']),
 })
 
-export type StartCheckoutState = { ok: boolean; error?: string }
+export type StartCheckoutState = {
+  ok: boolean
+  error?:
+    | 'validation'
+    | 'not_configured'
+    | 'address_not_found'
+    | 'contact_required'
+    | 'call_required'
+    | 'slot_unavailable'
+}
 
 export async function startCheckoutAction(
   _prev: StartCheckoutState,
@@ -76,6 +85,10 @@ export async function startCheckoutAction(
     const eventStartUtc = laWallTimeToUtc(parsed.data.eventDate, parsed.data.startTime)
     const blockStart = new Date(eventStartUtc.getTime() - 30 * 60 * 1000)
     const blockEnd = new Date(blockStart.getTime() + quote.calendarBlockMinutes * 60 * 1000)
+
+    const available = await checkAvailability(blockStart, blockEnd)
+    if (!available) return { ok: false, error: 'slot_unavailable' }
+
     calendarEventId = await createHoldEvent({
       summary: `HOLD — awaiting deposit — ${parsed.data.name}`,
       description: `Package: ${parsed.data.packageType}\nHours: ${quote.enforcedHours}\nAddress: ${parsed.data.address}\nPhone: ${parsed.data.phone || '—'}`,
