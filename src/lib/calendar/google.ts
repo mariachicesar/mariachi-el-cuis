@@ -16,17 +16,21 @@ export type HoldDetails = {
   endUtc: Date
 }
 
-export async function checkAvailability(startUtc: Date, endUtc: Date): Promise<boolean> {
+export type BusyBlock = { startUtc: Date; endUtc: Date }
+
+export async function getBusyBlocks(dayStartUtc: Date, dayEndUtc: Date): Promise<BusyBlock[]> {
   const calendar = calendarClient()
   const res = await calendar.freebusy.query({
     requestBody: {
-      timeMin: startUtc.toISOString(),
-      timeMax: endUtc.toISOString(),
+      timeMin: dayStartUtc.toISOString(),
+      timeMax: dayEndUtc.toISOString(),
       items: [{ id: env.GOOGLE_CALENDAR_ID! }],
     },
   })
   const busy = res.data.calendars?.[env.GOOGLE_CALENDAR_ID!]?.busy ?? []
-  return busy.length === 0
+  return busy
+    .filter((b): b is { start: string; end: string } => Boolean(b.start && b.end))
+    .map((b) => ({ startUtc: new Date(b.start), endUtc: new Date(b.end) }))
 }
 
 export async function createHoldEvent(details: HoldDetails): Promise<string> {
