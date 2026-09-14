@@ -1,11 +1,7 @@
 import { PRICING } from '@/lib/data/pricing'
 import { laWallTimeToUtc, weekdayIndexOf } from './timezone'
 import type { QuoteInput, QuoteLineItem, QuoteResult } from './types'
-
-function minutesOf(time: string): number {
-  const [h, m] = time.split(':').map(Number) as [number, number]
-  return h * 60 + m
-}
+import { minutesOf } from './time-of-day'
 
 function minimumHoursFor(distanceMi: number): number {
   for (const tier of PRICING.minimumTable) {
