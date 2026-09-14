@@ -14,7 +14,17 @@ export const PRICING = {
   depositPerHour: 50,
   rushFlatDeposit: 150,
   hoursWindow: { start: '07:00', end: '24:00' },
-  weekendEarliestStart: '15:00',
+  weekendSevenSongsFlat: 470, // shared Saturday + Sunday serenata package price
+  saturdayEarliestStart: '07:00',
+  sundayEarliestStart: '08:00',
+  saturdayMaxDistanceMi: 30, // beyond this, Saturday is contact_required
+  saturdaySerenataEnd: '10:00', // 07:00-10:00 serenata window (Saturday only)
+  saturdayMidDayEnd: '15:00', // 10:00-15:00 midday tier
+  saturdayPeakEnd: '21:30', // 15:00-21:30 peak tier; >=21:30 is the late tier
+  saturdayMidDayMinHours: 1,
+  saturdayPeakMinHours: 2,
+  saturdayLateMinHours: 1,
+  travelBufferMinutes: 30, // replaces the literal 30*60*1000 in availability.ts
   leadTimeCallHours: 3,
   leadTimeRushHours: 24,
   cancellationRefundDays: 7,
