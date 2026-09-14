@@ -31,12 +31,28 @@ below.
 
 ### Saturday schedule
 
+Saturday drops the mileage-based hour table entirely (`minimumTable`) in
+favor of a flat distance cap plus time-of-day-only minimums:
+
+- **Distance cap:** any Saturday request beyond **30 miles** gets
+  `contact_required` — no instant quote, call to book. This replaces the
+  mileage-scaled minimum table for Saturday; it's no longer needed once
+  distance is capped this tight.
+- **Serenata package radius:** the $470 flat 7-songs option additionally
+  needs ≤25mi (tighter than the 30mi general cap) — unchanged from before.
+
 | Time band | Package options | Duration rule |
 |---|---|---|
-| 7:00–10:00am ("serenata") | 7-songs flat **$470** (≤25mi only) or hourly $550/hr | 7-songs: fixed 1h block. Hourly: distance-based minimum only (unchanged from today) |
-| 10:00am–3:00pm | Hourly only, $550/hr | `max(1h, distance-based minimum)` |
-| 3:00–9:30pm ("peak") | Hourly only, $550/hr | `max(2h, distance-based minimum)`. If this is the **first booking placed on that Saturday** (zero existing calendar events that day), the start time must land exactly on the hour |
-| 9:30pm–midnight | Hourly only, $550/hr | `max(1h, distance-based minimum)` |
+| 7:00–10:00am ("serenata") | 7-songs flat **$470** (≤25mi) or hourly $550/hr | 7-songs: fixed 1h block. Hourly: no minimum beyond the schema's 1h floor |
+| 10:00am–3:00pm | Hourly only, $550/hr | 1h minimum |
+| 3:00–9:30pm ("peak") | Hourly only, $550/hr | 2h minimum. If this is the **first booking placed on that Saturday** (zero existing calendar events that day), the start time must land exactly on the hour |
+| 9:30pm–midnight | Hourly only, $550/hr | 1h minimum |
+
+None of these Saturday hourly minimums combine with distance — they're the
+whole rule now that distance is capped at 30mi. (Earlier drafts of this spec
+had these stacking via `max(time-tier, distance-based minimum)`; dropped
+because the mileage table's floor is always ≥2h, which would have made the
+1h midday/late minimums permanently unreachable dead code.)
 
 Saturday's earliest bookable start moves from 3:00pm to the general
 7:00am floor (`hoursWindow.start`).
@@ -83,6 +99,7 @@ reject on conflict, no tier logic, no suggestions.
 weekendSevenSongsFlat: 470,       // shared Sat + Sun serenata package price
 saturdayEarliestStart: '07:00',
 sundayEarliestStart: '08:00',
+saturdayMaxDistanceMi: 30,        // beyond this, Saturday is contact_required
 saturdaySerenataEnd: '10:00',     // 07:00–10:00 serenata window (Saturday only)
 saturdayMidDayEnd: '15:00',       // 10:00–15:00 midday tier
 saturdayPeakEnd: '21:30',         // 15:00–21:30 peak tier; >=21:30 is late tier
@@ -101,6 +118,9 @@ the weekend serenata package — same radius, no new constant needed.
 
 `getQuote` stays pure (no calendar access) and gains:
 
+- **Saturday distance cap, checked first** (right after the out-of-area
+  check): if `distanceMi > saturdayMaxDistanceMi` (30), return
+  `contact_required` with a new reason `'saturday_distance_limit'`.
 - Per-day earliest-start check: Saturday uses `saturdayEarliestStart`,
   Sunday uses `sundayEarliestStart`, weekday keeps `hoursWindow.start`
   (existing `outside_hours` check already covers weekday).
@@ -111,14 +131,17 @@ the weekend serenata package — same radius, no new constant needed.
   to `hourly`, same as today.
 - Weekend `seven_songs` prices at `weekendSevenSongsFlat` ($470) instead of
   `sevenSongsFlat` ($380); weekday pricing unchanged.
-- For `hourly` weekend bookings, `enforcedHours = max(durationHours,
-  distanceBasedMinimum, saturdayTimeTierMinimum)`, where
-  `saturdayTimeTierMinimum` is 0 for Saturday 7-10am and all of Sunday
-  (distance table is the only floor), 1 for Saturday 10am-3pm, 2 for
-  Saturday 3-9:30pm, 1 for Saturday 9:30pm-midnight.
+- For `hourly` bookings: **Saturday** uses `enforcedHours = max(durationHours,
+  saturdayTimeTierMinHours(startTime))` — the mileage table does not apply
+  (it's superseded by the distance cap above). **Sunday and weekday** keep
+  today's `enforcedHours = max(durationHours, distanceBasedMinimum)`
+  unchanged, where `distanceBasedMinimum` comes from the existing
+  `minimumTable`.
+- `saturdayTimeTierMinHours(startTime)` is 0 for Saturday 7-10am (serenata
+  window, hourly option), 1 for 10am-3pm, 2 for 3-9:30pm, 1 for
+  9:30pm-midnight.
 - `minimumApplied` is set whenever `enforcedHours > durationHours`, exactly
-  as today — the reason doesn't distinguish which floor (distance vs. time
-  tier) triggered it, just requested vs. enforced.
+  as today.
 - The on-the-hour rule is **not** enforced here — it depends on whether
   other bookings exist that day, which this pure function has no access to.
   It's enforced in the calendar-aware layer below.
@@ -174,8 +197,9 @@ at the boundary).
 Algorithm for `validateSaturdaySlot`:
 
 1. Candidate is valid if fully contained in one free interval, its duration
-   meets `minimumHoursForStart(candidate.startTime)` (the same time-tier +
-   distance logic as `getQuote`, passed in so both layers agree), and — only
+   meets `minimumHoursForStart(candidate.startTime)` (the same
+   `saturdayTimeTierMinHours` used by `getQuote`, passed in so both layers
+   agree — no distance involved, per the distance cap above), and — only
    when `isFirstBookingOfDay` and the start falls in the 3:00–9:30pm peak
    window — the start is exactly on the hour.
 2. If invalid, generate suggestions: for free intervals that could plausibly
@@ -200,8 +224,9 @@ This module has zero I/O — tests feed synthetic `busyBlocks` fixtures.
 - Fetch `getBusyBlocks` for the full LA-local calendar day (converted to
   UTC), convert to LA wall-time `{startTime, endTime}` pairs.
 - Saturday: call `freeIntervals` + `validateSaturdaySlot`, with
-  `minimumHoursForStart` mirroring the tier logic in `getQuote` (needs the
-  already-computed `distanceMi` for the distance floor).
+  `minimumHoursForStart` built directly from `saturdayTimeTierMinHours` — no
+  `distanceMi` needed here, since by the time this runs the quote already
+  confirmed the request is within the 30mi Saturday cap.
 - Sunday: call `freeIntervals` + `validateSundaySlot`.
 - Return shape becomes
   `{ checked: true; available: boolean; suggestions?: Slot[] } | { checked: false }`.
@@ -226,13 +251,12 @@ This module has zero I/O — tests feed synthetic `busyBlocks` fixtures.
   empty Saturday + off-hour peak request (rejected, on-hour suggestion),
   empty Saturday + on-hour peak request (accepted), 5-7pm booked + 8-9pm
   request (rejected — fails 2h peak minimum at that start — suggestions
-  land on 7:30-9:30 and 9:30-10:30), serenata-window booking at 8am with a
-  40-mile distance (7-songs unavailable beyond 25mi, falls back to hourly
-  with the distance minimum), 10am-3pm request below 1h (raised to 1h),
-  Sunday conflict (rejected, no suggestions), Sunday 8am request (accepted,
-  previously blocked by the old 3pm floor).
-- Unit tests for `getQuote`'s new package eligibility and
-  `max(time-tier, distance)` minimum, extending `quote.test.ts`.
+  land on 7:30-9:30 and 9:30-10:30), 10am-3pm request below 1h (raised to
+  1h), Sunday conflict (rejected, no suggestions), Sunday 8am request
+  (accepted, previously blocked by the old 3pm floor).
+- Unit tests for `getQuote`'s new package eligibility, the Saturday
+  distance cap, and the Saturday time-tier-only minimum (no more mileage
+  stacking), extending `quote.test.ts`.
 - Update `availability.test.ts` / `availability-disabled.test.ts` for the
   new return shape.
 - Update `booking.test.ts` / `booking-maps-disabled.test.ts` for the
