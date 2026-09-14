@@ -35,6 +35,7 @@ test('pricingLines mentions every PRICING dollar figure, both locales', () => {
     const text = pricingLines(locale).join(' ')
     for (const amount of [
       PRICING.sevenSongsFlat,
+      PRICING.weekendSevenSongsFlat,
       PRICING.hourlyWeekday,
       PRICING.hourlyWeekend,
       PRICING.depositPerHour,
