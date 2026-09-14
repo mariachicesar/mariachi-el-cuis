@@ -28,7 +28,7 @@ export type QuoteOk = {
 
 export type QuoteContactRequired = {
   status: 'contact_required'
-  reason: 'out_of_area' | 'weekend_early_start' | 'outside_hours'
+  reason: 'out_of_area' | 'saturday_distance_limit' | 'weekend_early_start' | 'outside_hours'
 }
 
 export type QuoteCallRequired = { status: 'call_required'; reason: 'lead_time' }

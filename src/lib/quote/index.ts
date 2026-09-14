@@ -1,9 +1,10 @@
 import { PRICING } from '@/lib/data/pricing'
 import { laWallTimeToUtc, weekdayIndexOf } from './timezone'
-import type { QuoteInput, QuoteLineItem, QuoteResult } from './types'
 import { minutesOf } from './time-of-day'
+import { saturdayTimeTierMinHours } from '@/lib/scheduling/saturday-tiers'
+import type { QuoteInput, QuoteLineItem, QuoteResult } from './types'
 
-function minimumHoursFor(distanceMi: number): number {
+export function distanceMinimumHoursFor(distanceMi: number): number {
   for (const tier of PRICING.minimumTable) {
     if (distanceMi <= tier.maxMi) return tier.hours
   }
@@ -20,16 +21,29 @@ export function getQuote(input: QuoteInput): QuoteResult {
   }
 
   const dow = weekdayIndexOf(eventDate)
-  const isWeekend = dow === 0 || dow === 6
+  const isSaturday = dow === 6
+  const isSunday = dow === 0
+  const isWeekend = isSaturday || isSunday
   const isWeekday = !isWeekend
+  const startMin = minutesOf(startTime)
   const weekdayLocalRate = isWeekday && distanceMi <= PRICING.weekdayRadiusMi
 
-  if (isWeekend && minutesOf(startTime) < minutesOf(PRICING.weekendEarliestStart)) {
-    return { status: 'contact_required', reason: 'weekend_early_start' }
+  if (isSaturday && distanceMi > PRICING.saturdayMaxDistanceMi) {
+    return { status: 'contact_required', reason: 'saturday_distance_limit' }
   }
 
+  if (isWeekend) {
+    const earliestStart = isSaturday ? PRICING.saturdayEarliestStart : PRICING.sundayEarliestStart
+    if (startMin < minutesOf(earliestStart)) {
+      return { status: 'contact_required', reason: 'weekend_early_start' }
+    }
+  }
+
+  const saturdaySerenataWindow = isSaturday && startMin < minutesOf(PRICING.saturdaySerenataEnd)
+  const weekendLocalSevenSongs = (saturdaySerenataWindow || isSunday) && distanceMi <= PRICING.weekdayRadiusMi
+
   const effectivePackage: 'seven_songs' | 'hourly' =
-    packageType === 'seven_songs' && weekdayLocalRate ? 'seven_songs' : 'hourly'
+    packageType === 'seven_songs' && (weekdayLocalRate || weekendLocalSevenSongs) ? 'seven_songs' : 'hourly'
 
   let enforcedHours: number
   let minimumApplied: { requested: number; enforced: number } | undefined
@@ -38,17 +52,18 @@ export function getQuote(input: QuoteInput): QuoteResult {
     enforcedHours = 1
   } else if (weekdayLocalRate) {
     enforcedHours = durationHours // "no min" for weekday, <=25mi, hourly
-  } else {
-    const minimum = minimumHoursFor(distanceMi)
+  } else if (isSaturday) {
+    const minimum = saturdayTimeTierMinHours(startMin)
     enforcedHours = Math.max(durationHours, minimum)
-    if (enforcedHours > durationHours) {
-      minimumApplied = { requested: durationHours, enforced: enforcedHours }
-    }
+    if (enforcedHours > durationHours) minimumApplied = { requested: durationHours, enforced: enforcedHours }
+  } else {
+    const minimum = distanceMinimumHoursFor(distanceMi)
+    enforcedHours = Math.max(durationHours, minimum)
+    if (enforcedHours > durationHours) minimumApplied = { requested: durationHours, enforced: enforcedHours }
   }
 
-  const startMinutes = minutesOf(startTime)
-  const endMinutes = startMinutes + enforcedHours * 60
-  if (startMinutes < minutesOf(PRICING.hoursWindow.start) || endMinutes > minutesOf(PRICING.hoursWindow.end)) {
+  const endMinutes = startMin + enforcedHours * 60
+  if (startMin < minutesOf(PRICING.hoursWindow.start) || endMinutes > minutesOf(PRICING.hoursWindow.end)) {
     return { status: 'contact_required', reason: 'outside_hours' }
   }
 
@@ -60,10 +75,11 @@ export function getQuote(input: QuoteInput): QuoteResult {
   const rush = leadHours < PRICING.leadTimeRushHours
 
   const rate = isWeekend ? PRICING.hourlyWeekend : PRICING.hourlyWeekday
-  const total = effectivePackage === 'seven_songs' ? PRICING.sevenSongsFlat : rate * enforcedHours
+  const sevenSongsPrice = isWeekend ? PRICING.weekendSevenSongsFlat : PRICING.sevenSongsFlat
+  const total = effectivePackage === 'seven_songs' ? sevenSongsPrice : rate * enforcedHours
   const lineItems: QuoteLineItem[] =
     effectivePackage === 'seven_songs'
-      ? [{ key: 'seven_songs', amount: PRICING.sevenSongsFlat }]
+      ? [{ key: 'seven_songs', amount: sevenSongsPrice }]
       : [{ key: 'hourly_rate', amount: rate * enforcedHours }]
 
   const normalDeposit = PRICING.depositPerHour * enforcedHours

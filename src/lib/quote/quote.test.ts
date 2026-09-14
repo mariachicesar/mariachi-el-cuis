@@ -62,7 +62,9 @@ test('weekday, seven_songs requested but distance > 25mi: forced to hourly', () 
 })
 
 test('distance-minimum boundaries: 14.9/15.0 -> 2h, 15.1 -> 3h', () => {
-  const base = { eventDate: SATURDAY, startTime: '15:00', packageType: 'hourly' as const, durationHours: 1 }
+  // Sunday (not Saturday): Sunday's hourly minimum is still distance-tier based,
+  // unlike Saturday's which is time-tier based (see the Saturday-specific tests below).
+  const base = { eventDate: SUNDAY, startTime: '15:00', packageType: 'hourly' as const, durationHours: 1 }
   expect(getQuote(input({ ...base, distanceMi: 14.9 }))).toMatchObject({ enforcedHours: 2 })
   expect(getQuote(input({ ...base, distanceMi: 15.0 }))).toMatchObject({ enforcedHours: 2 })
   expect(getQuote(input({ ...base, distanceMi: 15.1 }))).toMatchObject({ enforcedHours: 3 })
@@ -100,22 +102,80 @@ test('seven_songs is exempt from the distance minimum', () => {
   expect(q).toMatchObject({ enforcedHours: 1 })
 })
 
-test('weekend before 3pm is contact_required/weekend_early_start', () => {
+test('saturday before 7am is contact_required/weekend_early_start', () => {
   expect(
-    getQuote(input({ eventDate: SATURDAY, startTime: '14:59', packageType: 'hourly', distanceMi: 10, durationHours: 2 })),
+    getQuote(input({ eventDate: SATURDAY, startTime: '06:59', packageType: 'hourly', distanceMi: 10, durationHours: 2 })),
   ).toEqual({ status: 'contact_required', reason: 'weekend_early_start' })
 })
 
-test('weekend at/after 3pm is bookable, hourly-only at $550/h, minimum always applies', () => {
-  const q = getQuote(
-    input({ eventDate: SUNDAY, startTime: '15:00', packageType: 'seven_songs', distanceMi: 10, durationHours: 1 }),
-  )
+test('sunday before 8am is contact_required/weekend_early_start', () => {
+  expect(
+    getQuote(input({ eventDate: SUNDAY, startTime: '07:59', packageType: 'hourly', distanceMi: 10, durationHours: 2 })),
+  ).toEqual({ status: 'contact_required', reason: 'weekend_early_start' })
+})
+
+test('saturday beyond 30 miles is contact_required/saturday_distance_limit', () => {
+  expect(
+    getQuote(input({ eventDate: SATURDAY, startTime: '17:00', packageType: 'hourly', distanceMi: 31, durationHours: 2 })),
+  ).toEqual({ status: 'contact_required', reason: 'saturday_distance_limit' })
+})
+
+test('saturday at exactly 30 miles is still bookable', () => {
+  const q = getQuote(input({ eventDate: SATURDAY, startTime: '17:00', packageType: 'hourly', distanceMi: 30, durationHours: 2 }))
+  expect(q).toMatchObject({ status: 'ok' })
+})
+
+test('sunday has no distance cap (unchanged from today)', () => {
+  const q = getQuote(input({ eventDate: SUNDAY, startTime: '15:00', packageType: 'hourly', distanceMi: 60, durationHours: 5 }))
+  expect(q).toMatchObject({ status: 'ok', enforcedHours: 5 })
+})
+
+test('saturday serenata window (7-10am), seven_songs within 25mi: $470 flat, 1h block', () => {
+  const q = getQuote(input({ eventDate: SATURDAY, startTime: '08:00', packageType: 'seven_songs', distanceMi: 20, durationHours: 1 }))
   expect(q).toMatchObject({
     status: 'ok',
-    lineItems: [{ key: 'hourly_rate', amount: 1100 }], // forced hourly, 2h minimum @ $550
-    enforcedHours: 2,
-    total: 1100,
+    lineItems: [{ key: 'seven_songs', amount: 470 }],
+    enforcedHours: 1,
+    total: 470,
+    calendarBlockMinutes: 120,
   })
+})
+
+test('saturday serenata window beyond 25mi (but within the 30mi cap) forces hourly', () => {
+  const q = getQuote(input({ eventDate: SATURDAY, startTime: '08:00', packageType: 'seven_songs', distanceMi: 26, durationHours: 3 }))
+  expect(q).toMatchObject({ status: 'ok', lineItems: [{ key: 'hourly_rate', amount: 1650 }], total: 1650 })
+})
+
+test('saturday hourly has no minimum beyond 1h during the serenata window', () => {
+  const q = getQuote(input({ eventDate: SATURDAY, startTime: '08:00', packageType: 'hourly', distanceMi: 10, durationHours: 1 }))
+  expect(q).toMatchObject({ status: 'ok', enforcedHours: 1 })
+})
+
+test('saturday 10am-3pm hourly minimum is 1h', () => {
+  const q = getQuote(input({ eventDate: SATURDAY, startTime: '11:00', packageType: 'hourly', distanceMi: 10, durationHours: 1 }))
+  expect(q).toMatchObject({ status: 'ok', enforcedHours: 1 })
+})
+
+test('saturday peak window (3-9:30pm) hourly minimum is 2h, regardless of distance', () => {
+  const close = getQuote(input({ eventDate: SATURDAY, startTime: '17:00', packageType: 'hourly', distanceMi: 2, durationHours: 1 }))
+  const far = getQuote(input({ eventDate: SATURDAY, startTime: '17:00', packageType: 'hourly', distanceMi: 29, durationHours: 1 }))
+  expect(close).toMatchObject({ enforcedHours: 2, minimumApplied: { requested: 1, enforced: 2 } })
+  expect(far).toMatchObject({ enforcedHours: 2, minimumApplied: { requested: 1, enforced: 2 } })
+})
+
+test('saturday late window (9:30pm+) hourly minimum drops to 1h', () => {
+  const q = getQuote(input({ eventDate: SATURDAY, startTime: '22:00', packageType: 'hourly', distanceMi: 10, durationHours: 1 }))
+  expect(q).toMatchObject({ status: 'ok', enforcedHours: 1 })
+})
+
+test('sunday, seven_songs within 25mi is available any time of day: $470 flat', () => {
+  const q = getQuote(input({ eventDate: SUNDAY, startTime: '20:00', packageType: 'seven_songs', distanceMi: 10, durationHours: 1 }))
+  expect(q).toMatchObject({ status: 'ok', lineItems: [{ key: 'seven_songs', amount: 470 }], enforcedHours: 1, total: 470 })
+})
+
+test('sunday seven_songs beyond 25mi is forced to hourly with the existing mileage minimum', () => {
+  const q = getQuote(input({ eventDate: SUNDAY, startTime: '15:00', packageType: 'seven_songs', distanceMi: 26, durationHours: 1 }))
+  expect(q).toMatchObject({ status: 'ok', lineItems: [{ key: 'hourly_rate', amount: 1650 }], enforcedHours: 3, total: 1650 })
 })
 
 test('outside the 07:00-24:00 window is contact_required/outside_hours', () => {
