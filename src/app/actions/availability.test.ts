@@ -28,6 +28,7 @@ test('passes suggestions through when the slot is unavailable', async () => {
   const { checkSlot } = await import('@/lib/scheduling/check-slot')
   vi.mocked(checkSlot).mockResolvedValue({
     available: false,
+    reason: 'conflict',
     suggestions: [{ startTime: '17:00', endTime: '19:00' }],
   })
   const { checkAvailabilityAction } = await import('./availability')
@@ -40,6 +41,7 @@ test('passes suggestions through when the slot is unavailable', async () => {
   expect(result).toEqual({
     checked: true,
     available: false,
+    reason: 'conflict',
     suggestions: [{ startTime: '17:00', endTime: '19:00' }],
   })
 })

@@ -97,7 +97,7 @@ test('returns slot_unavailable and never creates a hold or checkout session when
     county: 'Los Angeles County',
     state: 'CA',
   })
-  vi.mocked(checkSlot).mockResolvedValue({ available: false, suggestions: [] })
+  vi.mocked(checkSlot).mockResolvedValue({ available: false, reason: 'conflict', suggestions: [] })
 
   const { startCheckoutAction } = await import('./booking')
   const result = await startCheckoutAction({ ok: false }, formData(validFields))
