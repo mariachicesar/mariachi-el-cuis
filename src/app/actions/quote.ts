@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import { getQuote } from '@/lib/quote'
 import type { QuoteResult } from '@/lib/quote/types'
-import { geocodeAddress } from '@/lib/geo/geocode'
+import { GeocodeConfigurationError, geocodeAddress } from '@/lib/geo/geocode'
 import { haversineMiles } from '@/lib/geo/distance'
 import { siteConfig } from '@/lib/config/site'
 import { features } from '@/lib/env'
@@ -25,7 +25,13 @@ export async function getQuoteAction(input: unknown): Promise<GetQuoteActionResu
   if (!parsed.success) return { ok: false, error: 'validation' }
   if (!features.maps) return { ok: false, error: 'not_configured' }
 
-  const geocoded = await geocodeAddress(parsed.data.address)
+  let geocoded
+  try {
+    geocoded = await geocodeAddress(parsed.data.address)
+  } catch (error) {
+    if (error instanceof GeocodeConfigurationError) return { ok: false, error: 'not_configured' }
+    throw error
+  }
   if (!geocoded) return { ok: false, error: 'address_not_found' }
 
   const distanceMi = haversineMiles(

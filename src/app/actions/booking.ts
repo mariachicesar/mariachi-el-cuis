@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { getQuote } from '@/lib/quote'
 import { laWallTimeToUtc } from '@/lib/quote/timezone'
-import { geocodeAddress } from '@/lib/geo/geocode'
+import { GeocodeConfigurationError, geocodeAddress } from '@/lib/geo/geocode'
 import { haversineMiles } from '@/lib/geo/distance'
 import { createHoldEvent } from '@/lib/calendar/google'
 import { checkSlot } from '@/lib/scheduling/check-slot'
@@ -60,7 +60,13 @@ export async function startCheckoutAction(
   if (!features.stripe) return { ok: false, error: 'not_configured' }
   if (!features.maps) return { ok: false, error: 'not_configured' }
 
-  const geocoded = await geocodeAddress(parsed.data.address)
+  let geocoded
+  try {
+    geocoded = await geocodeAddress(parsed.data.address)
+  } catch (error) {
+    if (error instanceof GeocodeConfigurationError) return { ok: false, error: 'not_configured' }
+    throw error
+  }
   if (!geocoded) return { ok: false, error: 'address_not_found' }
 
   const distanceMi = haversineMiles(
