@@ -5,7 +5,7 @@ import { Resend } from 'resend'
 import { z } from 'zod'
 import { EstimateEmail } from '@/emails/estimate'
 import { getQuote } from '@/lib/quote'
-import { geocodeAddress } from '@/lib/geo/geocode'
+import { GeocodeConfigurationError, geocodeAddress } from '@/lib/geo/geocode'
 import { haversineMiles } from '@/lib/geo/distance'
 import { siteConfig } from '@/lib/config/site'
 import { env, features } from '@/lib/env'
@@ -41,7 +41,13 @@ export async function sendEstimateEmailAction(
   if (!parsed.success) return { ok: false, error: 'validation' }
   if (!features.email || !features.maps) return { ok: false, error: 'not_configured' }
 
-  const geocoded = await geocodeAddress(parsed.data.address)
+  let geocoded
+  try {
+    geocoded = await geocodeAddress(parsed.data.address)
+  } catch (error) {
+    if (error instanceof GeocodeConfigurationError) return { ok: false, error: 'not_configured' }
+    throw error
+  }
   if (!geocoded) return { ok: false, error: 'address_not_found' }
 
   const distanceMi = haversineMiles(

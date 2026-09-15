@@ -26,6 +26,24 @@ test('email contact shows the estimate button', async ({ page }) => {
   await expect(page.getByRole('button', { name: /email me this estimate/i })).toBeVisible()
 })
 
+test('saturday peak uses restricted times and enforces hourly two-hour minimum', async ({ page }) => {
+  await page.goto('/en/book')
+  await page.getByLabel(/event date/i).fill('2026-09-19')
+  const startTime = page.getByLabel(/start time/i)
+  await expect(startTime.locator('option[value="17:01"]')).toHaveCount(0)
+  await startTime.selectOption('17:30')
+  await expect(startTime).toHaveValue('17:30')
+  await expect(page.getByLabel(/7-songs package/i)).toHaveCount(0)
+  await expect(page.getByLabel(/hourly/i)).toBeChecked()
+  await expect(page.getByLabel(/duration/i)).toHaveValue('2')
+  await expect(page.getByLabel(/duration/i)).toHaveAttribute('min', '2')
+
+  await page.getByLabel(/duration/i).fill('')
+  await expect(page.getByLabel(/duration/i)).toHaveValue('')
+  await page.getByLabel(/duration/i).fill('3')
+  await expect(page.getByLabel(/duration/i)).toHaveValue('3')
+})
+
 test('booking success page renders a thank-you message', async ({ page }) => {
   await page.goto('/en/book/success?session_id=cs_test_123')
   await expect(page.locator('#main h1')).toBeVisible()

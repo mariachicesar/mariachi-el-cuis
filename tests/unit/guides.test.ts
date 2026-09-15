@@ -1,9 +1,16 @@
 import { expect, test } from 'vitest'
 import { GUIDES, getGuide } from '@/lib/content/guides'
 
-test('4 guides, unique slugs, both locales titled', () => {
-  expect(GUIDES.length).toBe(4)
-  expect(new Set(GUIDES.map((g) => g.slug)).size).toBe(4)
+test('7 guides, unique slugs, both locales titled', () => {
+  expect(GUIDES.length).toBe(7)
+  expect(new Set(GUIDES.map((g) => g.slug)).size).toBe(7)
+  expect(GUIDES.map((g) => g.slug)).toEqual(
+    expect.arrayContaining([
+      'how-to-hire-a-mariachi-band',
+      'mariachi-funeral-songs',
+      'best-mariachi-songs-by-occasion',
+    ]),
+  )
   for (const g of GUIDES) {
     expect(g.title.es).not.toBe('')
     expect(g.title.en).not.toBe('')
