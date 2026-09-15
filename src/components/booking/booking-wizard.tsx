@@ -2,7 +2,8 @@
 
 import { useActionState, useEffect, useState, useTransition } from 'react'
 import { useFormStatus } from 'react-dom'
-import { getQuoteAction } from '@/app/actions/quote'
+import { getAddressSuggestionsAction } from '@/app/actions/address-suggestions'
+import { getQuoteAction, type GetQuoteActionResult } from '@/app/actions/quote'
 import { checkAvailabilityAction, type CheckAvailabilityResult } from '@/app/actions/availability'
 import { sendEstimateEmailAction, type SendEstimateState } from '@/app/actions/estimate-email'
 import { startCheckoutAction, type StartCheckoutState } from '@/app/actions/booking'
@@ -11,7 +12,13 @@ import type { QuoteResult } from '@/lib/quote/types'
 import { siteConfig } from '@/lib/config/site'
 import type { Locale } from '@/lib/i18n/locales'
 import { PRICING } from '@/lib/data/pricing'
-import { effectDelayMs } from './schedule'
+import {
+  effectDelayMs,
+  formatTime12Hour,
+  minimumDurationForTime,
+  sevenSongsAvailableForTime,
+  weekendStartTimes,
+} from './schedule'
 
 const COPY = {
   es: {
@@ -220,6 +227,7 @@ export function BookingWizard({
   const [phone, setPhone] = useState('')
 
   const [quote, setQuote] = useState<QuoteResult | null>(null)
+  const [quoteError, setQuoteError] = useState<Extract<GetQuoteActionResult, { ok: false }>['error'] | null>(null)
   const [availability, setAvailability] = useState<CheckAvailabilityResult>({ checked: false })
   const [isQuotePending, startQuoteTransition] = useTransition()
 
@@ -356,7 +364,13 @@ export function BookingWizard({
           type="date"
           className={inputCls}
           value={eventDate}
-          onInput={(e) => setEventDate(e.currentTarget.value)}
+          onInput={(e) => {
+            const nextDate = e.currentTarget.value
+            setEventDate(nextDate)
+            setDurationInput((currentDuration) =>
+              Math.max(Number(currentDuration) || 1, minimumDurationForTime(nextDate, startTime)).toString(),
+            )
+          }}
         />
       </div>
 
@@ -369,7 +383,13 @@ export function BookingWizard({
             id="wizard-time"
             className={inputCls}
             value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
+            onChange={(e) => {
+              const nextTime = e.target.value
+              setStartTime(nextTime)
+              setDurationInput((currentDuration) =>
+                Math.max(Number(currentDuration) || 1, minimumDurationForTime(eventDate, nextTime)).toString(),
+              )
+            }}
           >
             {weekendTimes.map((time) => (
               <option key={time} value={time}>
@@ -384,7 +404,13 @@ export function BookingWizard({
             step={15 * 60}
             className={inputCls}
             value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
+            onChange={(e) => {
+              const nextTime = e.target.value
+              setStartTime(nextTime)
+              setDurationInput((currentDuration) =>
+                Math.max(Number(currentDuration) || 1, minimumDurationForTime(eventDate, nextTime)).toString(),
+              )
+            }}
           />
         )}
         {weekdayIndexOf(eventDate) === 6 && (
@@ -404,7 +430,7 @@ export function BookingWizard({
             checked={packageType === 'seven_songs'}
             onChange={() => {
               setPackageType('seven_songs')
-              setDurationHours(1)
+              setDurationInput('1')
             }}
           />
           {t.sevenSongs(isWeekday ? PRICING.sevenSongsFlat : PRICING.weekendSevenSongsFlat)}
