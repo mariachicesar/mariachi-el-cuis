@@ -2,25 +2,40 @@
 
 import { useActionState, useEffect, useState, useTransition } from 'react'
 import { useFormStatus } from 'react-dom'
-import { getQuoteAction } from '@/app/actions/quote'
-import { checkAvailabilityAction } from '@/app/actions/availability'
+import { getQuoteAction, type GetQuoteActionResult } from '@/app/actions/quote'
+import { getAddressSuggestionsAction } from '@/app/actions/address-suggestions'
+import { checkAvailabilityAction, type CheckAvailabilityResult } from '@/app/actions/availability'
 import { sendEstimateEmailAction, type SendEstimateState } from '@/app/actions/estimate-email'
 import { startCheckoutAction, type StartCheckoutState } from '@/app/actions/booking'
 import { weekdayIndexOf } from '@/lib/quote/timezone'
 import type { QuoteResult } from '@/lib/quote/types'
 import { siteConfig } from '@/lib/config/site'
 import type { Locale } from '@/lib/i18n/locales'
-import { effectDelayMs } from './schedule'
+import { PRICING } from '@/lib/data/pricing'
+import {
+  effectDelayMs,
+  formatTime12Hour,
+  minimumDurationForTime,
+  sevenSongsAvailableForTime,
+  slotDurationHours,
+  weekendStartTimes,
+} from './schedule'
 
 const COPY = {
   es: {
     eventDate: 'Fecha del evento',
     startTime: 'Hora de inicio',
+    saturdayTimeNotice: 'Los sábados ofrecemos horarios cada 30 minutos. La primera reserva entre 3:00 y 9:30 PM debe comenzar en punto; te mostraremos alternativas si no está disponible.',
+    sundayTimeNotice: 'Los domingos ofrecemos horarios cada 30 minutos, de 8:00 AM a 11:00 PM.',
     duration: 'Duración (horas)',
+    minimumDuration: (hours: number) => `Este horario requiere un mínimo de ${hours} horas.`,
+    saturdayPackageNotice: 'El paquete de 7 canciones solo está disponible los sábados de 7:00 a 10:00 AM.',
     packageLabel: 'Paquete',
-    sevenSongs: 'Paquete de 7 canciones ($380)',
+    sevenSongs: (price: number) => `Paquete de 7 canciones ($${price})`,
     hourly: 'Por hora',
     address: 'Dirección del evento',
+    selectAddress: 'Selecciona una dirección de la lista para continuar.',
+    noAddresses: 'No encontramos direcciones que coincidan. Intenta agregar calle, ciudad o código postal.',
     checking: 'Calculando…',
     available: 'Disponible',
     unavailable: 'Esa fecha y hora ya está reservada — intenta otra.',
@@ -57,11 +72,17 @@ const COPY = {
   en: {
     eventDate: 'Event date',
     startTime: 'Start time',
+    saturdayTimeNotice: 'Saturday times are offered every 30 minutes. The first booking from 3:00 to 9:30 PM must start on the hour; we will show alternatives when needed.',
+    sundayTimeNotice: 'Sunday times are offered every 30 minutes, from 8:00 AM to 11:00 PM.',
     duration: 'Duration (hours)',
+    minimumDuration: (hours: number) => `This time requires a ${hours}-hour minimum.`,
+    saturdayPackageNotice: 'The 7-songs package is available on Saturdays only from 7:00 to 10:00 AM.',
     packageLabel: 'Package',
-    sevenSongs: '7-songs package ($380)',
+    sevenSongs: (price: number) => `7-songs package ($${price})`,
     hourly: 'Hourly',
     address: 'Event address',
+    selectAddress: 'Select an address from the list to continue.',
+    noAddresses: 'No matching addresses found. Try adding a street, city, or ZIP code.',
     checking: 'Checking…',
     available: 'Available',
     unavailable: 'That date and time is already booked — try another.',
@@ -133,6 +154,17 @@ function estimateErrorMessage(t: Copy, error: SendEstimateState['error']): strin
   }
 }
 
+function quoteErrorMessage(t: Copy, error: Extract<GetQuoteActionResult, { ok: false }>['error']): string {
+  switch (error) {
+    case 'validation':
+      return t.errorValidation
+    case 'not_configured':
+      return t.errorNotConfigured
+    case 'address_not_found':
+      return t.errorAddressNotFound
+  }
+}
+
 const inputCls =
   'mt-1 w-full rounded border border-charcoal-border bg-surface-container px-4 py-3 text-on-surface placeholder:text-muted-silver focus:border-burnished-gold focus:outline-none focus:ring-2 focus:ring-burnished-gold/40'
 const labelCls = 'block text-sm font-medium text-crema-white'
@@ -185,21 +217,58 @@ export function BookingWizard({
 
   const [eventDate, setEventDate] = useState('')
   const [startTime, setStartTime] = useState('15:00')
-  const [durationHours, setDurationHours] = useState(1)
+  const [durationInput, setDurationInput] = useState('1')
   const [packageType, setPackageType] = useState<'seven_songs' | 'hourly'>('seven_songs')
   const [address, setAddress] = useState('')
+  const [addressSelected, setAddressSelected] = useState(false)
+  const [addressSuggestions, setAddressSuggestions] = useState<string[]>([])
   const [contactMethod, setContactMethod] = useState<'email' | 'phone'>('email')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
 
   const [quote, setQuote] = useState<QuoteResult | null>(null)
-  const [availability, setAvailability] = useState<{ checked: boolean; available?: boolean }>({
-    checked: false,
-  })
+  const [quoteError, setQuoteError] = useState<Extract<GetQuoteActionResult, { ok: false }>['error'] | null>(null)
+  const [availability, setAvailability] = useState<CheckAvailabilityResult>({ checked: false })
   const [isQuotePending, startQuoteTransition] = useTransition()
 
   const isWeekday = eventDate ? ![0, 6].includes(weekdayIndexOf(eventDate)) : true
+  const weekendTimes = eventDate ? weekendStartTimes(eventDate) : []
+  const isWeekend = weekendTimes.length > 0
+  const canChooseSevenSongs = sevenSongsAvailableForTime(eventDate, startTime)
+  const minimumDurationHours = minimumDurationForTime(eventDate, startTime)
+  const enteredDuration = Number(durationInput)
+  const durationIsBelowMinimum =
+    durationInput !== '' && Number.isFinite(enteredDuration) && enteredDuration < minimumDurationHours
+  const durationHours =
+    durationInput !== '' && Number.isFinite(enteredDuration)
+      ? Math.max(minimumDurationHours, enteredDuration)
+      : minimumDurationHours
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      if (!canChooseSevenSongs && packageType === 'seven_songs') setPackageType('hourly')
+    }, 0)
+    return () => clearTimeout(handle)
+  }, [canChooseSevenSongs, packageType])
+
+  useEffect(() => {
+    const query = address.trim()
+    const handle = setTimeout(async () => {
+      if (query.length < 3 || addressSelected) {
+        setAddressSuggestions([])
+        return
+      }
+
+      try {
+        const result = await getAddressSuggestionsAction({ query })
+        setAddressSuggestions(result.ok ? result.suggestions : [])
+      } catch {
+        setAddressSuggestions([])
+      }
+    }, effectDelayMs(query.length >= 3 && !addressSelected))
+    return () => clearTimeout(handle)
+  }, [address, addressSelected])
 
   // setQuote/setAvailability are only ever invoked from inside the
   // setTimeout callback (never synchronously in the effect body) — calling
@@ -213,26 +282,33 @@ export function BookingWizard({
   // keeps the real debounce.
   useEffect(() => {
     const isValidQuoteInput =
-      features.maps && !!eventDate && !!startTime && address.trim().length >= 5
+      features.maps && !!eventDate && !!startTime && durationInput !== '' && addressSelected
 
     const handle = setTimeout(() => {
       if (!isValidQuoteInput) {
         setQuote(null)
+        setQuoteError(null)
         return
       }
       startQuoteTransition(async () => {
-        const result = await getQuoteAction({
-          eventDate,
-          startTime,
-          durationHours,
-          packageType,
-          address,
-        })
-        setQuote(result.ok ? result.quote : null)
+        try {
+          const result = await getQuoteAction({
+            eventDate,
+            startTime,
+            durationHours,
+            packageType,
+            address,
+          })
+          setQuote(result.ok ? result.quote : null)
+          setQuoteError(result.ok ? null : result.error)
+        } catch {
+          setQuote(null)
+          setQuoteError('address_not_found')
+        }
       })
     }, effectDelayMs(isValidQuoteInput))
     return () => clearTimeout(handle)
-  }, [features.maps, eventDate, startTime, durationHours, packageType, address])
+  }, [features.maps, eventDate, startTime, durationHours, durationInput, packageType, address, addressSelected])
 
   useEffect(() => {
     const canCheckAvailability = features.calendar && quote !== null && quote.status === 'ok'
@@ -245,7 +321,7 @@ export function BookingWizard({
       checkAvailabilityAction({
         eventDate,
         startTime,
-        calendarBlockMinutes: quote.calendarBlockMinutes,
+        durationHours: quote.enforcedHours,
       })
         .then(setAvailability)
         .catch(() => setAvailability({ checked: false }))
@@ -289,7 +365,7 @@ export function BookingWizard({
           type="date"
           className={inputCls}
           value={eventDate}
-          onChange={(e) => setEventDate(e.target.value)}
+          onInput={(e) => setEventDate(e.currentTarget.value)}
         />
       </div>
 
@@ -297,18 +373,40 @@ export function BookingWizard({
         <label htmlFor="wizard-time" className={labelCls}>
           {t.startTime}
         </label>
-        <input
-          id="wizard-time"
-          type="time"
-          className={inputCls}
-          value={startTime}
-          onChange={(e) => setStartTime(e.target.value)}
-        />
+        {isWeekend ? (
+          <select
+            id="wizard-time"
+            className={inputCls}
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          >
+            {weekendTimes.map((time) => (
+              <option key={time} value={time}>
+                {formatTime12Hour(time)}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <input
+            id="wizard-time"
+            type="time"
+            step={15 * 60}
+            className={inputCls}
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
+        )}
+        {weekdayIndexOf(eventDate) === 6 && (
+          <p className="mt-2 text-sm text-on-surface-variant">{t.saturdayTimeNotice}</p>
+        )}
+        {weekdayIndexOf(eventDate) === 0 && (
+          <p className="mt-2 text-sm text-on-surface-variant">{t.sundayTimeNotice}</p>
+        )}
       </div>
 
       <fieldset>
         <legend className={labelCls}>{t.packageLabel}</legend>
-        {isWeekday && (
+        {canChooseSevenSongs && (
           <label className="flex items-center gap-2 py-1">
             <input
               type="radio"
@@ -316,10 +414,10 @@ export function BookingWizard({
               checked={packageType === 'seven_songs'}
               onChange={() => {
                 setPackageType('seven_songs')
-                setDurationHours(1)
+                setDurationInput('1')
               }}
             />
-            {t.sevenSongs}
+            {t.sevenSongs(isWeekday ? PRICING.sevenSongsFlat : PRICING.weekendSevenSongsFlat)}
           </label>
         )}
         <label className="flex items-center gap-2 py-1">
@@ -333,6 +431,10 @@ export function BookingWizard({
         </label>
       </fieldset>
 
+      {weekdayIndexOf(eventDate) === 6 && !canChooseSevenSongs && (
+        <p className="text-sm text-on-surface-variant">{t.saturdayPackageNotice}</p>
+      )}
+
       {packageType === 'hourly' && (
         <div>
           <label htmlFor="wizard-duration" className={labelCls}>
@@ -341,12 +443,18 @@ export function BookingWizard({
           <input
             id="wizard-duration"
             type="number"
-            min={1}
+            min={minimumDurationHours}
             max={12}
             className={inputCls}
-            value={durationHours}
-            onChange={(e) => setDurationHours(Number(e.target.value))}
+            value={durationInput}
+            onChange={(e) => setDurationInput(e.target.value)}
+            onBlur={() => setDurationInput(String(durationHours))}
           />
+          {durationIsBelowMinimum && (
+            <p role="alert" className="mt-2 text-sm text-red-400">
+              {t.minimumDuration(minimumDurationHours)}
+            </p>
+          )}
         </div>
       )}
 
@@ -357,10 +465,47 @@ export function BookingWizard({
         <input
           id="wizard-address"
           type="text"
+          autoComplete="off"
           className={inputCls}
           value={address}
-          onChange={(e) => setAddress(e.target.value)}
+          onChange={(e) => {
+            setAddress(e.target.value)
+            setAddressSelected(false)
+          }}
         />
+        {!addressSelected && address.trim().length >= 3 && (
+          <div className="mt-2">
+            {addressSuggestions.length > 0 ? (
+              <ul role="listbox" aria-label={t.address} className="overflow-hidden rounded border border-charcoal-border">
+                {addressSuggestions.map((suggestion) => (
+                  <li key={suggestion} role="option" aria-selected="false">
+                    <button
+                      type="button"
+                      className="w-full px-4 py-3 text-left text-sm text-crema-white hover:bg-charcoal-elevated"
+                      onClick={() => {
+                        setAddress(suggestion)
+                        setAddressSelected(true)
+                        setAddressSuggestions([])
+                      }}
+                    >
+                      {suggestion}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-on-surface-variant">{t.noAddresses}</p>
+            )}
+          </div>
+        )}
+        {!addressSelected && address.trim().length >= 3 && addressSuggestions.length > 0 && (
+          <p className="mt-2 text-sm text-on-surface-variant">{t.selectAddress}</p>
+        )}
+        {quoteError && (
+          <p role="alert" className="mt-2 text-sm text-red-400">
+            {quoteErrorMessage(t, quoteError)}
+          </p>
+        )}
       </div>
 
       {!features.maps && <p className="text-on-surface-variant">{t.notConfigured}</p>}
@@ -390,9 +535,26 @@ export function BookingWizard({
               </p>
               {features.calendar ? (
                 availability.checked && (
-                  <p className="mt-2 font-semibold">
-                    {availability.available ? t.available : t.unavailable}
-                  </p>
+                  <div className="mt-2">
+                    <p className="font-semibold">{availability.available ? t.available : t.unavailable}</p>
+                    {!availability.available && availability.suggestions && availability.suggestions.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {availability.suggestions.map((s) => (
+                          <button
+                            key={s.startTime}
+                            type="button"
+                            onClick={() => {
+                              setStartTime(s.startTime)
+                              setDurationInput(String(slotDurationHours(s.startTime, s.endTime)))
+                            }}
+                            className="rounded border border-charcoal-border px-3 py-1 text-sm text-crema-white hover:bg-charcoal-elevated"
+                          >
+                            {s.startTime}–{s.endTime}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 )
               ) : (
                 <p className="mt-2 text-on-surface-variant">{t.noCalendarNotice}</p>

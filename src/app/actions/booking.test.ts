@@ -5,10 +5,8 @@ vi.mock('@/lib/env', () => ({
   env: { NEXT_PUBLIC_SITE_URL: 'https://mariachielcuis.com' },
 }))
 vi.mock('@/lib/geo/geocode', () => ({ geocodeAddress: vi.fn() }))
-vi.mock('@/lib/calendar/google', () => ({
-  checkAvailability: vi.fn(),
-  createHoldEvent: vi.fn(),
-}))
+vi.mock('@/lib/scheduling/check-slot', () => ({ checkSlot: vi.fn() }))
+vi.mock('@/lib/calendar/google', () => ({ createHoldEvent: vi.fn() }))
 vi.mock('@/lib/payments/stripe', () => ({ createDepositCheckoutSession: vi.fn() }))
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(() => {
@@ -51,7 +49,8 @@ test('returns the quote status as the error when the quote is not ok', async () 
 
 test('creates a calendar hold and a Stripe session, then redirects, for an ok quote', async () => {
   const { geocodeAddress } = await import('@/lib/geo/geocode')
-  const { checkAvailability, createHoldEvent } = await import('@/lib/calendar/google')
+  const { checkSlot } = await import('@/lib/scheduling/check-slot')
+  const { createHoldEvent } = await import('@/lib/calendar/google')
   const { createDepositCheckoutSession } = await import('@/lib/payments/stripe')
 
   vi.mocked(geocodeAddress).mockResolvedValue({
@@ -60,7 +59,7 @@ test('creates a calendar hold and a Stripe session, then redirects, for an ok qu
     county: 'Los Angeles County',
     state: 'CA',
   })
-  vi.mocked(checkAvailability).mockResolvedValue(true)
+  vi.mocked(checkSlot).mockResolvedValue({ available: true })
   vi.mocked(createHoldEvent).mockResolvedValue('evt-1')
   vi.mocked(createDepositCheckoutSession).mockResolvedValue({
     url: 'https://checkout.stripe.com/session-1',
@@ -71,8 +70,12 @@ test('creates a calendar hold and a Stripe session, then redirects, for an ok qu
     'NEXT_REDIRECT',
   )
 
-  expect(checkAvailability).toHaveBeenCalledOnce()
+  expect(checkSlot).toHaveBeenCalledWith('2026-12-15', '15:00', 1)
   expect(createHoldEvent).toHaveBeenCalledOnce()
+  const holdArgs = vi.mocked(createHoldEvent).mock.calls[0]![0]!
+  expect(holdArgs.startUtc.toISOString()).toBe('2026-12-15T23:00:00.000Z') // raw event start, no buffer
+  expect(holdArgs.endUtc.toISOString()).toBe('2026-12-16T00:00:00.000Z') // raw event end, no buffer
+
   const sessionArgs = vi.mocked(createDepositCheckoutSession).mock.calls[0]![0]!
   expect(sessionArgs.depositUsd).toBe(50)
   expect(sessionArgs.metadata.calendarEventId).toBe('evt-1')
@@ -82,9 +85,10 @@ test('creates a calendar hold and a Stripe session, then redirects, for an ok qu
   expect(redirect).toHaveBeenCalledWith('https://checkout.stripe.com/session-1')
 })
 
-test('returns slot_unavailable and never creates a hold or checkout session when the calendar slot is taken', async () => {
+test('returns slot_unavailable and never creates a hold or checkout session when the slot is taken', async () => {
   const { geocodeAddress } = await import('@/lib/geo/geocode')
-  const { checkAvailability, createHoldEvent } = await import('@/lib/calendar/google')
+  const { checkSlot } = await import('@/lib/scheduling/check-slot')
+  const { createHoldEvent } = await import('@/lib/calendar/google')
   const { createDepositCheckoutSession } = await import('@/lib/payments/stripe')
 
   vi.mocked(geocodeAddress).mockResolvedValue({
@@ -93,7 +97,7 @@ test('returns slot_unavailable and never creates a hold or checkout session when
     county: 'Los Angeles County',
     state: 'CA',
   })
-  vi.mocked(checkAvailability).mockResolvedValue(false)
+  vi.mocked(checkSlot).mockResolvedValue({ available: false, reason: 'conflict', suggestions: [] })
 
   const { startCheckoutAction } = await import('./booking')
   const result = await startCheckoutAction({ ok: false }, formData(validFields))

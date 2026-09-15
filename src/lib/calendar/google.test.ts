@@ -37,18 +37,22 @@ beforeEach(() => {
   eventsDelete.mockReset()
 })
 
-test('checkAvailability is true when the calendar reports no busy blocks', async () => {
-  const { checkAvailability } = await import('./google')
+test('getBusyBlocks returns an empty array when the calendar reports no busy blocks', async () => {
+  const { getBusyBlocks } = await import('./google')
   freebusyQuery.mockResolvedValue({ data: { calendars: { 'cal-1': { busy: [] } } } })
-  expect(await checkAvailability(new Date(), new Date())).toBe(true)
+  const result = await getBusyBlocks(new Date('2026-06-06T00:00:00Z'), new Date('2026-06-07T00:00:00Z'))
+  expect(result).toEqual([])
 })
 
-test('checkAvailability is false when the calendar reports a busy block', async () => {
-  const { checkAvailability } = await import('./google')
+test('getBusyBlocks maps busy periods to startUtc/endUtc Date pairs', async () => {
+  const { getBusyBlocks } = await import('./google')
   freebusyQuery.mockResolvedValue({
-    data: { calendars: { 'cal-1': { busy: [{ start: 'x', end: 'y' }] } } },
+    data: { calendars: { 'cal-1': { busy: [{ start: '2026-06-06T17:00:00Z', end: '2026-06-06T19:00:00Z' }] } } },
   })
-  expect(await checkAvailability(new Date(), new Date())).toBe(false)
+  const result = await getBusyBlocks(new Date('2026-06-06T00:00:00Z'), new Date('2026-06-07T00:00:00Z'))
+  expect(result).toEqual([
+    { startUtc: new Date('2026-06-06T17:00:00.000Z'), endUtc: new Date('2026-06-06T19:00:00.000Z') },
+  ])
 })
 
 test('createHoldEvent returns the new event id', async () => {

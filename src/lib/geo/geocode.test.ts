@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { geocodeAddress } from './geocode'
+import { GeocodeConfigurationError, geocodeAddress, suggestAddresses } from './geocode'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -33,6 +33,26 @@ test('parses county and state from a successful geocode', async () => {
 test('returns null on ZERO_RESULTS', async () => {
   mockFetchOnce({ status: 'ZERO_RESULTS', results: [] })
   expect(await geocodeAddress('not a real address')).toBeNull()
+})
+
+test('returns formatted address suggestions from matching geocodes', async () => {
+  mockFetchOnce({
+    status: 'OK',
+    results: [
+      { formatted_address: '123 Main St, Los Angeles, CA 90011, USA', geometry: { location: { lat: 34, lng: -118 } }, address_components: [] },
+      { formatted_address: '123 Main St, Bell, CA 90201, USA', geometry: { location: { lat: 34.1, lng: -118.2 } }, address_components: [] },
+    ],
+  })
+
+  await expect(suggestAddresses('123 Main St')).resolves.toEqual([
+    '123 Main St, Los Angeles, CA 90011, USA',
+    '123 Main St, Bell, CA 90201, USA',
+  ])
+})
+
+test('throws a configuration error when Google rejects the API key', async () => {
+  mockFetchOnce({ status: 'REQUEST_DENIED', error_message: 'API key restriction mismatch', results: [] })
+  await expect(geocodeAddress('90011')).rejects.toBeInstanceOf(GeocodeConfigurationError)
 })
 
 test('returns null on a non-OK HTTP response', async () => {

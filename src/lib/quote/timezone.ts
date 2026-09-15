@@ -41,3 +41,21 @@ export function weekdayIndexOf(dateStr: string): number {
   const [y, m, d] = dateStr.split('-').map(Number) as [number, number, number]
   return new Date(Date.UTC(y, m - 1, d)).getUTCDay()
 }
+
+/**
+ * Minutes since LA-local midnight (0-1440, clamped) for a UTC instant,
+ * relative to `dateStr`'s LA-local midnight — not the instant's own date.
+ */
+export function utcToLaMinutesOfDay(instant: Date, dateStr: string): number {
+  const dayStartUtc = laWallTimeToUtc(dateStr, '00:00')
+  const minutes = Math.round((instant.getTime() - dayStartUtc.getTime()) / 60_000)
+  return Math.min(Math.max(minutes, 0), 24 * 60)
+}
+
+/** UTC instants bounding the full LA-local calendar day for `dateStr` ("YYYY-MM-DD"). */
+export function laDayBoundsUtc(dateStr: string): { startUtc: Date; endUtc: Date } {
+  const [y, m, d] = dateStr.split('-').map(Number) as [number, number, number]
+  const next = new Date(Date.UTC(y, m - 1, d + 1))
+  const nextDateStr = `${next.getUTCFullYear()}-${String(next.getUTCMonth() + 1).padStart(2, '0')}-${String(next.getUTCDate()).padStart(2, '0')}`
+  return { startUtc: laWallTimeToUtc(dateStr, '00:00'), endUtc: laWallTimeToUtc(nextDateStr, '00:00') }
+}

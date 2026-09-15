@@ -4,9 +4,10 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { getQuote } from '@/lib/quote'
 import { laWallTimeToUtc } from '@/lib/quote/timezone'
-import { geocodeAddress } from '@/lib/geo/geocode'
+import { GeocodeConfigurationError, geocodeAddress } from '@/lib/geo/geocode'
 import { haversineMiles } from '@/lib/geo/distance'
-import { checkAvailability, createHoldEvent } from '@/lib/calendar/google'
+import { createHoldEvent } from '@/lib/calendar/google'
+import { checkSlot } from '@/lib/scheduling/check-slot'
 import { createDepositCheckoutSession } from '@/lib/payments/stripe'
 import { siteConfig } from '@/lib/config/site'
 import { env, features } from '@/lib/env'
@@ -59,7 +60,13 @@ export async function startCheckoutAction(
   if (!features.stripe) return { ok: false, error: 'not_configured' }
   if (!features.maps) return { ok: false, error: 'not_configured' }
 
-  const geocoded = await geocodeAddress(parsed.data.address)
+  let geocoded
+  try {
+    geocoded = await geocodeAddress(parsed.data.address)
+  } catch (error) {
+    if (error instanceof GeocodeConfigurationError) return { ok: false, error: 'not_configured' }
+    throw error
+  }
   if (!geocoded) return { ok: false, error: 'address_not_found' }
 
   const distanceMi = haversineMiles(
@@ -82,19 +89,18 @@ export async function startCheckoutAction(
 
   let calendarEventId = ''
   if (features.calendar) {
-    const eventStartUtc = laWallTimeToUtc(parsed.data.eventDate, parsed.data.startTime)
-    const blockStart = new Date(eventStartUtc.getTime() - 30 * 60 * 1000)
-    const blockEnd = new Date(blockStart.getTime() + quote.calendarBlockMinutes * 60 * 1000)
-
-    const available = await checkAvailability(blockStart, blockEnd)
+    const { available } = await checkSlot(parsed.data.eventDate, parsed.data.startTime, quote.enforcedHours)
     if (!available) return { ok: false, error: 'slot_unavailable' }
+
+    const eventStartUtc = laWallTimeToUtc(parsed.data.eventDate, parsed.data.startTime)
+    const eventEndUtc = new Date(eventStartUtc.getTime() + quote.enforcedHours * 60 * 60 * 1000)
 
     calendarEventId = await createHoldEvent({
       summary: `HOLD — awaiting deposit — ${parsed.data.name}`,
       description: `Package: ${parsed.data.packageType}\nHours: ${quote.enforcedHours}\nAddress: ${parsed.data.address}\nPhone: ${parsed.data.phone || '—'}`,
       location: parsed.data.address,
-      startUtc: blockStart,
-      endUtc: blockEnd,
+      startUtc: eventStartUtc,
+      endUtc: eventEndUtc,
     })
   }
 

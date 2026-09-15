@@ -65,8 +65,9 @@ test('calendar feature requires all four Google Calendar vars', () => {
   ).toBe(true)
 })
 
-test('stripe feature requires both Stripe vars', () => {
-  expect(parseEnv({ STRIPE_SECRET_KEY: 'sk_x' }).features.stripe).toBe(false)
+test('stripe feature is enabled with a secret key and webhook secret is optional for the booking flow', () => {
+  expect(parseEnv({ STRIPE_SECRET_KEY: 'sk_x' }).features.stripe).toBe(true)
+  expect(parseEnv({ STRIPE_WEBHOOK_SECRET: 'whsec_x' }).features.stripe).toBe(false)
   expect(
     parseEnv({ STRIPE_SECRET_KEY: 'sk_x', STRIPE_WEBHOOK_SECRET: 'whsec_x' }).features.stripe,
   ).toBe(true)
