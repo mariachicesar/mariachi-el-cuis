@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { MusicianFan } from '@/components/about/musician-fan'
 import { Button } from '@/components/ui/button'
 import { JsonLd } from '@/components/ui/json-ld'
 import { Section } from '@/components/ui/section'
@@ -23,6 +24,7 @@ const COPY = {
     bioHeading: 'Nuestra historia',
     bioBody:
       'Aquí compartiremos pronto más sobre los músicos que forman el grupo y su trayectoria.',
+    comingSoon: 'Fotos próximamente',
     ctaHeading: '¿Tienes preguntas antes de reservar?',
     ctaBody: 'Escríbenos y con gusto te respondemos.',
     ctaLabel: 'Contáctanos',
@@ -36,6 +38,7 @@ const COPY = {
       'We are a mariachi based in the 90011 ZIP code serving Los Angeles County. We play weddings, quinceañeras, masses, serenatas, corporate events, and memorials.',
     bioHeading: 'Our story',
     bioBody: "We'll share more here soon about the musicians in the group and their background.",
+    comingSoon: 'Photos coming soon',
     ctaHeading: 'Have questions before you book?',
     ctaBody: "Reach out and we'll get back to you.",
     ctaLabel: 'Contact us',
@@ -81,7 +84,8 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: st
       <Section>
         <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">{t.bioHeading}</h2>
         <p className="mt-4 max-w-2xl text-on-surface-variant">{t.bioBody}</p>
-        {/* TODO: owner — musician bios + photos */}
+        {/* TODO: owner — replace with real musician bios + photos */}
+        <MusicianFan locale={locale} comingSoon={t.comingSoon} />
       </Section>
 
       <Section className="border-t border-charcoal-border bg-surface-container">
