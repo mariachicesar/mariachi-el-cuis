@@ -3,13 +3,14 @@
 import { useActionState, useEffect, useState, useTransition } from 'react'
 import { useFormStatus } from 'react-dom'
 import { getQuoteAction } from '@/app/actions/quote'
-import { checkAvailabilityAction } from '@/app/actions/availability'
+import { checkAvailabilityAction, type CheckAvailabilityResult } from '@/app/actions/availability'
 import { sendEstimateEmailAction, type SendEstimateState } from '@/app/actions/estimate-email'
 import { startCheckoutAction, type StartCheckoutState } from '@/app/actions/booking'
 import { weekdayIndexOf } from '@/lib/quote/timezone'
 import type { QuoteResult } from '@/lib/quote/types'
 import { siteConfig } from '@/lib/config/site'
 import type { Locale } from '@/lib/i18n/locales'
+import { PRICING } from '@/lib/data/pricing'
 import { effectDelayMs } from './schedule'
 
 const COPY = {
@@ -18,7 +19,7 @@ const COPY = {
     startTime: 'Hora de inicio',
     duration: 'Duración (horas)',
     packageLabel: 'Paquete',
-    sevenSongs: 'Paquete de 7 canciones ($380)',
+    sevenSongs: (price: number) => `Paquete de 7 canciones ($${price})`,
     hourly: 'Por hora',
     address: 'Dirección del evento',
     checking: 'Calculando…',
@@ -59,7 +60,7 @@ const COPY = {
     startTime: 'Start time',
     duration: 'Duration (hours)',
     packageLabel: 'Package',
-    sevenSongs: '7-songs package ($380)',
+    sevenSongs: (price: number) => `7-songs package ($${price})`,
     hourly: 'Hourly',
     address: 'Event address',
     checking: 'Checking…',
@@ -194,9 +195,7 @@ export function BookingWizard({
   const [phone, setPhone] = useState('')
 
   const [quote, setQuote] = useState<QuoteResult | null>(null)
-  const [availability, setAvailability] = useState<{ checked: boolean; available?: boolean }>({
-    checked: false,
-  })
+  const [availability, setAvailability] = useState<CheckAvailabilityResult>({ checked: false })
   const [isQuotePending, startQuoteTransition] = useTransition()
 
   const isWeekday = eventDate ? ![0, 6].includes(weekdayIndexOf(eventDate)) : true
@@ -245,7 +244,7 @@ export function BookingWizard({
       checkAvailabilityAction({
         eventDate,
         startTime,
-        calendarBlockMinutes: quote.calendarBlockMinutes,
+        durationHours: quote.enforcedHours,
       })
         .then(setAvailability)
         .catch(() => setAvailability({ checked: false }))
@@ -308,20 +307,18 @@ export function BookingWizard({
 
       <fieldset>
         <legend className={labelCls}>{t.packageLabel}</legend>
-        {isWeekday && (
-          <label className="flex items-center gap-2 py-1">
-            <input
-              type="radio"
-              name="package"
-              checked={packageType === 'seven_songs'}
-              onChange={() => {
-                setPackageType('seven_songs')
-                setDurationHours(1)
-              }}
-            />
-            {t.sevenSongs}
-          </label>
-        )}
+        <label className="flex items-center gap-2 py-1">
+          <input
+            type="radio"
+            name="package"
+            checked={packageType === 'seven_songs'}
+            onChange={() => {
+              setPackageType('seven_songs')
+              setDurationHours(1)
+            }}
+          />
+          {t.sevenSongs(isWeekday ? PRICING.sevenSongsFlat : PRICING.weekendSevenSongsFlat)}
+        </label>
         <label className="flex items-center gap-2 py-1">
           <input
             type="radio"
@@ -390,9 +387,23 @@ export function BookingWizard({
               </p>
               {features.calendar ? (
                 availability.checked && (
-                  <p className="mt-2 font-semibold">
-                    {availability.available ? t.available : t.unavailable}
-                  </p>
+                  <div className="mt-2">
+                    <p className="font-semibold">{availability.available ? t.available : t.unavailable}</p>
+                    {!availability.available && availability.suggestions && availability.suggestions.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {availability.suggestions.map((s) => (
+                          <button
+                            key={s.startTime}
+                            type="button"
+                            onClick={() => setStartTime(s.startTime)}
+                            className="rounded border border-charcoal-border px-3 py-1 text-sm text-crema-white hover:bg-charcoal-elevated"
+                          >
+                            {s.startTime}–{s.endTime}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 )
               ) : (
                 <p className="mt-2 text-on-surface-variant">{t.noCalendarNotice}</p>
