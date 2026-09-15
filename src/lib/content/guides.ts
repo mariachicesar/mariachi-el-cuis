@@ -51,6 +51,45 @@ export const GUIDES = [
       en: 'Ceremony, cocktail hour, and reception entrance: when the mariachi plays.',
     },
   },
+  {
+    slug: 'how-to-hire-a-mariachi-band',
+    datePublished: '2026-09-15',
+    dateModified: '2026-09-15',
+    title: {
+      es: 'Cómo contratar un mariachi en Los Ángeles',
+      en: 'How to hire a mariachi band in Los Angeles',
+    },
+    description: {
+      es: 'Qué preguntar, cómo comparar cotizaciones y qué confirmar antes de apartar un mariachi.',
+      en: 'What to ask, how to compare quotes, and what to confirm before booking a mariachi band.',
+    },
+  },
+  {
+    slug: 'mariachi-funeral-songs',
+    datePublished: '2026-09-15',
+    dateModified: '2026-09-15',
+    title: {
+      es: 'Canciones de mariachi para funerales y homenajes',
+      en: 'Mariachi songs for funerals and memorials',
+    },
+    description: {
+      es: 'Canciones respetuosas para despedir a mamá, papá o un ser querido y cómo planear el homenaje.',
+      en: 'Respectful songs for honoring a mother, father, or loved one and how to plan the tribute.',
+    },
+  },
+  {
+    slug: 'best-mariachi-songs-by-occasion',
+    datePublished: '2026-09-15',
+    dateModified: '2026-09-15',
+    title: {
+      es: 'Las mejores canciones de mariachi para cada ocasión',
+      en: 'Best mariachi songs for every occasion',
+    },
+    description: {
+      es: 'Ideas de canciones para cumpleaños, serenatas, bodas, fiestas y momentos de despedida.',
+      en: 'Song ideas for birthdays, serenades, weddings, parties, and moments of remembrance.',
+    },
+  },
 ] as const
 
 export type GuideSlug = (typeof GUIDES)[number]['slug']
@@ -77,6 +116,18 @@ const content: Record<GuideSlug, Record<Locale, () => Promise<GuideModule>>> = {
   'wedding-mariachi-timeline': {
     es: () => import('@/content/guides/wedding-mariachi-timeline.es.mdx'),
     en: () => import('@/content/guides/wedding-mariachi-timeline.en.mdx'),
+  },
+  'how-to-hire-a-mariachi-band': {
+    es: () => import('@/content/guides/how-to-hire-a-mariachi-band.es.mdx'),
+    en: () => import('@/content/guides/how-to-hire-a-mariachi-band.en.mdx'),
+  },
+  'mariachi-funeral-songs': {
+    es: () => import('@/content/guides/mariachi-funeral-songs.es.mdx'),
+    en: () => import('@/content/guides/mariachi-funeral-songs.en.mdx'),
+  },
+  'best-mariachi-songs-by-occasion': {
+    es: () => import('@/content/guides/best-mariachi-songs-by-occasion.es.mdx'),
+    en: () => import('@/content/guides/best-mariachi-songs-by-occasion.en.mdx'),
   },
 }
 
