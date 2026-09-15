@@ -23,3 +23,11 @@ export function saturdayTimeTierMinHours(startMin: number): number {
 export function isSaturdayPeakStart(startMin: number): boolean {
   return startMin >= SATURDAY_PEAK_START_MIN && startMin < SATURDAY_PEAK_END_MIN
 }
+
+// The pure tier function returns 0 for the serenata window (no floor beyond
+// the app-wide 1h schema minimum) — wrap it so a bare 0 never turns into a
+// zero-length suggested slot when this is used standalone (outside getQuote,
+// where durationHours already provides that floor).
+export function saturdayMinimumMinutesForStart(startMin: number): number {
+  return Math.max(1, saturdayTimeTierMinHours(startMin)) * 60
+}

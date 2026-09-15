@@ -1,12 +1,8 @@
 import { expect, test } from 'vitest'
-import { freeIntervals, validateSaturdaySlot, validateSundaySlot } from './free-intervals'
-import { saturdayTimeTierMinHours } from './saturday-tiers'
+import { freeIntervals, validateSaturdaySlot, validateSimpleSlot } from './free-intervals'
+import { saturdayMinimumMinutesForStart as minimumMinutesForStart } from './saturday-tiers'
 
 const DAY_WINDOW = { startMin: 420, endMin: 1440 } // 07:00-24:00
-
-function minimumMinutesForStart(startMin: number): number {
-  return Math.max(1, saturdayTimeTierMinHours(startMin)) * 60
-}
 
 test('freeIntervals with no busy blocks returns the whole day window', () => {
   expect(freeIntervals(DAY_WINDOW, [], 30)).toEqual([{ startMin: 420, endMin: 1440 }])
@@ -69,12 +65,12 @@ test('validateSaturdaySlot: a fully booked day is rejected without throwing', ()
   expect(result.ok).toBe(false)
 })
 
-test('validateSundaySlot: fits a free interval', () => {
+test('validateSimpleSlot: fits a free interval', () => {
   const free = freeIntervals(DAY_WINDOW, [], 30)
-  expect(validateSundaySlot({ startMin: 480, endMin: 600 }, free)).toEqual({ ok: true })
+  expect(validateSimpleSlot({ startMin: 480, endMin: 600 }, free)).toEqual({ ok: true })
 })
 
-test('validateSundaySlot: conflicts with a padded busy block', () => {
+test('validateSimpleSlot: conflicts with a padded busy block', () => {
   const free = freeIntervals(DAY_WINDOW, [{ startMin: 480, endMin: 600 }], 30)
-  expect(validateSundaySlot({ startMin: 510, endMin: 570 }, free)).toEqual({ ok: false, reason: 'conflict' })
+  expect(validateSimpleSlot({ startMin: 510, endMin: 570 }, free)).toEqual({ ok: false, reason: 'conflict' })
 })

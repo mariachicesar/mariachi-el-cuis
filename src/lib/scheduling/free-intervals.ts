@@ -117,7 +117,7 @@ export function validateSaturdaySlot(
   return { ok: true }
 }
 
-export function validateSundaySlot(candidate: Interval, free: Interval[]): { ok: true } | { ok: false; reason: 'conflict' } {
+export function validateSimpleSlot(candidate: Interval, free: Interval[]): { ok: true } | { ok: false; reason: 'conflict' } {
   const host = free.find((i) => fitsWithin(candidate, i))
   return host ? { ok: true } : { ok: false, reason: 'conflict' }
 }

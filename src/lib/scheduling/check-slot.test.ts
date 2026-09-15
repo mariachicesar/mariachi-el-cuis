@@ -18,6 +18,8 @@ test('saturday: empty day, off-hour peak request is rejected with on-hour sugges
   const { checkSlot } = await import('./check-slot')
   const result = await checkSlot('2026-01-03', '17:15', 2)
   expect(result.available).toBe(false)
+  if (result.available) throw new Error('unreachable')
+  expect(result.reason).toBe('not_on_hour')
   expect(result.suggestions).toEqual([
     { startTime: '17:00', endTime: '19:00' },
     { startTime: '18:00', endTime: '20:00' },
@@ -33,6 +35,8 @@ test('saturday: 5-7pm booked, 8-9pm request is rejected with gap-filling suggest
   const { checkSlot } = await import('./check-slot')
   const result = await checkSlot('2026-01-03', '20:00', 1)
   expect(result.available).toBe(false)
+  if (result.available) throw new Error('unreachable')
+  expect(result.reason).toBe('below_minimum')
   expect(result.suggestions).toEqual([
     { startTime: '19:30', endTime: '21:30' },
     { startTime: '21:30', endTime: '22:30' },
@@ -47,7 +51,7 @@ test('sunday: conflicting request returns available:false with no suggestions', 
   ])
   const { checkSlot } = await import('./check-slot')
   const result = await checkSlot('2026-01-04', '08:30', 1)
-  expect(result).toEqual({ available: false })
+  expect(result).toEqual({ available: false, reason: 'conflict', suggestions: [] })
 })
 
 test('sunday: 8am request on an empty day is available (previously blocked by the old 3pm floor)', async () => {

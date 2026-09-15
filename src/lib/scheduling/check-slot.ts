@@ -3,18 +3,12 @@ import { laDayBoundsUtc, utcToLaMinutesOfDay, weekdayIndexOf } from '@/lib/quote
 import { minutesOf } from '@/lib/quote/time-of-day'
 import { PRICING } from '@/lib/data/pricing'
 import { getBusyBlocks } from '@/lib/calendar/google'
-import { freeIntervals, validateSaturdaySlot, validateSundaySlot, type Slot } from './free-intervals'
-import { saturdayTimeTierMinHours } from './saturday-tiers'
+import { freeIntervals, validateSaturdaySlot, validateSimpleSlot, type Slot } from './free-intervals'
+import { saturdayMinimumMinutesForStart } from './saturday-tiers'
 
-export type SlotCheckResult = { available: boolean; suggestions?: Slot[] }
-
-// The pure tier function returns 0 for the serenata window (no floor beyond
-// the app-wide 1h schema minimum) — wrap it so a bare 0 never turns into a
-// zero-length suggested slot when this is used standalone (outside getQuote,
-// where durationHours already provides that floor).
-function saturdayMinimumMinutesForStart(startMin: number): number {
-  return Math.max(1, saturdayTimeTierMinHours(startMin)) * 60
-}
+export type SlotCheckResult =
+  | { available: true }
+  | { available: false; reason: 'conflict' | 'below_minimum' | 'not_on_hour'; suggestions: Slot[] }
 
 export async function checkSlot(eventDate: string, startTime: string, durationHours: number): Promise<SlotCheckResult> {
   const startMin = minutesOf(startTime)
@@ -29,18 +23,19 @@ export async function checkSlot(eventDate: string, startTime: string, durationHo
     endMin: utcToLaMinutesOfDay(b.endUtc, eventDate),
   }))
 
-  // Shared lower bound for both days' free-interval math (Saturday's 7am
-  // floor). Harmless for Sunday: getQuote already rejects anything before
-  // Sunday's tighter 8am floor before checkSlot is ever called.
-  const dayWindow = { startMin: minutesOf(PRICING.saturdayEarliestStart), endMin: minutesOf(PRICING.hoursWindow.end) }
+  // General lower bound for the app's bookable hours (7am). This is not a
+  // day-specific floor: Saturday's and Sunday's own, tighter per-day floors
+  // are already enforced upstream by getQuote before checkSlot is ever
+  // reached, so this only needs to be the app-wide earliest bound.
+  const dayWindow = { startMin: minutesOf(PRICING.hoursWindow.start), endMin: minutesOf(PRICING.hoursWindow.end) }
   const free = freeIntervals(dayWindow, rawBusy, PRICING.travelBufferMinutes)
 
   const isSaturday = weekdayIndexOf(eventDate) === 6
   if (isSaturday) {
     const result = validateSaturdaySlot(rawCandidate, free, isFirstBookingOfDay, saturdayMinimumMinutesForStart)
-    return result.ok ? { available: true } : { available: false, suggestions: result.suggestions }
+    return result.ok ? { available: true } : { available: false, reason: result.reason, suggestions: result.suggestions }
   }
 
-  const result = validateSundaySlot(rawCandidate, free)
-  return { available: result.ok }
+  const result = validateSimpleSlot(rawCandidate, free)
+  return result.ok ? { available: true } : { available: false, reason: 'conflict', suggestions: [] }
 }

@@ -12,9 +12,17 @@ const inputSchema = z.object({
 })
 
 export type CheckAvailabilityResult =
-  | { checked: true; available: boolean; suggestions?: Slot[] }
+  | { checked: true; available: true }
+  | { checked: true; available: false; reason: 'conflict' | 'below_minimum' | 'not_on_hour'; suggestions: Slot[] }
   | { checked: false }
 
+// checkSlot only enforces calendar conflicts and Saturday's fragmentation
+// rules here — it is not gated by getQuote first (unlike startCheckoutAction,
+// which always calls getQuote and bails out before ever reaching the
+// calendar layer). So this action trusts its caller (the wizard, which
+// always calls getQuoteAction first) to have already validated the
+// earliest-start/hours-window rules; a hand-crafted call could report
+// available:true for a date/time getQuote would actually reject.
 export async function checkAvailabilityAction(input: unknown): Promise<CheckAvailabilityResult> {
   const parsed = inputSchema.safeParse(input)
   if (!parsed.success || !features.calendar) return { checked: false }
