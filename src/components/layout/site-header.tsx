@@ -1,6 +1,8 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import logo from '@/assets/brand/logo.png'
 import { siteConfig } from '@/lib/config/site'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/locales'
@@ -15,8 +17,8 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
   return (
     <header className="sticky top-0 z-40 border-b border-charcoal-border bg-surface">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3 lg:px-12">
-        <Link href={link('/')} className="font-display text-xl text-burnished-gold">
-          {siteConfig.name}
+        <Link href={link('/')} className="shrink-0">
+          <Image src={logo} alt={siteConfig.name} priority className="h-10 w-auto" />
         </Link>
 
         <nav aria-label="Main" className="hidden items-center gap-6 xl:flex">

@@ -2,8 +2,7 @@
 
 import { useActionState, useEffect, useState, useTransition } from 'react'
 import { useFormStatus } from 'react-dom'
-import { getQuoteAction, type GetQuoteActionResult } from '@/app/actions/quote'
-import { getAddressSuggestionsAction } from '@/app/actions/address-suggestions'
+import { getQuoteAction } from '@/app/actions/quote'
 import { checkAvailabilityAction, type CheckAvailabilityResult } from '@/app/actions/availability'
 import { sendEstimateEmailAction, type SendEstimateState } from '@/app/actions/estimate-email'
 import { startCheckoutAction, type StartCheckoutState } from '@/app/actions/booking'
@@ -12,14 +11,7 @@ import type { QuoteResult } from '@/lib/quote/types'
 import { siteConfig } from '@/lib/config/site'
 import type { Locale } from '@/lib/i18n/locales'
 import { PRICING } from '@/lib/data/pricing'
-import {
-  effectDelayMs,
-  formatTime12Hour,
-  minimumDurationForTime,
-  sevenSongsAvailableForTime,
-  slotDurationHours,
-  weekendStartTimes,
-} from './schedule'
+import { effectDelayMs } from './schedule'
 
 const COPY = {
   es: {
@@ -228,7 +220,6 @@ export function BookingWizard({
   const [phone, setPhone] = useState('')
 
   const [quote, setQuote] = useState<QuoteResult | null>(null)
-  const [quoteError, setQuoteError] = useState<Extract<GetQuoteActionResult, { ok: false }>['error'] | null>(null)
   const [availability, setAvailability] = useState<CheckAvailabilityResult>({ checked: false })
   const [isQuotePending, startQuoteTransition] = useTransition()
 
@@ -406,20 +397,18 @@ export function BookingWizard({
 
       <fieldset>
         <legend className={labelCls}>{t.packageLabel}</legend>
-        {canChooseSevenSongs && (
-          <label className="flex items-center gap-2 py-1">
-            <input
-              type="radio"
-              name="package"
-              checked={packageType === 'seven_songs'}
-              onChange={() => {
-                setPackageType('seven_songs')
-                setDurationInput('1')
-              }}
-            />
-            {t.sevenSongs(isWeekday ? PRICING.sevenSongsFlat : PRICING.weekendSevenSongsFlat)}
-          </label>
-        )}
+        <label className="flex items-center gap-2 py-1">
+          <input
+            type="radio"
+            name="package"
+            checked={packageType === 'seven_songs'}
+            onChange={() => {
+              setPackageType('seven_songs')
+              setDurationHours(1)
+            }}
+          />
+          {t.sevenSongs(isWeekday ? PRICING.sevenSongsFlat : PRICING.weekendSevenSongsFlat)}
+        </label>
         <label className="flex items-center gap-2 py-1">
           <input
             type="radio"
@@ -543,10 +532,7 @@ export function BookingWizard({
                           <button
                             key={s.startTime}
                             type="button"
-                            onClick={() => {
-                              setStartTime(s.startTime)
-                              setDurationInput(String(slotDurationHours(s.startTime, s.endTime)))
-                            }}
+                            onClick={() => setStartTime(s.startTime)}
                             className="rounded border border-charcoal-border px-3 py-1 text-sm text-crema-white hover:bg-charcoal-elevated"
                           >
                             {s.startTime}–{s.endTime}

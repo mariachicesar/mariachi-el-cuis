@@ -8,4 +8,5 @@ test('security headers present on a page response', async ({ request }) => {
   expect(h['referrer-policy']).toBe('strict-origin-when-cross-origin')
   expect(h['content-security-policy']).toContain("default-src 'self'")
   expect(h['content-security-policy']).toContain('youtube-nocookie.com')
+  expect(h['content-security-policy']).toContain('mariachiassets.s3.us-west-1.amazonaws.com')
 })
