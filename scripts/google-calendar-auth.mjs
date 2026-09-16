@@ -8,6 +8,13 @@ import { createServer } from 'node:http'
 import { google } from 'googleapis'
 import open from 'open'
 
+// Load .env from the cwd when present (Node 20.12+, no dotenv dependency).
+try {
+  process.loadEnvFile()
+} catch {
+  // No .env file — rely on the shell environment instead.
+}
+
 const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID
 const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET
 if (!clientId || !clientSecret) {
