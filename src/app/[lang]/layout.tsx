@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import Script from 'next/script'
 import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google'
 import '@/app/globals.css'
 import { SiteHeader } from '@/components/layout/site-header'
@@ -30,6 +31,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: { default: siteConfig.name, template: `%s · ${siteConfig.name}` },
   applicationName: siteConfig.name,
+  verification: { google: 'DrVKLHX6FQ0Oid3v22uYRBGW3bQFqXadeprpL67Itdc' },
 }
 
 export function generateStaticParams() {
@@ -57,6 +59,16 @@ export default async function RootLayout({
         {children}
         <SiteFooter locale={lang} dict={dict} />
         <MobileTabBar locale={lang} dict={dict} />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-YGK2HZEWXD"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date);
+gtag('config', 'G-YGK2HZEWXD');`}
+        </Script>
       </body>
     </html>
   )
