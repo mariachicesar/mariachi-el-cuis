@@ -26,7 +26,7 @@ test('saturday: empty day, off-hour peak request is rejected with on-hour sugges
   ])
 })
 
-test('saturday: 5-7pm booked, 8-9pm request is rejected with gap-filling suggestions', async () => {
+test('saturday: 5-7pm booked, 8-9pm request is rejected with gap-adjacent suggestions', async () => {
   const { getBusyBlocks } = await import('@/lib/calendar/google')
   // 2026-01-03 17:00-19:00 PST (winter, UTC-8) = 2026-01-04T01:00:00Z to 03:00:00Z
   vi.mocked(getBusyBlocks).mockResolvedValue([
@@ -39,7 +39,7 @@ test('saturday: 5-7pm booked, 8-9pm request is rejected with gap-filling suggest
   expect(result.reason).toBe('below_minimum')
   expect(result.suggestions).toEqual([
     { startTime: '19:30', endTime: '21:30' },
-    { startTime: '21:30', endTime: '22:30' },
+    { startTime: '20:00', endTime: '22:00' },
   ])
 })
 

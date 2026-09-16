@@ -1,5 +1,5 @@
 import { formatMinutes } from '@/lib/quote/time-of-day'
-import { SATURDAY_TIER_BOUNDARIES_MIN, isSaturdayPeakStart } from './saturday-tiers'
+import { isSaturdayPeakStart } from './saturday-tiers'
 
 export type Interval = { startMin: number; endMin: number }
 export type Slot = { startTime: string; endTime: string }
@@ -38,50 +38,73 @@ function fitsWithin(candidate: Interval, interval: Interval): boolean {
   return candidate.startMin >= interval.startMin && candidate.endMin <= interval.endMin
 }
 
-function snapToHour(startMin: number): number {
-  return Math.ceil(startMin / 60) * 60
+function snapToHalfHour(startMin: number): number {
+  return Math.ceil(startMin / 30) * 30
 }
 
+/**
+ * Saturday suggestions. When the day already has a booking, prefer slots that
+ * sit directly against the booked gaps (back-to-back), so the day packs as many
+ * bookable hours as possible — e.g. with 3:00-5:00pm booked, suggest the slot
+ * ending at 3:00pm rather than a distant tier boundary. On an empty day the
+ * peak on-hour first-booking rule still applies to suggestions in the peak
+ * window (to avoid fragmenting it). Each suggestion uses its own start's tier
+ * minimum, so pre-3pm suggestions can be 1h.
+ */
 function buildSaturdaySuggestions(
   candidate: Interval,
   free: Interval[],
   isFirstBookingOfDay: boolean,
   minimumMinutesForStart: (startMin: number) => number,
 ): Slot[] {
-  const anchors = new Set<number>()
-  for (const interval of free) {
-    anchors.add(interval.startMin)
-    for (const boundary of SATURDAY_TIER_BOUNDARIES_MIN) {
-      if (boundary > interval.startMin && boundary < interval.endMin) anchors.add(boundary)
-    }
-  }
-  // Only relevant when the day is empty (fragmentation isn't a concern yet) —
-  // these give the nearest on-hour options around what was actually asked for.
-  if (isFirstBookingOfDay) {
-    anchors.add(Math.floor(candidate.startMin / 60) * 60)
-    anchors.add(snapToHour(candidate.startMin))
-  }
+  const requestedDuration = candidate.endMin - candidate.startMin
 
   const valid: Interval[] = []
-  for (const anchorStart of anchors) {
-    const requiresOnHour = isFirstBookingOfDay && isSaturdayPeakStart(anchorStart)
-    const start = requiresOnHour ? snapToHour(anchorStart) : anchorStart
-    const interval = free.find((i) => start >= i.startMin && start < i.endMin)
-    if (!interval) continue
-    const end = start + minimumMinutesForStart(start)
-    if (end > interval.endMin) continue
-    valid.push({ startMin: start, endMin: end })
+  for (const interval of free) {
+    for (let start = snapToHalfHour(interval.startMin); start < interval.endMin; start += 30) {
+      if (isFirstBookingOfDay && isSaturdayPeakStart(start) && start % 60 !== 0) continue
+      const end = start + Math.max(requestedDuration, minimumMinutesForStart(start))
+      if (end > interval.endMin) continue
+      valid.push({ startMin: start, endMin: end })
+    }
   }
 
-  const unique = Array.from(new Map(valid.map((v) => [v.startMin, v])).values()).sort(
+  // Nearest slot on each side of the request (gap-adjacent first), falling
+  // back to the two nearest overall when only one side has room. Ties in
+  // distance go to the earlier start.
+  const before = valid
+    .filter((v) => v.startMin < candidate.startMin)
+    .sort(
+      (a, b) =>
+        Math.abs(a.startMin - candidate.startMin) - Math.abs(b.startMin - candidate.startMin) ||
+        a.startMin - b.startMin,
+    )
+  const after = valid
+    .filter((v) => v.startMin >= candidate.startMin)
+    .sort(
+      (a, b) =>
+        Math.abs(a.startMin - candidate.startMin) - Math.abs(b.startMin - candidate.startMin) ||
+        a.startMin - b.startMin,
+    )
+  const picked: Interval[] = []
+  if (before.length) picked.push(before[0]!)
+  if (after.length) picked.push(after[0]!)
+  if (picked.length < 2) {
+    const ranked = [...valid].sort(
+      (a, b) =>
+        Math.abs(a.startMin - candidate.startMin) - Math.abs(b.startMin - candidate.startMin) ||
+        a.startMin - b.startMin,
+    )
+    for (const v of ranked) {
+      if (picked.length >= 2) break
+      if (!picked.includes(v)) picked.push(v)
+    }
+  }
+
+  const unique = Array.from(new Map(picked.map((v) => [v.startMin, v])).values()).sort(
     (a, b) => a.startMin - b.startMin,
   )
-
-  const before = unique.filter((v) => v.startMin <= candidate.startMin).slice(-1)
-  const after = unique.filter((v) => v.startMin > candidate.startMin).slice(0, 1)
-  const picked = before.length && after.length ? [...before, ...after] : unique.slice(0, 2)
-
-  return picked.map((v) => ({ startTime: formatMinutes(v.startMin), endTime: formatMinutes(v.endMin) }))
+  return unique.slice(0, 2).map((v) => ({ startTime: formatMinutes(v.startMin), endTime: formatMinutes(v.endMin) }))
 }
 
 export function validateSaturdaySlot(
@@ -115,10 +138,6 @@ export function validateSaturdaySlot(
     }
   }
   return { ok: true }
-}
-
-function snapToHalfHour(startMin: number): number {
-  return Math.ceil(startMin / 30) * 30
 }
 
 function buildSimpleSuggestions(candidate: Interval, free: Interval[]): Slot[] {

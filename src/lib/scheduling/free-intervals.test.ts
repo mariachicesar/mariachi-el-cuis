@@ -43,13 +43,29 @@ test('validateSaturdaySlot: empty day, off-hour peak request is rejected with on
   ])
 })
 
-test('validateSaturdaySlot: 5-7pm booked, 8-9pm request is rejected with gap-filling suggestions', () => {
+test('validateSaturdaySlot: 5-7pm booked, 8-9pm request is rejected with gap-adjacent suggestions', () => {
   const free = freeIntervals(DAY_WINDOW, [{ startMin: 1020, endMin: 1140 }], 30) // 17:00-19:00 booked
   const result = validateSaturdaySlot({ startMin: 1200, endMin: 1260 }, free, false, minimumMinutesForStart) // 20:00-21:00
   expect(result).toMatchObject({ ok: false, reason: 'below_minimum' })
+  // Nearest-after is the request's own start with the 2h peak minimum applied;
+  // nearest-before hugs the padded booking.
   expect((result as { suggestions: unknown }).suggestions).toEqual([
     { startTime: '19:30', endTime: '21:30' },
-    { startTime: '21:30', endTime: '22:30' },
+    { startTime: '20:00', endTime: '22:00' },
+  ])
+})
+
+// User scenario: 3:00-5:00pm booked (peak), request 3:00pm for 2h.
+// Suggestions should pack around the booking: 12:30pm (ends 2:30pm, right at
+// the padded block edge; its 15:00 peak minimum is why it's 2h long) and
+// 5:30pm (right after the booking, 2h peak minimum).
+test('validateSaturdaySlot: 3-5pm booked, 3pm request suggests adjacent slots', () => {
+  const free = freeIntervals(DAY_WINDOW, [{ startMin: 900, endMin: 1020 }], 30) // 15:00-17:00 booked
+  const result = validateSaturdaySlot({ startMin: 900, endMin: 1020 }, free, false, minimumMinutesForStart)
+  expect(result).toMatchObject({ ok: false, reason: 'conflict' })
+  expect((result as { suggestions: unknown }).suggestions).toEqual([
+    { startTime: '12:30', endTime: '14:30' },
+    { startTime: '17:30', endTime: '19:30' },
   ])
 })
 

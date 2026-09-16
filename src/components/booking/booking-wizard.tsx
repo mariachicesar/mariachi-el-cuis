@@ -549,37 +549,48 @@ export function BookingWizard({
         >
           {quote.status === 'ok' ? (
             <>
-              <p>
-                {t.total}: ${quote.total}
-              </p>
-              <p>
-                {t.deposit}: ${quote.deposit}
-              </p>
-              <p>
-                {t.balance}: ${quote.balanceDue}
-              </p>
-              {features.calendar ? (
-                availability.checked && (
-                  <div className="mt-2">
-                    <p className="font-semibold">{availability.available ? t.available : t.unavailable}</p>
-                    {!availability.available && availability.suggestions && availability.suggestions.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {availability.suggestions.map((s) => (
-                          <button
-                            key={s.startTime}
-                            type="button"
-                            onClick={() => setStartTime(s.startTime)}
-                            className="rounded border border-charcoal-border px-3 py-1 text-sm text-crema-white hover:bg-charcoal-elevated"
-                          >
-                            {formatTime12Hour(s.startTime)}–{formatTime12Hour(s.endTime)}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
+              {isSlotUnavailable ? (
+                <div
+                  role="alert"
+                  className="rounded border border-red-400/60 bg-red-400/10 p-4 text-sm font-semibold text-red-400"
+                >
+                  {t.unavailable}
+                  {availability.suggestions && availability.suggestions.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {availability.suggestions.map((s) => (
+                        <button
+                          key={s.startTime}
+                          type="button"
+                          onClick={() => setStartTime(s.startTime)}
+                          className="rounded border border-red-400/60 bg-transparent px-3 py-1 text-sm font-normal text-crema-white hover:bg-red-400/20"
+                        >
+                          {formatTime12Hour(s.startTime)}–{formatTime12Hour(s.endTime)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ) : (
-                <p className="mt-2 text-on-surface-variant">{t.noCalendarNotice}</p>
+                <>
+                  <p>
+                    {t.total}: ${quote.total}
+                  </p>
+                  <p>
+                    {t.deposit}: ${quote.deposit}
+                  </p>
+                  <p>
+                    {t.balance}: ${quote.balanceDue}
+                  </p>
+                  {features.calendar ? (
+                    availability.checked && (
+                      <div className="mt-2">
+                        <p className="font-semibold">{t.available}</p>
+                      </div>
+                    )
+                  ) : (
+                    <p className="mt-2 text-on-surface-variant">{t.noCalendarNotice}</p>
+                  )}
+                </>
               )}
             </>
           ) : (
