@@ -29,7 +29,7 @@ const validFields = {
   packageType: 'seven_songs',
   address: '90011',
   email: 'customer@example.com',
-  phone: '',
+  phone: '2135551234',
   name: 'Test Customer',
   locale: 'en',
 }
@@ -105,4 +105,43 @@ test('returns slot_unavailable and never creates a hold or checkout session when
   expect(result).toEqual({ ok: false, error: 'slot_unavailable' })
   expect(createHoldEvent).not.toHaveBeenCalled()
   expect(createDepositCheckoutSession).not.toHaveBeenCalled()
+})
+
+test('returns a phone field error when the phone number is missing', async () => {
+  const { startCheckoutAction } = await import('./booking')
+  const result = await startCheckoutAction(
+    { ok: false },
+    formData({ ...validFields, phone: '' }),
+  )
+  expect(result).toEqual({
+    ok: false,
+    error: 'validation',
+    fieldErrors: expect.objectContaining({ phone: expect.any(Array) }),
+  })
+})
+
+test('returns a name field error when the name is too short', async () => {
+  const { startCheckoutAction } = await import('./booking')
+  const result = await startCheckoutAction(
+    { ok: false },
+    formData({ ...validFields, name: 'A' }),
+  )
+  expect(result).toEqual({
+    ok: false,
+    error: 'validation',
+    fieldErrors: expect.objectContaining({ name: expect.any(Array) }),
+  })
+})
+
+test('returns an email field error when the email is malformed', async () => {
+  const { startCheckoutAction } = await import('./booking')
+  const result = await startCheckoutAction(
+    { ok: false },
+    formData({ ...validFields, email: 'not-an-email' }),
+  )
+  expect(result).toEqual({
+    ok: false,
+    error: 'validation',
+    fieldErrors: expect.objectContaining({ email: expect.any(Array) }),
+  })
 })

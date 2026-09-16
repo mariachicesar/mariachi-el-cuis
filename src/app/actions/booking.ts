@@ -19,13 +19,7 @@ const inputSchema = z.object({
   packageType: z.enum(['seven_songs', 'hourly']),
   address: z.string().trim().min(5).max(200),
   email: z.email(),
-  phone: z
-    .string()
-    .trim()
-    .min(7)
-    .max(20)
-    .optional()
-    .or(z.literal('')),
+  phone: z.string().trim().min(7).max(20),
   name: z.string().trim().min(2).max(100),
   locale: z.enum(['es', 'en']),
 })
@@ -39,6 +33,7 @@ export type StartCheckoutState = {
     | 'contact_required'
     | 'call_required'
     | 'slot_unavailable'
+  fieldErrors?: Partial<Record<keyof z.input<typeof inputSchema>, string[]>>
 }
 
 export async function startCheckoutAction(
@@ -56,7 +51,9 @@ export async function startCheckoutAction(
     name: formData.get('name'),
     locale: formData.get('locale'),
   })
-  if (!parsed.success) return { ok: false, error: 'validation' }
+  if (!parsed.success) {
+    return { ok: false, error: 'validation', fieldErrors: z.flattenError(parsed.error).fieldErrors }
+  }
   if (!features.stripe) return { ok: false, error: 'not_configured' }
   if (!features.maps) return { ok: false, error: 'not_configured' }
 
@@ -97,7 +94,7 @@ export async function startCheckoutAction(
 
     calendarEventId = await createHoldEvent({
       summary: `HOLD — awaiting deposit — ${parsed.data.name}`,
-      description: `Package: ${parsed.data.packageType}\nHours: ${quote.enforcedHours}\nAddress: ${parsed.data.address}\nPhone: ${parsed.data.phone || '—'}`,
+      description: `Package: ${parsed.data.packageType}\nHours: ${quote.enforcedHours}\nAddress: ${parsed.data.address}\nPhone: ${parsed.data.phone}`,
       location: parsed.data.address,
       startUtc: eventStartUtc,
       endUtc: eventEndUtc,
@@ -119,7 +116,7 @@ export async function startCheckoutAction(
       address: parsed.data.address,
       name: parsed.data.name,
       email: parsed.data.email,
-      phone: parsed.data.phone || '',
+      phone: parsed.data.phone,
       total: String(quote.total),
       deposit: String(quote.deposit),
       balanceDue: String(quote.balanceDue),

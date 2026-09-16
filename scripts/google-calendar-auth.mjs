@@ -15,27 +15,40 @@ if (!clientId || !clientSecret) {
   process.exit(1)
 }
 
-const REDIRECT_URI = 'http://localhost:53682/oauth2callback'
+// Google rejects the `localhost` hostname for "Desktop app" OAuth clients
+// (redirect_uri_mismatch) — the loopback IP literal is required.
+const REDIRECT_URI = 'http://127.0.0.1:53682/oauth2callback'
 const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, REDIRECT_URI)
 
 const authUrl = oauth2Client.generateAuthUrl({
   access_type: 'offline',
   prompt: 'consent', // forces a refresh_token even on a re-auth
-  scope: ['https://www.googleapis.com/auth/calendar.events', 'https://www.googleapis.com/auth/calendar.readonly'],
+  // `calendar` is a superset of calendar.events + calendar.readonly and also
+  // allows calendars.insert below (creating the bookings calendar), which the
+  // narrower scopes reject with ACCESS_TOKEN_SCOPE_INSUFFICIENT.
+  scope: ['https://www.googleapis.com/auth/calendar'],
 })
 
 console.log('Opening your browser to authorize with the Gmail that should host the calendar...')
+console.log('\nIf the consent screen shows redirect_uri_mismatch, compare this URL against')
+console.log('the Authorized redirect URIs in Cloud Console:\n\n' + authUrl + '\n')
 await open(authUrl)
 
-const code = await new Promise((resolve) => {
+const code = await new Promise((resolve, reject) => {
   const server = createServer((req, res) => {
     const url = new URL(req.url, REDIRECT_URI)
     const c = url.searchParams.get('code')
+    const err = url.searchParams.get('error')
     res.end('You can close this tab and return to the terminal.')
     server.close()
-    resolve(c)
+    if (err || !c) reject(new Error(`Authorization failed: ${err ?? 'no code returned'}`))
+    else resolve(c)
   })
+  server.on('error', reject)
   server.listen(53682)
+}).catch((err) => {
+  console.error(err.message)
+  process.exit(1)
 })
 
 const { tokens } = await oauth2Client.getToken(code)

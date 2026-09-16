@@ -139,6 +139,54 @@ export const CITIES: City[] = [
       en: 'Our home base is 90011 in South Los Angeles. We play across Downtown, South LA, and the historic neighborhoods surrounding our headquarters.',
     },
   },
+  {
+    slug: 'beverly-hills', name: 'Beverly Hills', lat: 34.0736, lng: -118.4004,
+    neighborhoods: ['Golden Triangle', 'The Flats', 'Trousdale Estates'],
+    blurb: {
+      es: 'En Beverly Hills tocamos bodas, cenas de gala y fiestas privadas en hoteles, restaurantes y residencias por todo el Golden Triangle y The Flats.',
+      en: 'In Beverly Hills we play weddings, gala dinners, and private parties at hotels, restaurants, and residences across the Golden Triangle and The Flats.',
+    },
+  },
+  {
+    slug: 'west-hollywood', name: 'West Hollywood', lat: 34.0900, lng: -118.3617,
+    neighborhoods: ['Sunset Strip', 'Santa Monica Boulevard', 'Design District'],
+    blurb: {
+      es: 'West Hollywood nos pide seguido para cumpleaños, aniversarios y eventos en restaurantes y terrazas sobre el Sunset Strip y Santa Monica Boulevard.',
+      en: 'West Hollywood books us often for birthdays, anniversaries, and events at restaurants and terraces along the Sunset Strip and Santa Monica Boulevard.',
+    },
+  },
+  {
+    slug: 'hollywood', name: 'Hollywood', lat: 34.0928, lng: -118.3287,
+    neighborhoods: ['Hollywood Boulevard', 'Hollywood Hills', 'Los Feliz border'],
+    blurb: {
+      es: 'En Hollywood tocamos estrenos, fiestas de producción y celebraciones privadas en venues sobre Hollywood Boulevard y casas en Hollywood Hills.',
+      en: 'In Hollywood we play premieres, production parties, and private celebrations at venues along Hollywood Boulevard and homes in the Hollywood Hills.',
+    },
+  },
+  {
+    slug: 'pasadena', name: 'Pasadena', lat: 34.1478, lng: -118.1445,
+    neighborhoods: ['Old Pasadena', 'Bungalow Heaven', 'Madison Heights'],
+    blurb: {
+      es: 'En Pasadena tocamos bodas en jardines y mansiones históricas, fiestas en Old Pasadena y celebraciones familiares en Madison Heights.',
+      en: 'In Pasadena we play weddings at gardens and historic estates, parties in Old Pasadena, and family celebrations in Madison Heights.',
+    },
+  },
+  {
+    slug: 'altadena', name: 'Altadena', lat: 34.1897, lng: -118.1312,
+    neighborhoods: ['Christmas Tree Lane', 'Lake Avenue', 'Altadena Meadows'],
+    blurb: {
+      es: 'Altadena nos recibe para fiestas en patios amplios, serenatas sobre Lake Avenue y reuniones familiares cerca de Christmas Tree Lane.',
+      en: 'Altadena hosts us for backyard parties, serenatas along Lake Avenue, and family gatherings near Christmas Tree Lane.',
+    },
+  },
+  {
+    slug: 'santa-monica', name: 'Santa Monica', lat: 34.0195, lng: -118.4912,
+    neighborhoods: ['Montana Avenue', 'Ocean Park', 'Downtown Santa Monica'],
+    blurb: {
+      es: 'En Santa Monica tocamos bodas frente al mar, cumpleaños en restaurantes de Montana Avenue y fiestas privadas en Ocean Park.',
+      en: 'In Santa Monica we play oceanfront weddings, birthdays at Montana Avenue restaurants, and private parties in Ocean Park.',
+    },
+  },
 ]
 
 export function getCity(slug: string): City | undefined {

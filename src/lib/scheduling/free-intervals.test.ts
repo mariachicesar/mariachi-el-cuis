@@ -72,5 +72,25 @@ test('validateSimpleSlot: fits a free interval', () => {
 
 test('validateSimpleSlot: conflicts with a padded busy block', () => {
   const free = freeIntervals(DAY_WINDOW, [{ startMin: 480, endMin: 600 }], 30)
-  expect(validateSimpleSlot({ startMin: 510, endMin: 570 }, free)).toEqual({ ok: false, reason: 'conflict' })
+  expect(validateSimpleSlot({ startMin: 510, endMin: 570 }, free)).toMatchObject({ ok: false, reason: 'conflict' })
+})
+
+test('validateSimpleSlot: conflict suggests the nearest windows before and after', () => {
+  // 08:00-10:00 busy, padded to 07:30-10:30; request 10:00-12:00 (conflicts with the pad)
+  const free = freeIntervals(DAY_WINDOW, [{ startMin: 480, endMin: 600 }], 30)
+  const result = validateSimpleSlot({ startMin: 600, endMin: 720 }, free)
+  expect(result).toEqual({
+    ok: false,
+    reason: 'conflict',
+    suggestions: [{ startTime: '10:30', endTime: '12:30' }],
+  })
+})
+
+test('validateSimpleSlot: conflict with no fitting window returns no suggestions', () => {
+  const free = freeIntervals(DAY_WINDOW, [{ startMin: 420, endMin: 1440 }], 0)
+  expect(validateSimpleSlot({ startMin: 480, endMin: 600 }, free)).toEqual({
+    ok: false,
+    reason: 'conflict',
+    suggestions: [],
+  })
 })

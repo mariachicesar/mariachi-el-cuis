@@ -25,7 +25,7 @@ const validFields = {
   packageType: 'seven_songs',
   address: '90011',
   email: 'customer@example.com',
-  phone: '',
+  phone: '2135551234',
   name: 'Test Customer',
   locale: 'en',
 }

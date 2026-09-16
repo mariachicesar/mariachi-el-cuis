@@ -117,7 +117,34 @@ export function validateSaturdaySlot(
   return { ok: true }
 }
 
-export function validateSimpleSlot(candidate: Interval, free: Interval[]): { ok: true } | { ok: false; reason: 'conflict' } {
+function snapToHalfHour(startMin: number): number {
+  return Math.ceil(startMin / 30) * 30
+}
+
+function buildSimpleSuggestions(candidate: Interval, free: Interval[]): Slot[] {
+  const duration = candidate.endMin - candidate.startMin
+  const fits: Interval[] = []
+  for (const interval of free) {
+    const start = snapToHalfHour(interval.startMin)
+    if (start + duration <= interval.endMin) fits.push({ startMin: start, endMin: start + duration })
+  }
+  if (fits.length === 0) return []
+
+  const before = fits.filter((v) => v.endMin <= candidate.startMin)
+  const after = fits.filter((v) => v.startMin >= candidate.endMin)
+  const picked: Interval[] = []
+  if (before.length) picked.push(before[before.length - 1]!)
+  if (after.length) picked.push(after[0]!)
+  const fallback = picked.length ? picked : fits.slice(0, 2)
+
+  return fallback.map((v) => ({ startTime: formatMinutes(v.startMin), endTime: formatMinutes(v.endMin) }))
+}
+
+export function validateSimpleSlot(
+  candidate: Interval,
+  free: Interval[],
+): { ok: true } | { ok: false; reason: 'conflict'; suggestions: Slot[] } {
   const host = free.find((i) => fitsWithin(candidate, i))
-  return host ? { ok: true } : { ok: false, reason: 'conflict' }
+  if (host) return { ok: true }
+  return { ok: false, reason: 'conflict', suggestions: buildSimpleSuggestions(candidate, free) }
 }

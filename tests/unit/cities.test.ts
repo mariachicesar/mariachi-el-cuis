@@ -2,9 +2,9 @@
 import { expect, test } from 'vitest'
 import { CITIES, cityDistanceMi, getCity } from '@/lib/data/cities'
 
-test('15-20 cities, all fields present, slugs unique', () => {
+test('15-25 cities, all fields present, slugs unique', () => {
   expect(CITIES.length).toBeGreaterThanOrEqual(15)
-  expect(CITIES.length).toBeLessThanOrEqual(20)
+  expect(CITIES.length).toBeLessThanOrEqual(25)
   const slugs = new Set(CITIES.map((c) => c.slug))
   expect(slugs.size).toBe(CITIES.length)
   for (const c of CITIES) {

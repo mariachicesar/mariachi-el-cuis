@@ -7,6 +7,7 @@ import { ServiceTeaser } from '@/components/home/service-teaser'
 import { Button } from '@/components/ui/button'
 import { JsonLd } from '@/components/ui/json-ld'
 import { Section } from '@/components/ui/section'
+import { ContactForm } from '@/app/[lang]/contact/contact-form'
 import { CITIES } from '@/lib/data/cities'
 import { GUIDES } from '@/lib/content/guides'
 import { pricingLines } from '@/lib/data/pricing'
@@ -139,6 +140,20 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       </Section>
 
       <CtaBand locale={locale} dict={dict} />
+
+      <Section>
+        <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">
+          {es ? 'Envíanos un mensaje' : 'Send us a message'}
+        </h2>
+        <p className="mt-3 max-w-2xl text-on-surface-variant">
+          {es
+            ? 'Cuéntanos sobre tu evento y te respondemos lo antes posible.'
+            : 'Tell us about your event and we will get back to you as soon as possible.'}
+        </p>
+        <div className="mt-6">
+          <ContactForm dict={dict} locale={locale} />
+        </div>
+      </Section>
     </main>
   )
 }

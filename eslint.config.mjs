@@ -12,6 +12,7 @@ export default tseslint.config(
       'playwright-report/**',
       'test-results/**',
       '.lighthouseci/**',
+      '.worktrees/**',
       'next-env.d.ts',
     ],
   },

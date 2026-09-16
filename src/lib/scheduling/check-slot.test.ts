@@ -43,7 +43,7 @@ test('saturday: 5-7pm booked, 8-9pm request is rejected with gap-filling suggest
   ])
 })
 
-test('sunday: conflicting request returns available:false with no suggestions', async () => {
+test('sunday: conflicting request returns available:false with nearby suggestions', async () => {
   const { getBusyBlocks } = await import('@/lib/calendar/google')
   // 2026-01-04 08:00-10:00 PST = 16:00-18:00Z
   vi.mocked(getBusyBlocks).mockResolvedValue([
@@ -51,7 +51,11 @@ test('sunday: conflicting request returns available:false with no suggestions', 
   ])
   const { checkSlot } = await import('./check-slot')
   const result = await checkSlot('2026-01-04', '08:30', 1)
-  expect(result).toEqual({ available: false, reason: 'conflict', suggestions: [] })
+  expect(result).toEqual({
+    available: false,
+    reason: 'conflict',
+    suggestions: [{ startTime: '10:30', endTime: '11:30' }],
+  })
 })
 
 test('sunday: 8am request on an empty day is available (previously blocked by the old 3pm floor)', async () => {

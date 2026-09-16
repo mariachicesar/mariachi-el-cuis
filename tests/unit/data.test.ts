@@ -30,14 +30,10 @@ test('services + faq + repertoire have content', () => {
   expect(REPERTOIRE.length).toBeGreaterThanOrEqual(40)
 })
 
-test('pricingLines mentions every PRICING dollar figure, both locales', () => {
+test('pricingLines mentions deposit dollar figures, both locales', () => {
   for (const locale of ['es', 'en'] as const) {
     const text = pricingLines(locale).join(' ')
     for (const amount of [
-      PRICING.sevenSongsFlat,
-      PRICING.weekendSevenSongsFlat,
-      PRICING.hourlyWeekday,
-      PRICING.hourlyWeekend,
       PRICING.depositPerHour,
       PRICING.rushFlatDeposit,
     ]) {

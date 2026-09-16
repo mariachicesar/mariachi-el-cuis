@@ -46,7 +46,7 @@ const COPY = {
     byPhone: 'Solo tengo teléfono',
     email: 'Correo electrónico',
     name: 'Nombre',
-    phone: 'Teléfono (opcional)',
+    phone: 'Teléfono',
     emailEstimate: 'Enviarme esta cotización',
     emailEstimatePending: 'Enviando…',
     emailSent: 'Te enviamos la cotización por correo.',
@@ -60,6 +60,9 @@ const COPY = {
     noCalendarNotice: 'Confirmaremos la disponibilidad cuando te llamemos.',
     noStripeNotice: 'Llámanos para confirmar y coordinar el depósito.',
     errorValidation: 'Revisa los datos del formulario e intenta de nuevo.',
+    errorNameRequired: 'Ingresa tu nombre.',
+    errorEmailInvalid: 'Ingresa un correo electrónico válido.',
+    errorPhoneRequired: 'Ingresa tu número de teléfono.',
     errorNotConfigured: 'Por ahora, llámanos o escríbenos por WhatsApp para tu cotización.',
     errorAddressNotFound: 'No pudimos encontrar esa dirección — verifica que esté bien escrita.',
     errorCallRequired: 'Necesitamos que nos llames para confirmar esta reserva.',
@@ -93,7 +96,7 @@ const COPY = {
     byPhone: 'I only have a phone',
     email: 'Email',
     name: 'Name',
-    phone: 'Phone (optional)',
+    phone: 'Phone',
     emailEstimate: 'Email me this estimate',
     emailEstimatePending: 'Sending…',
     emailSent: 'We emailed you the estimate.',
@@ -107,6 +110,9 @@ const COPY = {
     noCalendarNotice: "We'll confirm availability when we call you.",
     noStripeNotice: 'Call us to confirm and arrange the deposit.',
     errorValidation: 'Please check the form fields and try again.',
+    errorNameRequired: 'Please enter your name.',
+    errorEmailInvalid: 'Please enter a valid email address.',
+    errorPhoneRequired: 'Please enter your phone number.',
     errorNotConfigured: 'For now, please call us or message us on WhatsApp for your quote.',
     errorAddressNotFound: "We couldn't find that address — please check it and try again.",
     errorCallRequired: 'Please call us to confirm this booking.',
@@ -332,6 +338,10 @@ export function BookingWizard({
   const [checkoutState, checkoutFormAction] = useActionState(startCheckoutAction, checkoutInitial)
 
   const isSlotUnavailable = availability.checked && availability.available === false
+  const checkoutFieldErrors =
+    checkoutState.error === 'validation' ? checkoutState.fieldErrors : undefined
+  const checkoutReady =
+    name.trim().length >= 2 && email.trim() !== '' && phone.trim().length >= 7
 
   const hiddenQuoteFields = (
     <>
@@ -561,7 +571,7 @@ export function BookingWizard({
                             onClick={() => setStartTime(s.startTime)}
                             className="rounded border border-charcoal-border px-3 py-1 text-sm text-crema-white hover:bg-charcoal-elevated"
                           >
-                            {s.startTime}–{s.endTime}
+                            {formatTime12Hour(s.startTime)}–{formatTime12Hour(s.endTime)}
                           </button>
                         ))}
                       </div>
@@ -616,10 +626,16 @@ export function BookingWizard({
             <input
               id="wizard-email"
               type="email"
+              required
               className={inputCls}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+            {checkoutFieldErrors?.email && (
+              <p role="alert" className="mt-2 text-sm text-red-400">
+                {t.errorEmailInvalid}
+              </p>
+            )}
           </div>
 
           <form action={estimateFormAction} className="space-y-2">
@@ -646,20 +662,33 @@ export function BookingWizard({
               <input
                 id="wizard-name"
                 type="text"
+                required
+                minLength={2}
                 className={inputCls}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
+              {checkoutFieldErrors?.name && (
+                <p role="alert" className="mt-2 text-sm text-red-400">
+                  {t.errorNameRequired}
+                </p>
+              )}
               <label htmlFor="wizard-phone" className={labelCls}>
                 {t.phone}
               </label>
               <input
                 id="wizard-phone"
                 type="tel"
+                required
                 className={inputCls}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
+              {checkoutFieldErrors?.phone && (
+                <p role="alert" className="mt-2 text-sm text-red-400">
+                  {t.errorPhoneRequired}
+                </p>
+              )}
               {isSlotUnavailable ? (
                 <p className="mt-4 text-sm font-semibold text-red-400">{t.reserveUnavailable}</p>
               ) : (
@@ -671,7 +700,7 @@ export function BookingWizard({
                   <ReserveSubmitButton
                     label={t.reserve(quote.deposit)}
                     pendingLabel={t.reservePending}
-                    disabled={isQuotePending}
+                    disabled={isQuotePending || !checkoutReady}
                   />
                   {checkoutState.error && (
                     <p className="mt-2 text-sm text-red-400">

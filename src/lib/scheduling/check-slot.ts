@@ -37,5 +37,6 @@ export async function checkSlot(eventDate: string, startTime: string, durationHo
   }
 
   const result = validateSimpleSlot(rawCandidate, free)
-  return result.ok ? { available: true } : { available: false, reason: 'conflict', suggestions: [] }
+  if (result.ok) return { available: true }
+  return { available: false, reason: 'conflict', suggestions: result.suggestions }
 }

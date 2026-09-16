@@ -27,7 +27,6 @@ export const SERVICES: Service[] = [
       en: 'From the mass to the vals and the surprise dance, plus the rancheras that fill the floor.',
     },
     occasions: [
-      { es: 'Misa de acción de gracias', en: 'Thanksgiving mass' },
       { es: 'Vals con el papá y la corte', en: 'Vals with dad and the court' },
       { es: 'Set de rancheras y sones para la fiesta', en: 'Ranchera and son set for the party' },
     ],
