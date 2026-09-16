@@ -27,8 +27,9 @@ const jakarta = Plus_Jakarta_Sans({
   variable: '--font-jakarta',
 })
 
+// metadataBase lives in the root layout (src/app/layout.tsx) so it also
+// covers routes outside the [lang] subtree (opengraph-image, sitemap, etc.).
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
   title: { default: siteConfig.name, template: `%s · ${siteConfig.name}` },
   applicationName: siteConfig.name,
   verification: { google: 'DrVKLHX6FQ0Oid3v22uYRBGW3bQFqXadeprpL67Itdc' },

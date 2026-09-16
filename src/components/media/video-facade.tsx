@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 import { useState } from 'react'
 
 type VideoFacadeProps =
@@ -43,12 +44,26 @@ export function VideoFacade(props: VideoFacadeProps) {
       className="group relative flex aspect-video w-full items-center justify-center rounded-xl bg-charcoal-elevated"
       aria-label={`Play: ${title}`}
     >
-      <img
-        src={posterSrc}
-        alt=""
-        className="absolute inset-0 h-full w-full rounded-xl object-cover opacity-70"
-        loading="lazy"
-      />
+      {props.youtubeId ? (
+        // YouTube thumbnail host isn't in remotePatterns; a raw img avoids
+        // widening the image optimizer's allowlist for a facade poster.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={posterSrc}
+          alt=""
+          className="absolute inset-0 h-full w-full rounded-xl object-cover opacity-70"
+          loading="lazy"
+        />
+      ) : (
+        <Image
+          src={posterSrc!}
+          alt=""
+          fill
+          unoptimized
+          sizes="(max-width: 768px) 100vw, 768px"
+          className="rounded-xl object-cover opacity-70"
+        />
+      )}
       <span className="relative rounded-full bg-burnished-gold px-5 py-3 font-semibold text-on-primary">
         ▶
       </span>
