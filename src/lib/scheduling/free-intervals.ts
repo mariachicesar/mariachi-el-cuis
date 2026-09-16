@@ -1,4 +1,5 @@
 import { formatMinutes } from '@/lib/quote/time-of-day'
+
 import { isSaturdayPeakStart } from './saturday-tiers'
 
 export type Interval = { startMin: number; endMin: number }
