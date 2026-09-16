@@ -54,11 +54,14 @@ export async function generateMetadata({
   const slot = findMusician(musician)
   if (!slot) return {}
   const t = COPY[locale]
+  // Placeholder pages stay out of the index until real bios + photos land;
+  // flip noindex off when each musician page has unique content.
   return buildMetadata({
     locale,
     path: `/about/${slot.slug}`,
     title: `${slot.role[locale]} — ${t.breadcrumbAbout}`,
     description: t.bioBody,
+    noindex: true,
   })
 }
 

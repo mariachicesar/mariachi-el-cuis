@@ -42,7 +42,7 @@ export async function submitContact(
   try {
     const resend = new Resend(env.RESEND_API_KEY)
     await resend.emails.send({
-      from: `${siteConfig.name} <noreply@${new URL(siteConfig.url).hostname}>`,
+      from: siteConfig.emailFrom,
       to: env.CONTACT_TO_EMAIL!,
       replyTo: email,
       subject: `Website contact — ${name}`,

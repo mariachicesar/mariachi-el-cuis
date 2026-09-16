@@ -1,6 +1,6 @@
 {
   "nav": { "home": "Home", "services": "Services", "musicians": "Musicians", "repertoire": "Repertoire", "media": "Media", "guides": "Guides", "quote": "Instant Quote", "menu": "Menu", "faq": "FAQ", "contact": "Contact" },
   "cta": { "checkAvailability": "Check availability", "getQuote": "Get a quote", "call": "Call", "whatsapp": "WhatsApp us" },
-  "footer": { "tagline": "Traditional mariachi for Los Angeles celebrations.", "areasHeading": "Service areas", "contactHeading": "Contact", "rights": "All rights reserved.", "terms": "Terms", "privacy": "Privacy" },
+  "footer": { "tagline": "Traditional mariachi for Los Angeles celebrations.", "areasHeading": "Service areas", "contactHeading": "Contact", "rights": "All rights reserved.", "terms": "Terms", "privacy": "Privacy", "preferredSource": "Add us as a preferred source on Google" },
   "common": { "skipToContent": "Skip to content", "languageName": "English" }
 }

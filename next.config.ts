@@ -18,9 +18,10 @@ const securityHeaders = [
       "media-src 'self' https://mariachiassets.s3.us-west-1.amazonaws.com",
       "font-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-inline'" + (process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''),
-      "connect-src 'self'",
-      "frame-src https://www.youtube-nocookie.com",
+      // news.google.com: Google's preferred-sources publisher library + its dialog.
+      "script-src 'self' 'unsafe-inline' https://news.google.com" + (process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''),
+      "connect-src 'self' https://news.google.com https://www.google.com",
+      "frame-src https://www.youtube-nocookie.com https://news.google.com",
       "object-src 'none'",
     ].join('; '),
   },

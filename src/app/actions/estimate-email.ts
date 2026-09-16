@@ -70,7 +70,7 @@ export async function sendEstimateEmailAction(
   const resend = new Resend(env.RESEND_API_KEY)
   try {
     await resend.emails.send({
-      from: `${siteConfig.name} <noreply@${new URL(siteConfig.url).hostname}>`,
+      from: siteConfig.emailFrom,
       to: parsed.data.email,
       subject:
         parsed.data.locale === 'es'

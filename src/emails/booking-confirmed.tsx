@@ -1,5 +1,6 @@
 import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from '@react-email/components'
 import type { Locale } from '@/lib/i18n/locales'
+import { formatStartTime } from '@/lib/contract/terms'
 import { laWallTimeToUtc } from '@/lib/quote/timezone'
 
 const COPY = {
@@ -13,6 +14,10 @@ const COPY = {
     balance: 'Saldo pendiente (se paga el día del evento)',
     cancellation:
       'El depósito es reembolsable solo si cancelas 7 días o más antes del evento.',
+    payment:
+      'El saldo se paga el día del evento en efectivo o por Zelle. No se aceptan cheques, salvo cheques entregados al menos 3 días hábiles antes del evento.',
+    contract:
+      'Adjuntamos tu contrato de presentación firmado. Guárdalo para tus registros.',
     addToCalendar: 'Agregar a Google Calendar',
     calendarTitle: 'Mariachi El Cuis — Evento',
   },
@@ -25,6 +30,9 @@ const COPY = {
     paid: 'Deposit paid',
     balance: 'Balance due (paid on the event day)',
     cancellation: 'The deposit is refundable only if you cancel 7 or more days before the event.',
+    payment:
+      'The balance is paid on the day of the event in cash or by Zelle. No checks are accepted, except checks delivered at least 3 business days before the event.',
+    contract: 'Your signed performance agreement is attached. Please keep it for your records.',
     addToCalendar: 'Add to Google Calendar',
     calendarTitle: 'Mariachi El Cuis — Event',
   },
@@ -72,7 +80,7 @@ export function BookingConfirmedEmail({
               {t.date}: {metadata.eventDate}
             </Text>
             <Text>
-              {t.time}: {metadata.startTime}
+              {t.time}: {metadata.startTime ? formatStartTime(metadata.startTime, locale) : ''}
             </Text>
             <Text>
               {t.address}: {metadata.address}
@@ -83,7 +91,9 @@ export function BookingConfirmedEmail({
             <Text>
               {t.balance}: ${metadata.balanceDue}
             </Text>
+            <Text>{t.payment}</Text>
             <Text>{t.cancellation}</Text>
+            {metadata.signatureName && <Text>{t.contract}</Text>}
           </Section>
           {calendarUrl && (
             <Section style={{ textAlign: 'center', marginTop: '24px' }}>

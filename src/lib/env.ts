@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 const schema = z.object({
   NEXT_PUBLIC_SITE_URL: z.url().default('http://localhost:3000'),
+  NEXT_PUBLIC_GOOGLE_PREFERRED_SOURCE: z.enum(['true', 'false']).optional(),
   RESEND_API_KEY: z.string().min(1).optional(),
   CONTACT_TO_EMAIL: z.email().optional(),
   GOOGLE_MAPS_API_KEY: z.string().min(1).optional(),
@@ -26,6 +27,9 @@ function normalizeOptional(value: string | undefined): string | undefined {
 export function parseEnv(source: Record<string, string | undefined>) {
   const env = schema.parse({
     NEXT_PUBLIC_SITE_URL: normalizeOptional(source.NEXT_PUBLIC_SITE_URL),
+    NEXT_PUBLIC_GOOGLE_PREFERRED_SOURCE: normalizeOptional(
+      source.NEXT_PUBLIC_GOOGLE_PREFERRED_SOURCE,
+    ),
     RESEND_API_KEY: normalizeOptional(source.RESEND_API_KEY),
     CONTACT_TO_EMAIL: normalizeOptional(source.CONTACT_TO_EMAIL),
     GOOGLE_MAPS_API_KEY: normalizeOptional(source.GOOGLE_MAPS_API_KEY),
@@ -48,6 +52,9 @@ export function parseEnv(source: Record<string, string | undefined>) {
           env.GOOGLE_CALENDAR_ID,
       ),
       stripe: Boolean(env.STRIPE_SECRET_KEY),
+      // Google only lists some sites in its source preferences tool; keep the
+      // button hidden until mariachielcuis.com is eligible.
+      preferredSource: env.NEXT_PUBLIC_GOOGLE_PREFERRED_SOURCE === 'true',
     },
   }
 }

@@ -18,7 +18,7 @@ export function generateStaticParams() {
 
 const COPY = {
   es: {
-    title: 'Preguntas frecuentes',
+    title: 'Preguntas frecuentes sobre mariachi',
     description:
       'Respuestas sobre precios, áreas de servicio, depósitos, cancelaciones y cómo reservar a Mariachi El Cuis en el Condado de Los Ángeles.',
     intro:
@@ -27,7 +27,7 @@ const COPY = {
     breadcrumbHome: 'Inicio',
   },
   en: {
-    title: 'Frequently asked questions',
+    title: 'Mariachi FAQ',
     description:
       'Answers about pricing, service areas, deposits, cancellations, and how to book Mariachi El Cuis across Los Angeles County.',
     intro:

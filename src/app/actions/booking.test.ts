@@ -31,6 +31,8 @@ const validFields = {
   email: 'customer@example.com',
   phone: '2135551234',
   name: 'Test Customer',
+  agreed: 'on',
+  signatureName: 'Test Customer',
   locale: 'en',
 }
 
@@ -80,9 +82,36 @@ test('creates a calendar hold and a Stripe session, then redirects, for an ok qu
   expect(sessionArgs.depositUsd).toBe(50)
   expect(sessionArgs.metadata.calendarEventId).toBe('evt-1')
   expect(sessionArgs.metadata.email).toBe('customer@example.com')
+  expect(sessionArgs.metadata.contractVersion).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+  expect(sessionArgs.metadata.signatureName).toBe('Test Customer')
+  expect(sessionArgs.metadata.signedAt).toBeTruthy()
 
   const { redirect } = await import('next/navigation')
   expect(redirect).toHaveBeenCalledWith('https://checkout.stripe.com/session-1')
+})
+
+test('returns validation errors when the agreement is not accepted or the signature is missing', async () => {
+  const { startCheckoutAction } = await import('./booking')
+
+  const noAgree = await startCheckoutAction(
+    { ok: false },
+    formData({ ...validFields, agreed: '' }),
+  )
+  expect(noAgree).toEqual({
+    ok: false,
+    error: 'validation',
+    fieldErrors: expect.objectContaining({ agreed: expect.any(Array) }),
+  })
+
+  const shortSignature = await startCheckoutAction(
+    { ok: false },
+    formData({ ...validFields, signatureName: 'A' }),
+  )
+  expect(shortSignature).toEqual({
+    ok: false,
+    error: 'validation',
+    fieldErrors: expect.objectContaining({ signatureName: expect.any(Array) }),
+  })
 })
 
 test('returns slot_unavailable and never creates a hold or checkout session when the slot is taken', async () => {

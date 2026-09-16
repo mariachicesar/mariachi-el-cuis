@@ -35,8 +35,8 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-on-surface-variant">
           {es
-            ? 'Mariachi tradicional para bodas, quinceañeras, misas y serenatas en el Condado de Los Ángeles. Cotiza y reserva directamente con la agrupación.'
-            : 'Traditional mariachi for weddings, quinceañeras, masses, and serenatas across Los Angeles County. Get a quote and book directly with the group.'}
+            ? 'Contrata mariachi tradicional para bodas, quinceañeras, misas y serenatas en el Condado de Los Ángeles. Cotiza y reserva directamente con la agrupación.'
+            : 'Hire a traditional mariachi for weddings, quinceañeras, masses, and serenatas across Los Angeles County. Get a quote and book directly with the group.'}
         </p>
         <div className="mt-8 flex flex-wrap gap-4">
           <Button href={localizedPath('/book', locale)} variant="primary">

@@ -27,6 +27,8 @@ const validFields = {
   email: 'customer@example.com',
   phone: '2135551234',
   name: 'Test Customer',
+  agreed: 'on',
+  signatureName: 'Test Customer',
   locale: 'en',
 }
 

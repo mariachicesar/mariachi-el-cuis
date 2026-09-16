@@ -30,3 +30,32 @@ test('service references the business', () => {
   expect(ld['@type']).toBe('Service')
   expect(ld.provider.name).toBe('Mariachi El Cuis')
 })
+
+test('localBusiness declares opening hours matching the booking windows', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ld = localBusiness({ areaServed: [] }) as any
+  const specs = ld.openingHoursSpecification
+  expect(specs).toHaveLength(3)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const weekday = specs.find((s: any) => Array.isArray(s.dayOfWeek))
+  expect(weekday.dayOfWeek).toContain('Monday')
+  expect(weekday.opens).toBe('07:00')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  expect(specs.find((s: any) => s.dayOfWeek === 'Saturday').opens).toBe('07:00')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  expect(specs.find((s: any) => s.dayOfWeek === 'Sunday').opens).toBe('08:00')
+})
+
+test('service offer catalog mirrors PRICING constants', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ld = service({ locale: 'en', url: 'https://mariachielcuis.com/en/services' }) as any
+  const offers = ld.hasOfferCatalog.itemListElement
+  expect(offers).toHaveLength(3)
+  expect(offers[0].priceSpecification.price).toBe(380)
+  expect(offers[1].priceSpecification).toMatchObject({
+    price: 500,
+    priceCurrency: 'USD',
+    unitCode: 'HUR',
+  })
+  expect(offers[2].priceSpecification.price).toBe(550)
+})

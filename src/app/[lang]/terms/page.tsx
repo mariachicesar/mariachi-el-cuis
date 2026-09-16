@@ -55,7 +55,38 @@ const COPY = {
       {
         heading: 'Formas de pago',
         body: [
-          'Aceptamos tarjeta a través de Stripe, además de Zelle, Venmo y PayPal de forma manual. El pago en línea instantáneo (checkout) llegará próximamente; por ahora coordinamos el pago directamente contigo.',
+          'El depósito se paga con tarjeta a través de Stripe. El saldo se paga el día del evento en efectivo o por Zelle.',
+          'No se aceptan cheques, excepto cheques entregados al menos 3 días hábiles antes de la fecha del evento.',
+        ],
+      },
+      {
+        heading: 'Sets y descansos',
+        body: [
+          'Tocamos durante las horas reservadas, con un descanso de 15 minutos después de la primera hora y después sets de aproximadamente 45 minutos seguidos de descansos de 15 minutos, ajustado al total de horas reservadas.',
+        ],
+      },
+      {
+        heading: 'Integrantes y sustitutos',
+        body: [
+          'La contratación es con Mariachi El Cuis como grupo, no con integrantes específicos. Algunos integrantes pueden ausentarse por enfermedad o asuntos personales; al menos el 80% de los integrantes habituales estará presente, y cualquier sustituto será de talento igual o superior.',
+        ],
+      },
+      {
+        heading: 'Cambios de dirección o fecha',
+        body: [
+          'Un cambio de dirección o de fecha del evento puede modificar el precio y nuestra disponibilidad o compromiso. Cualquier cambio se confirma por escrito con una cotización revisada.',
+        ],
+      },
+      {
+        heading: 'Seguro',
+        body: [
+          'El seguro del evento o de responsabilidad civil no está incluido en la cotización y está disponible por un costo adicional.',
+        ],
+      },
+      {
+        heading: 'Medios y producciones comerciales',
+        body: [
+          'Televisión, comerciales, transmisiones y producciones similares se cotizan por separado y no están cubiertas por una reserva estándar.',
         ],
       },
     ],
@@ -102,7 +133,38 @@ const COPY = {
       {
         heading: 'Payment methods',
         body: [
-          'We accept card payment via Stripe, as well as Zelle, Venmo, and PayPal handled manually. Instant online checkout is coming soon; for now we coordinate payment with you directly.',
+          'The deposit is paid by card via Stripe. The balance is paid on the day of the event in cash or by Zelle.',
+          'No checks are accepted, except checks delivered at least 3 business days before the event date.',
+        ],
+      },
+      {
+        heading: 'Sets and breaks',
+        body: [
+          'We perform for the hours booked, with a 15-minute break after the first hour, then sets of approximately 45 minutes followed by 15-minute breaks, adjusted to the total hours booked.',
+        ],
+      },
+      {
+        heading: 'Band members and substitutes',
+        body: [
+          'The engagement is with Mariachi El Cuis as a group, not with specific individual members. Members may be absent due to illness or personal time off; at least 80% of the regular members will be present, and any substitute will be of equal or greater talent.',
+        ],
+      },
+      {
+        heading: 'Address or date changes',
+        body: [
+          'A change of event address or date may change the price and our availability or commitment. Any change is confirmed in writing with a revised quote.',
+        ],
+      },
+      {
+        heading: 'Insurance',
+        body: [
+          'Event or liability insurance is not included in the quote and is available at additional cost.',
+        ],
+      },
+      {
+        heading: 'Media and commercial productions',
+        body: [
+          'Television, commercials, broadcasts, and similar productions are priced separately and are not covered by a standard booking.',
         ],
       },
     ],

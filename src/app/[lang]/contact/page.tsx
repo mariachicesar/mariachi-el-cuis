@@ -17,11 +17,11 @@ export function generateStaticParams() {
 
 const COPY = {
   es: {
-    title: 'Contacto',
+    title: 'Contacto — Mariachi El Cuis',
     description:
       'Escríbenos para pedir tu cotización de mariachi en el Condado de Los Ángeles. También puedes llamarnos o mandarnos WhatsApp.',
     intro:
-      'Cuéntanos sobre tu evento y te respondemos lo antes posible. Si prefieres, también puedes llamarnos o escribirnos por WhatsApp directamente.',
+      'Cuéntanos sobre tu evento — fecha, ciudad y cuántas horas de mariachi necesitas — y te respondemos lo antes posible. Si prefieres, también puedes llamarnos o escribirnos por WhatsApp directamente.',
     formHeading: 'Envíanos un mensaje',
     directHeading: 'O contáctanos directamente',
     callLabel: 'Llamar',
@@ -30,11 +30,11 @@ const COPY = {
     breadcrumbHome: 'Inicio',
   },
   en: {
-    title: 'Contact',
+    title: 'Contact — Mariachi El Cuis',
     description:
       'Reach out for a mariachi quote across Los Angeles County. You can also call us or message us on WhatsApp.',
     intro:
-      'Tell us about your event and we will get back to you as soon as possible. You can also call or WhatsApp us directly.',
+      'Tell us about your event — date, city, and how many hours of mariachi you need — and we will get back to you as soon as possible. You can also call or WhatsApp us directly.',
     formHeading: 'Send us a message',
     directHeading: 'Or contact us directly',
     callLabel: 'Call',

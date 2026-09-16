@@ -1,5 +1,5 @@
 import { siteConfig } from '@/lib/config/site'
-import { pricingLines } from '@/lib/data/pricing'
+import { PRICING, pricingLines } from '@/lib/data/pricing'
 import { CITIES } from '@/lib/data/cities'
 import { GUIDES } from '@/lib/content/guides'
 
@@ -19,6 +19,9 @@ export function GET() {
 
 ## Pricing
 ${pricingLines('en').map((l) => `- ${l}`).join('\n')}
+- Weekend hourly rate: $${PRICING.hourlyWeekend}/hr (Saturday & Sunday, from 3:00 PM)
+- Weekday hourly rate: $${PRICING.hourlyWeekday}/hr (Monday–Friday)
+- 7-song package: $${PRICING.sevenSongsFlat} (Monday–Friday, within 25 miles of 90011)
 
 ## Key pages
 - Services & pricing: ${siteConfig.url}/services

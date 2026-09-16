@@ -18,7 +18,7 @@ export function generateStaticParams() {
 
 const COPY = {
   es: {
-    title: 'Guías',
+    title: 'Guías de mariachi',
     description:
       'Guías sobre precios de mariachi, cómo funciona la reserva y qué esperar en bodas y quinceañeras en Los Ángeles.',
     intro:
@@ -26,7 +26,7 @@ const COPY = {
     breadcrumbHome: 'Inicio',
   },
   en: {
-    title: 'Guides',
+    title: 'Mariachi guides',
     description:
       'Guides on mariachi pricing, how booking works, and what to expect at weddings and quinceañeras in Los Angeles.',
     intro:

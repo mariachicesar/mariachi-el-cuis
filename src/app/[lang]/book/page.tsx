@@ -20,9 +20,9 @@ export function generateStaticParams() {
 
 const COPY = {
   es: {
-    title: 'Cotización y reserva',
+    title: 'Contrata al mariachi — cotización y reserva',
     description:
-      'Obtén tu cotización de mariachi para el Condado de Los Ángeles. Escríbenos por WhatsApp o llámanos y te respondemos el mismo día.',
+      'Contrata a Mariachi El Cuis para tu evento en el Condado de Los Ángeles. Cotización exacta al instante; reserva con depósito en línea.',
     intro:
       'Cuéntanos la fecha, la hora, la ciudad y cuántas horas necesitas, y te enviamos tu precio exacto.',
     pricingHeading: 'Cómo calculamos el precio',
@@ -33,9 +33,9 @@ const COPY = {
     breadcrumbHome: 'Inicio',
   },
   en: {
-    title: 'Get a quote & book',
+    title: 'Hire the mariachi — get a quote & book',
     description:
-      'Get your mariachi quote for Los Angeles County. Message us on WhatsApp or call and we will reply the same day.',
+      'Hire Mariachi El Cuis for your event in Los Angeles County. Instant exact quote; book online with a deposit.',
     intro:
       'Tell us the date, time, city, and how many hours you need, and we will send you your exact price.',
     pricingHeading: 'How we calculate your price',

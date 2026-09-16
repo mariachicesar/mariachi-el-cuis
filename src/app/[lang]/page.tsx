@@ -32,12 +32,12 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       ? {
           title: 'Mariachi El Cuis — Mariachi en Los Ángeles',
           description:
-            'Mariachi tradicional para bodas, quinceañeras y serenatas en el Condado de Los Ángeles. Cotización y reserva directa.',
+            'Contrata mariachi tradicional para bodas, quinceañeras y serenatas en el Condado de Los Ángeles. Cotización y reserva directa.',
         }
       : {
           title: 'Mariachi El Cuis — Los Angeles Mariachi Band',
           description:
-            'Traditional mariachi for weddings, quinceañeras, and serenatas across Los Angeles County. Direct quotes and booking.',
+            'Hire a traditional mariachi for weddings, quinceañeras, and serenatas across Los Angeles County. Direct quotes and booking.',
         }
   return buildMetadata({
     locale,

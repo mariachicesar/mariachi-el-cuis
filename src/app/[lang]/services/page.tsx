@@ -20,13 +20,15 @@ export function generateStaticParams() {
 
 const COPY = {
   es: {
-    title: 'Servicios y precios',
+    title: 'Servicios de mariachi y precios',
     description:
       'Mariachi para bodas, quinceañeras, misas, serenatas, eventos corporativos y homenajes en el Condado de Los Ángeles, con los precios exactos.',
     intro:
-      'Seis tipos de eventos, un solo mariachi. Abajo están los servicios que cubrimos y las reglas de precio completas que aplicamos a cada cotización.',
+      'Contrata mariachi en vivo en Los Ángeles para seis tipos de eventos. Cubrimos todo el Condado de Los Ángeles y abajo están los servicios que ofrecemos y las reglas de precio completas que aplicamos a cada cotización.',
     servicesHeading: 'Lo que tocamos',
     occasionsLabel: 'Momentos que cubrimos',
+    hearLiveLabel: 'Escúchanos en vivo',
+    seeRepertoireLabel: 'Ver el repertorio',
     pricingHeading: 'Precios',
     pricingIntro: 'Las reglas completas, tal como se aplican a cada cotización:',
     tableCaption: 'Resumen de tarifas',
@@ -52,13 +54,15 @@ const COPY = {
     breadcrumbHome: 'Inicio',
   },
   en: {
-    title: 'Services & pricing',
+    title: 'Mariachi services & pricing',
     description:
       'Mariachi for weddings, quinceañeras, masses, serenatas, corporate events, and memorials across Los Angeles County, with exact pricing.',
     intro:
-      'Six kinds of events, one band. Below are the services we cover and the complete pricing rules we apply to every quote.',
+      'Hire live mariachi in Los Angeles for six kinds of events. We cover all of Los Angeles County — below are the services we offer and the complete pricing rules we apply to every quote.',
     servicesHeading: 'What we play',
     occasionsLabel: 'Moments we cover',
+    hearLiveLabel: 'Hear us live',
+    seeRepertoireLabel: 'See the repertoire',
     pricingHeading: 'Pricing',
     pricingIntro: 'The complete rules, exactly as they apply to every quote:',
     tableCaption: 'Rate summary',
@@ -179,6 +183,14 @@ export default async function ServicesPage({ params }: { params: Promise<{ lang:
             </li>
           ))}
         </ul>
+        <div className="mt-8 flex flex-wrap gap-6">
+          <Link href={localizedPath('/media', locale)} className={linkCls}>
+            {t.hearLiveLabel}
+          </Link>
+          <Link href={localizedPath('/repertoire', locale)} className={linkCls}>
+            {t.seeRepertoireLabel}
+          </Link>
+        </div>
       </Section>
 
       <Section className="border-y border-charcoal-border bg-surface-container-lowest">

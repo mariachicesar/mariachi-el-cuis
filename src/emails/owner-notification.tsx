@@ -1,6 +1,14 @@
 import { Body, Container, Head, Heading, Html, Preview, Section, Text } from '@react-email/components'
 
-export function OwnerNotificationEmail({ metadata }: { metadata: Record<string, string> }) {
+export function OwnerNotificationEmail({
+  metadata,
+  pdfFailed,
+  calendarFailed,
+}: {
+  metadata: Record<string, string>
+  pdfFailed?: boolean
+  calendarFailed?: boolean
+}) {
   return (
     <Html>
       <Head />
@@ -19,6 +27,24 @@ export function OwnerNotificationEmail({ metadata }: { metadata: Record<string, 
             <Text>Address: {metadata.address}</Text>
             <Text>Deposit paid: ${metadata.deposit}</Text>
             <Text>Balance due: ${metadata.balanceDue}</Text>
+            {metadata.signatureName && (
+              <Text>
+                Contract: v{metadata.contractVersion} signed by {metadata.signatureName} at{' '}
+                {metadata.signedAt} (countersigned PDF attached)
+              </Text>
+            )}
+            {pdfFailed && (
+              <Text>
+                Warning: the performance agreement PDF could not be generated — this email has no
+                attachment. Generate it manually from the Stripe session metadata.
+              </Text>
+            )}
+            {calendarFailed && (
+              <Text>
+                Warning: the Google Calendar event could not be confirmed (event id{' '}
+                {metadata.calendarEventId}). Update the calendar manually.
+              </Text>
+            )}
           </Section>
         </Container>
       </Body>

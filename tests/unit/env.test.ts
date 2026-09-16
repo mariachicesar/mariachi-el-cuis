@@ -53,6 +53,16 @@ test('maps feature is on with the key', () => {
   expect(features.maps).toBe(true)
 })
 
+test('preferredSource feature requires explicit opt-in', () => {
+  expect(parseEnv({}).features.preferredSource).toBe(false)
+  expect(
+    parseEnv({ NEXT_PUBLIC_GOOGLE_PREFERRED_SOURCE: 'false' }).features.preferredSource,
+  ).toBe(false)
+  expect(
+    parseEnv({ NEXT_PUBLIC_GOOGLE_PREFERRED_SOURCE: 'true' }).features.preferredSource,
+  ).toBe(true)
+})
+
 test('calendar feature requires all four Google Calendar vars', () => {
   expect(parseEnv({ GOOGLE_OAUTH_CLIENT_ID: 'a' }).features.calendar).toBe(false)
   expect(

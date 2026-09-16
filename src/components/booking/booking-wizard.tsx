@@ -7,6 +7,7 @@ import { getQuoteAction, type GetQuoteActionResult } from '@/app/actions/quote'
 import { checkAvailabilityAction, type CheckAvailabilityResult } from '@/app/actions/availability'
 import { sendEstimateEmailAction, type SendEstimateState } from '@/app/actions/estimate-email'
 import { startCheckoutAction, type StartCheckoutState } from '@/app/actions/booking'
+import { getClauses, CONTRACT_VERSION } from '@/lib/contract/terms'
 import { weekdayIndexOf } from '@/lib/quote/timezone'
 import type { QuoteResult } from '@/lib/quote/types'
 import { siteConfig } from '@/lib/config/site'
@@ -52,6 +53,11 @@ const COPY = {
     emailSent: 'Te enviamos la cotización por correo.',
     reserve: (amount: number) => `Reservar — pagar depósito de $${amount}`,
     reservePending: 'Redirigiendo…',
+    agreementHeading: 'Contrato de presentación',
+    agreementVersion: 'Versión',
+    agreeLabel: 'He leído y acepto el contrato de presentación.',
+    signatureLabel: 'Firma legal (escribe tu nombre completo)',
+    errorAgreementRequired: 'Debes aceptar el contrato y escribir tu firma para reservar.',
     callNow: 'Llamar ahora',
     notConfigured: 'Por ahora, llámanos o escríbenos por WhatsApp para tu cotización.',
     contactRequired: 'Para esta fecha necesitamos coordinar contigo directamente.',
@@ -97,6 +103,11 @@ const COPY = {
     email: 'Email',
     name: 'Name',
     phone: 'Phone',
+    agreementHeading: 'Performance Agreement',
+    agreementVersion: 'Version',
+    agreeLabel: 'I have read and agree to the performance agreement.',
+    signatureLabel: 'Legal signature (type your full name)',
+    errorAgreementRequired: 'You must agree to the contract and type your signature to reserve.',
     emailEstimate: 'Email me this estimate',
     emailEstimatePending: 'Sending…',
     emailSent: 'We emailed you the estimate.',
@@ -221,6 +232,8 @@ export function BookingWizard({
   const t = COPY[locale]
 
   const [eventDate, setEventDate] = useState('')
+  const [agreed, setAgreed] = useState(false)
+  const [signatureName, setSignatureName] = useState('')
   const [startTime, setStartTime] = useState('15:00')
   const [durationInput, setDurationInput] = useState('1')
   const [packageType, setPackageType] = useState<'seven_songs' | 'hourly'>('seven_songs')
@@ -341,7 +354,11 @@ export function BookingWizard({
   const checkoutFieldErrors =
     checkoutState.error === 'validation' ? checkoutState.fieldErrors : undefined
   const checkoutReady =
-    name.trim().length >= 2 && email.trim() !== '' && phone.trim().length >= 7
+    name.trim().length >= 2 &&
+    email.trim() !== '' &&
+    phone.trim().length >= 7 &&
+    agreed &&
+    signatureName.trim().length >= 2
 
   const hiddenQuoteFields = (
     <>
@@ -433,18 +450,20 @@ export function BookingWizard({
 
       <fieldset>
         <legend className={labelCls}>{t.packageLabel}</legend>
-        <label className="flex items-center gap-2 py-1">
-          <input
-            type="radio"
-            name="package"
-            checked={packageType === 'seven_songs'}
-            onChange={() => {
-              setPackageType('seven_songs')
-              setDurationInput('1')
-            }}
-          />
-          {t.sevenSongs(isWeekday ? PRICING.sevenSongsFlat : PRICING.weekendSevenSongsFlat)}
-        </label>
+        {canChooseSevenSongs && (
+          <label className="flex items-center gap-2 py-1">
+            <input
+              type="radio"
+              name="package"
+              checked={packageType === 'seven_songs'}
+              onChange={() => {
+                setPackageType('seven_songs')
+                setDurationInput('1')
+              }}
+            />
+            {t.sevenSongs(isWeekday ? PRICING.sevenSongsFlat : PRICING.weekendSevenSongsFlat)}
+          </label>
+        )}
         <label className="flex items-center gap-2 py-1">
           <input
             type="radio"
@@ -703,11 +722,60 @@ export function BookingWizard({
               {isSlotUnavailable ? (
                 <p className="mt-4 text-sm font-semibold text-red-400">{t.reserveUnavailable}</p>
               ) : (
-                <form action={checkoutFormAction} className="mt-4">
+                <form action={checkoutFormAction} className="mt-4 space-y-4">
                   {hiddenQuoteFields}
                   <input type="hidden" name="email" value={email} />
                   <input type="hidden" name="name" value={name} />
                   <input type="hidden" name="phone" value={phone} />
+                  <div className="rounded border border-charcoal-border bg-surface-container p-5">
+                    <h3 className="font-display text-lg text-burnished-gold">
+                      {t.agreementHeading}{' '}
+                      <span className="text-sm font-normal text-muted-silver">
+                        ({t.agreementVersion} {CONTRACT_VERSION})
+                      </span>
+                    </h3>
+                    <div className="mt-3 max-h-64 space-y-4 overflow-y-auto pr-2 text-sm text-on-surface-variant">
+                      {getClauses(locale).map((clause) => (
+                        <div key={clause.heading}>
+                          <p className="font-semibold text-crema-white">{clause.heading}</p>
+                          {clause.body.map((paragraph) => (
+                            <p key={paragraph} className="mt-1">
+                              {paragraph}
+                            </p>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                    <label className="mt-4 flex items-start gap-2 text-sm text-crema-white">
+                      <input
+                        type="checkbox"
+                        name="agreed"
+                        checked={agreed}
+                        onChange={(e) => setAgreed(e.target.checked)}
+                        className="mt-1"
+                      />
+                      {t.agreeLabel}
+                    </label>
+                    <div className="mt-3">
+                      <label htmlFor="wizard-signature" className={labelCls}>
+                        {t.signatureLabel}
+                      </label>
+                      <input
+                        id="wizard-signature"
+                        type="text"
+                        name="signatureName"
+                        minLength={2}
+                        className={inputCls}
+                        value={signatureName}
+                        onChange={(e) => setSignatureName(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  {(checkoutFieldErrors?.agreed || checkoutFieldErrors?.signatureName) && (
+                    <p role="alert" className="text-sm text-red-400">
+                      {t.errorAgreementRequired}
+                    </p>
+                  )}
                   <ReserveSubmitButton
                     label={t.reserve(quote.deposit)}
                     pendingLabel={t.reservePending}

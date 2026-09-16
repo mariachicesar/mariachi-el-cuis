@@ -5,7 +5,7 @@ import { Section } from '@/components/ui/section'
 import { siteConfig } from '@/lib/config/site'
 import { isLocale, type Locale } from '@/lib/i18n/locales'
 import { alternatesFor } from '@/lib/i18n/paths'
-import { breadcrumb } from '@/lib/seo/jsonld'
+import { breadcrumb, videoObject } from '@/lib/seo/jsonld'
 import { buildMetadata } from '@/lib/seo/metadata'
 
 export const dynamicParams = false
@@ -16,41 +16,62 @@ export function generateStaticParams() {
 
 // Live performance clips, hosted on the group's S3 bucket (re-encoded to
 // web-friendly 720p H.264 — see docs/superpowers/ for the source originals).
+// When adding a new clip, set `uploadDate` to the day it was actually uploaded
+// (ISO 8601) — Google uses it for video rich results and ignores stale dates.
 const ASSET_BASE = 'https://mariachiassets.s3.us-west-1.amazonaws.com/web'
 
-const MEDIA: { id: string; src: string; poster: string; title: Record<Locale, string> }[] = [
+const MEDIA: {
+  id: string
+  src: string
+  poster: string
+  duration: string
+  uploadDate: string
+  title: Record<Locale, string>
+}[] = [
   {
     id: 'no-llega-el-olvido-1',
     src: `${ASSET_BASE}/no-llega-el-olvido-1.mp4`,
     poster: `${ASSET_BASE}/no-llega-el-olvido-1.jpg`,
+    duration: 'PT17S',
+    uploadDate: '2026-09-16',
     title: { es: 'No Llega el Olvido — Toma 1', en: 'No Llega el Olvido — Take 1' },
   },
   {
     id: 'no-llega-el-olvido-2',
     src: `${ASSET_BASE}/no-llega-el-olvido-2.mp4`,
     poster: `${ASSET_BASE}/no-llega-el-olvido-2.jpg`,
+    duration: 'PT23S',
+    uploadDate: '2026-09-16',
     title: { es: 'No Llega el Olvido — Toma 2', en: 'No Llega el Olvido — Take 2' },
   },
   {
     id: 'ay-amigo',
     src: `${ASSET_BASE}/ay-amigo.mp4`,
     poster: `${ASSET_BASE}/ay-amigo.jpg`,
+    duration: 'PT39S',
+    uploadDate: '2026-09-16',
     title: { es: 'Ay Amigo', en: 'Ay Amigo' },
   },
   {
     id: 'sihualteco',
     src: `${ASSET_BASE}/sihualteco.mp4`,
     poster: `${ASSET_BASE}/sihualteco.jpg`,
+    duration: 'PT44S',
+    uploadDate: '2026-09-16',
     title: { es: 'Sihualteco', en: 'Sihualteco' },
   },
 ]
 
 const COPY = {
   es: {
-    title: 'Video y fotos',
+    title: 'Videos y fotos del mariachi',
     description:
-      'Videos y fotos de Mariachi El Cuis en vivo, próximamente. Síguenos en YouTube e Instagram.',
-    intro: 'Aquí compartiremos videos de presentaciones en vivo.',
+      'Videos en vivo de Mariachi El Cuis: rancheras, boleros, huapangos y sones grabados en bodas, quinceañeras y serenatas en el Condado de Los Ángeles.',
+    intro:
+      'Mira a Mariachi El Cuis en vivo: rancheras, boleros, huapangos y sones de nuestro repertorio, grabados en presentaciones reales en Los Ángeles. Así sonamos en bodas, quinceañeras, misas, serenatas y eventos corporativos en todo el Condado de Los Ángeles — y en tu evento tocamos lo que el público pida.',
+    videosHeading: 'Presentaciones en vivo',
+    clipDescription:
+      'Mariachi El Cuis en vivo. Mariachi con base en Los Ángeles (90011) para bodas, quinceañeras, serenatas y eventos en el Condado de Los Ángeles.',
     comingSoon: 'Próximamente',
     followLabel: 'Síguenos',
     youtube: 'YouTube',
@@ -58,10 +79,14 @@ const COPY = {
     breadcrumbHome: 'Inicio',
   },
   en: {
-    title: 'Video & photos',
+    title: 'Mariachi videos & photos',
     description:
-      'Live video and photos of Mariachi El Cuis, coming soon. Follow us on YouTube and Instagram.',
-    intro: "We'll share videos of live performances here.",
+      'Live videos of Mariachi El Cuis: rancheras, boleros, huapangos, and sones recorded at weddings, quinceañeras, and serenatas across Los Angeles County.',
+    intro:
+      'Watch Mariachi El Cuis live: rancheras, boleros, huapangos, and sones from our repertoire, recorded at real performances in Los Angeles. This is how we sound at weddings, quinceañeras, masses, serenatas, and corporate events across Los Angeles County — and at your event we play what the audience requests.',
+    videosHeading: 'Live performances',
+    clipDescription:
+      'Mariachi El Cuis performing live. Los Angeles (90011) mariachi for weddings, quinceañeras, serenatas, and events across Los Angeles County.',
     comingSoon: 'Coming soon',
     followLabel: 'Follow us',
     youtube: 'YouTube',
@@ -112,13 +137,32 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
 
       <Section>
         {MEDIA.length > 0 ? (
-          <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <>
             {MEDIA.map((item) => (
-              <li key={item.id}>
-                <VideoFacade src={item.src} poster={item.poster} title={item.title[locale]} />
-              </li>
+              <JsonLd
+                key={`jsonld-${item.id}`}
+                data={videoObject({
+                  name: item.title[locale],
+                  description: t.clipDescription,
+                  contentUrl: item.src,
+                  thumbnailUrl: item.poster,
+                  pageUrl: mediaUrl,
+                  uploadDate: item.uploadDate,
+                  duration: item.duration,
+                })}
+              />
             ))}
-          </ul>
+            <h2 className="mb-6 font-display text-2xl text-burnished-gold md:text-3xl">
+              {t.videosHeading}
+            </h2>
+            <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {MEDIA.map((item) => (
+                <li key={item.id}>
+                  <VideoFacade src={item.src} poster={item.poster} title={item.title[locale]} />
+                </li>
+              ))}
+            </ul>
+          </>
         ) : (
           <p className="text-on-surface-variant">{t.comingSoon}</p>
         )}

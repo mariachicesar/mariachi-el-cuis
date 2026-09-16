@@ -16,14 +16,14 @@ export function generateStaticParams() {
 
 const COPY = {
   es: {
-    title: 'Sobre nosotros',
+    title: 'Sobre Mariachi El Cuis',
     description:
       'Conoce a Mariachi El Cuis, un mariachi con base en el código postal 90011 que da servicio al Condado de Los Ángeles.',
     intro:
-      'Somos un mariachi con base en el código postal 90011 que da servicio al Condado de Los Ángeles. Tocamos bodas, quinceañeras, misas, serenatas, eventos corporativos y homenajes.',
+      'Somos Mariachi El Cuis, un mariachi tradicional con base en el código postal Los Angeles (90011) que da servicio a todo el Condado de Los Ángeles. Tocamos bodas, quinceañeras, misas, serenatas, eventos corporativos y homenajes.',
     bioHeading: 'Nuestra historia',
     bioBody:
-      'Aquí compartiremos pronto más sobre los músicos que forman el grupo y su trayectoria.',
+      'Mariachi El Cuis es un conjunto de cinco músicos: vihuela, guitarrón, violín, trompeta y voz con guitarra. Desde el sur de Los Ángeles llevamos el sonido tradicional del mariachi — rancheras, boleros, huapangos y sones — a bodas, quinceañeras, misas, serenatas y eventos en todo el Condado de Los Ángeles. Conocemos cientos de canciones y en cada evento tocamos lo que el público pida.',
     comingSoon: 'Fotos próximamente',
     ctaHeading: '¿Tienes preguntas antes de reservar?',
     ctaBody: 'Escríbenos y con gusto te respondemos.',
@@ -31,13 +31,14 @@ const COPY = {
     breadcrumbHome: 'Inicio',
   },
   en: {
-    title: 'About us',
+    title: 'About Mariachi El Cuis',
     description:
-      'Meet Mariachi El Cuis, a mariachi based in the 90011 ZIP code serving Los Angeles County.',
+      'Meet Mariachi El Cuis, a mariachi based in the Los Angeles (90011) ZIP code serving Los Angeles County.',
     intro:
-      'We are a mariachi based in the 90011 ZIP code serving Los Angeles County. We play weddings, quinceañeras, masses, serenatas, corporate events, and memorials.',
+      'We are Mariachi El Cuis, a traditional mariachi based in the Los Angeles (90011) ZIP code serving all of Los Angeles County. We play weddings, quinceañeras, masses, serenatas, corporate events, and memorials.',
     bioHeading: 'Our story',
-    bioBody: "We'll share more here soon about the musicians in the group and their background.",
+    bioBody:
+      'Mariachi El Cuis is a five-piece ensemble: vihuela, guitarrón, violin, trumpet, and voice with guitar. From South Los Angeles we bring the traditional mariachi sound — rancheras, boleros, huapangos, and sones — to weddings, quinceañeras, masses, serenatas, and events across Los Angeles County. We know hundreds of songs and at every event we play what the audience requests.',
     comingSoon: 'Photos coming soon',
     ctaHeading: 'Have questions before you book?',
     ctaBody: "Reach out and we'll get back to you.",
@@ -69,6 +70,15 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: st
 
   return (
     <main id="main">
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'AboutPage',
+          name: t.title,
+          url: aboutUrl,
+          about: { '@type': 'MusicGroup', name: 'Mariachi El Cuis' },
+        }}
+      />
       <JsonLd
         data={breadcrumb([
           { name: t.breadcrumbHome, url: homeUrl },

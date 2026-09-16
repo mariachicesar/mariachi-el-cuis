@@ -1,10 +1,12 @@
 import Link from 'next/link'
 import { CITIES } from '@/lib/data/cities'
 import { siteConfig } from '@/lib/config/site'
+import { features } from '@/lib/env'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/locales'
 import { localizedPath } from '@/lib/i18n/paths'
 import { navItems } from './nav'
+import { PreferredSourceButton } from './preferred-source-button'
 
 const linkCls = 'text-sm text-on-surface-variant transition-colors hover:text-burnished-gold'
 const headingCls = 'font-display text-sm uppercase tracking-wider text-burnished-gold'
@@ -74,6 +76,13 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
           <Link href={link('/privacy')} className="transition-colors hover:text-burnished-gold">
             {dict.footer.privacy}
           </Link>
+          {features.preferredSource && (
+            <PreferredSourceButton
+              locale={locale}
+              label={dict.footer.preferredSource}
+              className="transition-colors hover:text-burnished-gold"
+            />
+          )}
         </div>
       </div>
     </footer>

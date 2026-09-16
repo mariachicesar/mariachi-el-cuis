@@ -9,6 +9,7 @@ import { haversineMiles } from '@/lib/geo/distance'
 import { createHoldEvent } from '@/lib/calendar/google'
 import { checkSlot } from '@/lib/scheduling/check-slot'
 import { createDepositCheckoutSession } from '@/lib/payments/stripe'
+import { CONTRACT_VERSION } from '@/lib/contract/terms'
 import { siteConfig } from '@/lib/config/site'
 import { env, features } from '@/lib/env'
 
@@ -21,6 +22,8 @@ const inputSchema = z.object({
   email: z.email(),
   phone: z.string().trim().min(7).max(20),
   name: z.string().trim().min(2).max(100),
+  agreed: z.literal('on'),
+  signatureName: z.string().trim().min(2).max(100),
   locale: z.enum(['es', 'en']),
 })
 
@@ -49,6 +52,8 @@ export async function startCheckoutAction(
     email: formData.get('email'),
     phone: formData.get('phone') ?? '',
     name: formData.get('name'),
+    agreed: formData.get('agreed'),
+    signatureName: formData.get('signatureName'),
     locale: formData.get('locale'),
   })
   if (!parsed.success) {
@@ -120,6 +125,9 @@ export async function startCheckoutAction(
       total: String(quote.total),
       deposit: String(quote.deposit),
       balanceDue: String(quote.balanceDue),
+      contractVersion: CONTRACT_VERSION,
+      signatureName: parsed.data.signatureName,
+      signedAt: new Date().toISOString(),
       locale: parsed.data.locale,
     },
   })
