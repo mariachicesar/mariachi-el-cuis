@@ -3,6 +3,7 @@ import { z } from 'zod'
 const schema = z.object({
   NEXT_PUBLIC_SITE_URL: z.url().default('http://localhost:3000'),
   NEXT_PUBLIC_GOOGLE_PREFERRED_SOURCE: z.enum(['true', 'false']).optional(),
+  NEXT_PUBLIC_CLARITY_PROJECT_ID: z.string().min(1).optional(),
   RESEND_API_KEY: z.string().min(1).optional(),
   CONTACT_TO_EMAIL: z.email().optional(),
   GOOGLE_MAPS_API_KEY: z.string().min(1).optional(),
@@ -29,6 +30,9 @@ export function parseEnv(source: Record<string, string | undefined>) {
     NEXT_PUBLIC_SITE_URL: normalizeOptional(source.NEXT_PUBLIC_SITE_URL),
     NEXT_PUBLIC_GOOGLE_PREFERRED_SOURCE: normalizeOptional(
       source.NEXT_PUBLIC_GOOGLE_PREFERRED_SOURCE,
+    ),
+    NEXT_PUBLIC_CLARITY_PROJECT_ID: normalizeOptional(
+      source.NEXT_PUBLIC_CLARITY_PROJECT_ID,
     ),
     RESEND_API_KEY: normalizeOptional(source.RESEND_API_KEY),
     CONTACT_TO_EMAIL: normalizeOptional(source.CONTACT_TO_EMAIL),

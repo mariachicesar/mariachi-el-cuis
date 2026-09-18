@@ -27,6 +27,15 @@ test('home hero shows the real group photo', async ({ page }) => {
   await expect(hero).toHaveCount(1)
 })
 
+test('home hero background video loops silently', async ({ page }) => {
+  await page.goto('/')
+  const video = page.locator('section video').first()
+  await expect(video).toHaveAttribute('autoplay', '')
+  await expect(video).toHaveAttribute('loop', '')
+  await expect(video).toHaveAttribute('muted', '')
+  await expect(video).toHaveAttribute('playsinline', '')
+})
+
 test('home links to key routes', async ({ page }) => {
   await page.goto('/')
   for (const p of ['/book', '/services', '/repertoire']) {

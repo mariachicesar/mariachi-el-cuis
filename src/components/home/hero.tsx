@@ -1,11 +1,14 @@
 import { Phone } from 'lucide-react'
 import Image from 'next/image'
 import { Button, buttonClasses } from '@/components/ui/button'
-import heroPhoto from '@/assets/brand/cuarteto-mariachi.jpg'
+import heroPhoto from '@/assets/brand/mariachi-el-cuis-group.webp'
 import { siteConfig } from '@/lib/config/site'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/locales'
 import { localizedPath } from '@/lib/i18n/paths'
+
+const HERO_VIDEO_SRC =
+  'https://mariachiassets.s3.us-west-1.amazonaws.com/Mariachi+El+Cuis+Showcase+-+compressed.mp4'
 
 export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const es = locale === 'es'
@@ -18,11 +21,27 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         fill
         priority
         sizes="100vw"
-        className="object-cover object-[center_20%]"
+        className="object-cover object-[center_35%]"
       />
+      <video
+        aria-hidden="true"
+        autoPlay
+        loop
+        muted
+        playsInline
+        poster={heroPhoto.src}
+        preload="metadata"
+        className="absolute inset-0 hidden h-full w-full object-cover object-center motion-reduce:hidden md:block"
+      >
+        <source src={HERO_VIDEO_SRC} type="video/mp4" />
+      </video>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(239,176,73,0.16),_transparent_55%),_linear-gradient(180deg,_rgba(0,0,0,0.55),_rgba(0,0,0,0.75))]"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            'radial-gradient(ellipse at top left, rgba(239,176,73,0.16), transparent 55%), linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.88))',
+        }}
       />
       <div className="relative mx-auto max-w-7xl px-6 py-20 md:py-28 lg:px-12">
         <p className="font-display text-sm uppercase tracking-widest text-burnished-gold">

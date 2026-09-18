@@ -23,8 +23,7 @@ const COPY = {
       'Somos Mariachi El Cuis, un mariachi tradicional con base en el código postal Los Angeles (90011) que da servicio a todo el Condado de Los Ángeles. Tocamos bodas, quinceañeras, misas, serenatas, eventos corporativos y homenajes.',
     bioHeading: 'Nuestra historia',
     bioBody:
-      'Mariachi El Cuis es un conjunto de cinco músicos: vihuela, guitarrón, violín, trompeta y voz con guitarra. Desde el sur de Los Ángeles llevamos el sonido tradicional del mariachi — rancheras, boleros, huapangos y sones — a bodas, quinceañeras, misas, serenatas y eventos en todo el Condado de Los Ángeles. Conocemos cientos de canciones y en cada evento tocamos lo que el público pida.',
-    comingSoon: 'Fotos próximamente',
+      'Mariachi El Cuis es un conjunto de cinco músicos: dos trompetas, vihuela, guitarrón y violín. Desde el sur de Los Ángeles llevamos el sonido tradicional del mariachi — rancheras, boleros, huapangos y sones — a bodas, quinceañeras, misas, serenatas y eventos en todo el Condado de Los Ángeles. Conocemos cientos de canciones y en cada evento tocamos lo que el público pida.',
     ctaHeading: '¿Tienes preguntas antes de reservar?',
     ctaBody: 'Escríbenos y con gusto te respondemos.',
     ctaLabel: 'Contáctanos',
@@ -38,8 +37,7 @@ const COPY = {
       'We are Mariachi El Cuis, a traditional mariachi based in the Los Angeles (90011) ZIP code serving all of Los Angeles County. We play weddings, quinceañeras, masses, serenatas, corporate events, and memorials.',
     bioHeading: 'Our story',
     bioBody:
-      'Mariachi El Cuis is a five-piece ensemble: vihuela, guitarrón, violin, trumpet, and voice with guitar. From South Los Angeles we bring the traditional mariachi sound — rancheras, boleros, huapangos, and sones — to weddings, quinceañeras, masses, serenatas, and events across Los Angeles County. We know hundreds of songs and at every event we play what the audience requests.',
-    comingSoon: 'Photos coming soon',
+      'Mariachi El Cuis is a five-piece ensemble: two trumpets, vihuela, guitarrón, and violin. From South Los Angeles we bring the traditional mariachi sound — rancheras, boleros, huapangos, and sones — to weddings, quinceañeras, masses, serenatas, and events across Los Angeles County. We know hundreds of songs and at every event we play what the audience requests.',
     ctaHeading: 'Have questions before you book?',
     ctaBody: "Reach out and we'll get back to you.",
     ctaLabel: 'Contact us',
@@ -94,8 +92,7 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: st
       <Section>
         <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">{t.bioHeading}</h2>
         <p className="mt-4 max-w-2xl text-on-surface-variant">{t.bioBody}</p>
-        {/* TODO: owner — replace with real musician bios + photos */}
-        <MusicianFan locale={locale} comingSoon={t.comingSoon} />
+        <MusicianFan locale={locale} />
       </Section>
 
       <Section className="border-t border-charcoal-border bg-surface-container">

@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { JsonLd } from '@/components/ui/json-ld'
@@ -21,7 +22,6 @@ const COPY = {
   es: {
     bioHeading: 'Biografía',
     bioBody: 'Muy pronto compartiremos la historia de este músico.',
-    photosHeading: 'Fotos',
     videosHeading: 'Videos',
     comingSoon: 'Próximamente',
     ctaHeading: '¿Quieres reservarnos para tu evento?',
@@ -33,7 +33,6 @@ const COPY = {
   en: {
     bioHeading: 'Biography',
     bioBody: "We'll share this musician's story here soon.",
-    photosHeading: 'Photos',
     videosHeading: 'Videos',
     comingSoon: 'Coming soon',
     ctaHeading: 'Want to book us for your event?',
@@ -54,12 +53,12 @@ export async function generateMetadata({
   const slot = findMusician(musician)
   if (!slot) return {}
   const t = COPY[locale]
-  // Placeholder pages stay out of the index until real bios + photos land;
-  // flip noindex off when each musician page has unique content.
+  // Placeholder pages stay out of the index until real bios land;
+  // flip noindex off when each musician page has unique bio content.
   return buildMetadata({
     locale,
     path: `/about/${slot.slug}`,
-    title: `${slot.role[locale]} — ${t.breadcrumbAbout}`,
+    title: `${slot.name} — ${slot.role[locale]} — ${t.breadcrumbAbout}`,
     description: t.bioBody,
     noindex: true,
   })
@@ -87,14 +86,27 @@ export default async function MusicianPage({
         data={breadcrumb([
           { name: t.breadcrumbHome, url: homeUrl },
           { name: t.breadcrumbAbout, url: aboutUrl },
-          { name: slot.role[locale], url: pageUrl },
+          { name: slot.name, url: pageUrl },
         ])}
       />
 
       <Section className="border-b border-charcoal-border bg-surface-container-lowest">
-        <h1 className="font-display text-3xl text-burnished-gold md:text-5xl">
-          {slot.role[locale]}
-        </h1>
+        <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+          <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-full border-2 border-burnished-gold/40">
+            <Image
+              src={slot.photo}
+              alt={`${slot.name}, ${slot.role[locale]} — Mariachi El Cuis`}
+              fill
+              sizes="160px"
+              className="object-cover object-top"
+              priority
+            />
+          </div>
+          <div>
+            <h1 className="font-display text-3xl text-burnished-gold md:text-5xl">{slot.name}</h1>
+            <p className="mt-2 text-lg text-on-surface-variant">{slot.role[locale]}</p>
+          </div>
+        </div>
         <div className="mt-6">
           <Button href={localizedPath('/about', locale)} variant="ghost">
             ← {t.backLabel}
@@ -105,13 +117,6 @@ export default async function MusicianPage({
       <Section>
         <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">{t.bioHeading}</h2>
         <p className="mt-4 max-w-2xl text-on-surface-variant">{t.bioBody}</p>
-      </Section>
-
-      <Section className="border-t border-charcoal-border bg-surface-container">
-        <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">
-          {t.photosHeading}
-        </h2>
-        <p className="mt-4 max-w-2xl text-on-surface-variant">{t.comingSoon}</p>
       </Section>
 
       <Section>

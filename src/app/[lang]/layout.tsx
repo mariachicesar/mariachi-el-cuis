@@ -9,7 +9,9 @@ import { SiteHeader } from '@/components/layout/site-header'
 import { SiteFooter } from '@/components/layout/site-footer'
 import { MobileTabBar } from '@/components/layout/mobile-tab-bar'
 import { SkipLink } from '@/components/layout/skip-link'
+import { ClarityScript } from '@/components/layout/clarity'
 import { siteConfig } from '@/lib/config/site'
+import { env } from '@/lib/env'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isLocale } from '@/lib/i18n/locales'
 
@@ -60,6 +62,7 @@ export default async function RootLayout({
         {children}
         <SiteFooter locale={lang} dict={dict} />
         <MobileTabBar locale={lang} dict={dict} />
+        <ClarityScript projectId={env.NEXT_PUBLIC_CLARITY_PROJECT_ID} />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-YGK2HZEWXD"
           strategy="afterInteractive"
