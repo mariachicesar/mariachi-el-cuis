@@ -35,6 +35,7 @@ function MusicianCard({
         src={musician.photo}
         alt={`${musician.name}, ${musician.role[locale]} — Mariachi El Cuis`}
         fill
+        unoptimized
         sizes="(min-width: 768px) 240px, 190px"
         className="object-cover object-top"
       />

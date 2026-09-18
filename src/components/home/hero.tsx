@@ -20,6 +20,7 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         alt=""
         fill
         priority
+        unoptimized
         sizes="100vw"
         className="object-cover object-[center_35%]"
       />
@@ -31,7 +32,7 @@ export function Hero({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         playsInline
         poster={heroPhoto.src}
         preload="metadata"
-        className="absolute inset-0 hidden h-full w-full object-cover object-center motion-reduce:hidden md:block"
+        className="absolute inset-0 h-full w-full object-cover object-center motion-reduce:hidden"
       >
         <source src={HERO_VIDEO_SRC} type="video/mp4" />
       </video>

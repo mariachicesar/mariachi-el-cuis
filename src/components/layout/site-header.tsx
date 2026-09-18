@@ -18,7 +18,7 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
     <header className="sticky top-0 z-40 border-b border-charcoal-border bg-surface">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3 lg:px-12">
         <Link href={link('/')} className="shrink-0">
-          <Image src={logo} alt={siteConfig.name} priority className="h-10 w-auto" />
+          <Image src={logo} alt={siteConfig.name} priority unoptimized className="h-10 w-auto" />
         </Link>
 
         <nav aria-label="Main" className="hidden items-center gap-6 xl:flex">

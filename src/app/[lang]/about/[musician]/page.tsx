@@ -97,6 +97,7 @@ export default async function MusicianPage({
               src={slot.photo}
               alt={`${slot.name}, ${slot.role[locale]} — Mariachi El Cuis`}
               fill
+              unoptimized
               sizes="160px"
               className="object-cover object-top"
               priority
