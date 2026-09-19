@@ -23,7 +23,7 @@ const securityHeaders = [
       // clarity.ms: Microsoft Clarity analytics (script injected by @microsoft/clarity).
       "script-src 'self' 'unsafe-inline' https://news.google.com https://www.googletagmanager.com https://*.clarity.ms" + (process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''),
       "connect-src 'self' https://news.google.com https://www.google.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://*.clarity.ms",
-      "frame-src https://www.youtube-nocookie.com https://news.google.com",
+      "frame-src https://www.youtube-nocookie.com https://news.google.com https://www.googletagmanager.com",
       "object-src 'none'",
     ].join('; '),
   },
