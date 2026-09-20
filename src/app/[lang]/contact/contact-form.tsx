@@ -2,9 +2,10 @@
 
 import { useActionState, useEffect } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useRouter } from 'next/navigation'
 import { submitContact, type ContactActionState } from '@/app/actions/contact'
-import { pushDataLayerEvent } from '@/lib/gtm'
 import { siteConfig } from '@/lib/config/site'
+import { localizedPath } from '@/lib/i18n/paths'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/locales'
 
@@ -70,12 +71,13 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
 export function ContactForm({ dict, locale }: { dict: Dictionary; locale: Locale }) {
   const [state, formAction] = useActionState(submitContact, initialState)
   const t = COPY[locale]
+  const router = useRouter()
 
-  // Keyed on the whole state object (not state.ok) so a second successful
-  // submission fires the event again.
+  // On success, leave the form behind for a dedicated success page. The page
+  // (not this component) fires the GTM/Meta conversion event.
   useEffect(() => {
-    if (state.ok) pushDataLayerEvent('contact_form_submit')
-  }, [state])
+    if (state.ok) router.push(localizedPath('/contact/success', locale))
+  }, [state, router, locale])
 
   return (
     <div>

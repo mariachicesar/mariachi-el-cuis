@@ -13,16 +13,16 @@ export function generateStaticParams() {
 
 const COPY = {
   es: {
-    title: 'Reserva en proceso',
-    description: 'Tu depósito se está procesando.',
-    heading: '¡Gracias!',
-    body: 'Tu depósito se está procesando. Te enviaremos un correo de confirmación en cuanto el pago se complete.',
+    title: 'Mensaje enviado',
+    description: 'Recibimos tu mensaje.',
+    heading: '¡Mensaje enviado!',
+    body: 'Gracias por escribirnos. Te responderemos lo antes posible. Si es urgente, llámanos directamente.',
   },
   en: {
-    title: 'Booking in progress',
-    description: 'Your deposit is being processed.',
-    heading: 'Thank you!',
-    body: "Your deposit is being processed. We'll email you a confirmation as soon as the payment completes.",
+    title: 'Message sent',
+    description: 'We received your message.',
+    heading: 'Message sent!',
+    body: 'Thanks for reaching out. We will get back to you as soon as possible. If it is urgent, call us directly.',
   },
 } as const
 
@@ -30,10 +30,10 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const { lang } = await params
   const locale: Locale = isLocale(lang) ? lang : 'es'
   const t = COPY[locale]
-  return buildMetadata({ locale, path: '/book/success', title: t.title, description: t.description, noindex: true })
+  return buildMetadata({ locale, path: '/contact/success', title: t.title, description: t.description, noindex: true })
 }
 
-export default async function BookSuccessPage({ params }: { params: Promise<{ lang: string }> }) {
+export default async function ContactSuccessPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
   if (!isLocale(lang)) notFound()
   const t = COPY[lang]
@@ -45,7 +45,7 @@ export default async function BookSuccessPage({ params }: { params: Promise<{ la
         <p className="mt-4 max-w-2xl text-on-surface-variant">{t.body}</p>
         <p className="mt-4 text-on-surface-variant">{siteConfig.phoneDisplay}</p>
       </Section>
-      <TrackEvent event="booking_confirmed" />
+      <TrackEvent event="contact_form_submit" />
     </main>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState, useTransition } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useRouter } from 'next/navigation'
 import { getAddressSuggestionsAction } from '@/app/actions/address-suggestions'
 import { getQuoteAction, type GetQuoteActionResult } from '@/app/actions/quote'
 import { checkAvailabilityAction, type CheckAvailabilityResult } from '@/app/actions/availability'
@@ -9,7 +10,7 @@ import { sendEstimateEmailAction, type SendEstimateState } from '@/app/actions/e
 import { startCheckoutAction, type StartCheckoutState } from '@/app/actions/booking'
 import { getClauses, CONTRACT_VERSION } from '@/lib/contract/terms'
 import { weekdayIndexOf } from '@/lib/quote/timezone'
-import { pushDataLayerEvent } from '@/lib/gtm'
+import { localizedPath } from '@/lib/i18n/paths'
 import type { QuoteResult } from '@/lib/quote/types'
 import { siteConfig } from '@/lib/config/site'
 import type { Locale } from '@/lib/i18n/locales'
@@ -350,11 +351,13 @@ export function BookingWizard({
 
   const [estimateState, estimateFormAction] = useActionState(sendEstimateEmailAction, estimateInitial)
   const [checkoutState, checkoutFormAction] = useActionState(startCheckoutAction, checkoutInitial)
+  const router = useRouter()
 
-  // Keyed on the whole state object so repeat estimate sends re-fire.
+  // Estimate sent → dedicated confirmation page, which fires the
+  // GTM/Meta 'estimate_sent' conversion event on load.
   useEffect(() => {
-    if (estimateState.ok) pushDataLayerEvent('estimate_sent')
-  }, [estimateState])
+    if (estimateState.ok) router.push(localizedPath('/book/quote-sent', locale))
+  }, [estimateState, router, locale])
 
   const isSlotUnavailable = availability.checked && availability.available === false
   const checkoutFieldErrors =
