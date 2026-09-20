@@ -1,8 +1,9 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { useFormStatus } from 'react-dom'
 import { submitContact, type ContactActionState } from '@/app/actions/contact'
+import { pushDataLayerEvent } from '@/lib/gtm'
 import { siteConfig } from '@/lib/config/site'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/locales'
@@ -69,6 +70,12 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
 export function ContactForm({ dict, locale }: { dict: Dictionary; locale: Locale }) {
   const [state, formAction] = useActionState(submitContact, initialState)
   const t = COPY[locale]
+
+  // Keyed on the whole state object (not state.ok) so a second successful
+  // submission fires the event again.
+  useEffect(() => {
+    if (state.ok) pushDataLayerEvent('contact_form_submit')
+  }, [state])
 
   return (
     <div>

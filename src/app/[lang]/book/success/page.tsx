@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { Section } from '@/components/ui/section'
+import { BookingSuccessTracker } from '@/components/booking/booking-success-tracker'
 import { siteConfig } from '@/lib/config/site'
 import { isLocale, type Locale } from '@/lib/i18n/locales'
 import { buildMetadata } from '@/lib/seo/metadata'
@@ -44,6 +45,7 @@ export default async function BookSuccessPage({ params }: { params: Promise<{ la
         <p className="mt-4 max-w-2xl text-on-surface-variant">{t.body}</p>
         <p className="mt-4 text-on-surface-variant">{siteConfig.phoneDisplay}</p>
       </Section>
+      <BookingSuccessTracker />
     </main>
   )
 }
