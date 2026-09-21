@@ -15,16 +15,18 @@ test('renders the price breakdown for an ok quote', async () => {
     rush: false,
     calendarBlockMinutes: 120,
   }
-  const html = await render(EstimateEmail({ locale: 'en', quote }))
+  const html = await render(EstimateEmail({ locale: 'en', quote, address: '123 Main St, Los Angeles, CA' }))
   expect(html).toContain('380')
   expect(html).toContain('50')
   expect(html).toContain('330')
+  expect(html).toContain('123 Main St, Los Angeles, CA')
 })
 
 test('renders the call-us message for a call_required quote', async () => {
   const quote: QuoteResult = { status: 'call_required', reason: 'lead_time' }
-  const html = await render(EstimateEmail({ locale: 'es', quote }))
+  const html = await render(EstimateEmail({ locale: 'es', quote, address: '90011' }))
   expect(html).toContain('(626) 922-0091')
+  expect(html).toContain('90011')
 })
 
 test('renders the rush note only when the quote is rush', async () => {
@@ -39,6 +41,6 @@ test('renders the rush note only when the quote is rush', async () => {
     rush: true,
     calendarBlockMinutes: 120,
   }
-  const html = await render(EstimateEmail({ locale: 'en', quote: rushQuote }))
+  const html = await render(EstimateEmail({ locale: 'en', quote: rushQuote, address: '90011' }))
   expect(html).toContain('150')
 })

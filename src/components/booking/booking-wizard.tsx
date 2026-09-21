@@ -709,9 +709,37 @@ export function BookingWizard({
             )}
           </div>
 
+          <div>
+            <label htmlFor="wizard-lead-name" className={labelCls}>
+              {t.name}
+            </label>
+            <input
+              id="wizard-lead-name"
+              type="text"
+              className={inputCls}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="wizard-lead-phone" className={labelCls}>
+              {t.phone}
+            </label>
+            <input
+              id="wizard-lead-phone"
+              type="tel"
+              className={inputCls}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+
           <form action={estimateFormAction} className="space-y-2">
             {hiddenQuoteFields}
             <input type="hidden" name="email" value={email} />
+            <input type="hidden" name="name" value={name} />
+            <input type="hidden" name="phone" value={phone} />
             <EstimateSubmitButton label={t.emailEstimate} pendingLabel={t.emailEstimatePending} />
             {estimateState.ok && <p role="status">{t.emailSent}</p>}
             {!estimateState.ok && estimateState.error && (

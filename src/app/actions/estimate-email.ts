@@ -4,6 +4,7 @@ import { render } from '@react-email/render'
 import { Resend } from 'resend'
 import { z } from 'zod'
 import { EstimateEmail } from '@/emails/estimate'
+import { LeadNotificationEmail } from '@/emails/lead-notification'
 import { getQuote } from '@/lib/quote'
 import { GeocodeConfigurationError, geocodeAddress } from '@/lib/geo/geocode'
 import { haversineMiles } from '@/lib/geo/distance'
@@ -18,6 +19,8 @@ const inputSchema = z.object({
   address: z.string().trim().min(5).max(200),
   email: z.email(),
   locale: z.enum(['es', 'en']),
+  name: z.string().trim().max(200).optional(),
+  phone: z.string().trim().max(50).optional(),
 })
 
 export type SendEstimateState = {
@@ -37,6 +40,8 @@ export async function sendEstimateEmailAction(
     address: formData.get('address'),
     email: formData.get('email'),
     locale: formData.get('locale'),
+    name: formData.get('name') || undefined,
+    phone: formData.get('phone') || undefined,
   })
   if (!parsed.success) return { ok: false, error: 'validation' }
   if (!features.email || !features.maps) return { ok: false, error: 'not_configured' }
@@ -66,7 +71,7 @@ export async function sendEstimateEmailAction(
     now: new Date(),
   })
 
-  const html = await render(EstimateEmail({ locale: parsed.data.locale, quote }))
+  const html = await render(EstimateEmail({ locale: parsed.data.locale, quote, address: parsed.data.address }))
   const resend = new Resend(env.RESEND_API_KEY)
   try {
     await resend.emails.send({
@@ -78,8 +83,33 @@ export async function sendEstimateEmailAction(
           : 'Your Mariachi El Cuis estimate',
       html,
     })
-    return { ok: true }
   } catch {
     return { ok: false, error: 'send_failed' }
   }
+
+  // Lead notification to the business inbox — best-effort. The customer
+  // already has their estimate at this point, so a failure here must not
+  // turn a successful send into an error response.
+  try {
+    const leadHtml = await render(
+      LeadNotificationEmail({
+        name: parsed.data.name ?? '',
+        email: parsed.data.email,
+        phone: parsed.data.phone ?? '',
+        eventDate: parsed.data.eventDate,
+        startTime: parsed.data.startTime,
+        address: parsed.data.address,
+      }),
+    )
+    await resend.emails.send({
+      from: siteConfig.emailFrom,
+      to: env.CONTACT_TO_EMAIL!,
+      subject: `New quote request — ${parsed.data.name || parsed.data.email}`,
+      html: leadHtml,
+    })
+  } catch (error) {
+    console.error('Failed to send lead notification email', error)
+  }
+
+  return { ok: true }
 }

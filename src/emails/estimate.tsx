@@ -6,6 +6,7 @@ const COPY = {
   es: {
     preview: 'Tu cotización de Mariachi El Cuis',
     heading: 'Tu cotización',
+    address: 'Dirección del evento',
     total: 'Total estimado',
     deposit: 'Depósito requerido',
     balance: 'Saldo (se paga el día del evento)',
@@ -18,6 +19,7 @@ const COPY = {
   en: {
     preview: 'Your Mariachi El Cuis estimate',
     heading: 'Your estimate',
+    address: 'Event address',
     total: 'Estimated total',
     deposit: 'Deposit required',
     balance: 'Balance (paid on the event day)',
@@ -29,7 +31,15 @@ const COPY = {
   },
 } as const
 
-export function EstimateEmail({ locale, quote }: { locale: Locale; quote: QuoteResult }) {
+export function EstimateEmail({
+  locale,
+  quote,
+  address,
+}: {
+  locale: Locale
+  quote: QuoteResult
+  address: string
+}) {
   const t = COPY[locale]
   return (
     <Html>
@@ -38,6 +48,9 @@ export function EstimateEmail({ locale, quote }: { locale: Locale; quote: QuoteR
       <Body style={{ fontFamily: 'Georgia, serif', backgroundColor: '#131315', color: '#F5EFE3' }}>
         <Container>
           <Heading>{t.heading}</Heading>
+          <Text>
+            {t.address}: {address}
+          </Text>
           {quote.status === 'ok' ? (
             <Section>
               <Text>
