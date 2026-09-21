@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { VideoFacade } from '@/components/media/video-facade'
+import { FacebookIcon, InstagramIcon, YoutubeIcon } from '@/components/ui/social-icons'
 import { JsonLd } from '@/components/ui/json-ld'
 import { Section } from '@/components/ui/section'
 import { siteConfig } from '@/lib/config/site'
@@ -19,6 +20,8 @@ export function generateStaticParams() {
 // When adding a new clip, set `uploadDate` to the day it was actually uploaded
 // (ISO 8601) — Google uses it for video rich results and ignores stale dates.
 const ASSET_BASE = 'https://mariachiassets.s3.us-west-1.amazonaws.com/web'
+// Newer Shorts-style vertical clips (9:16) live at the bucket root.
+const ASSET_ROOT = 'https://mariachiassets.s3.us-west-1.amazonaws.com'
 
 const MEDIA: {
   id: string
@@ -26,6 +29,7 @@ const MEDIA: {
   poster: string
   duration: string
   uploadDate: string
+  vertical?: boolean
   title: Record<Locale, string>
 }[] = [
   {
@@ -60,6 +64,33 @@ const MEDIA: {
     uploadDate: '2026-09-16',
     title: { es: 'Sihualteco', en: 'Sihualteco' },
   },
+  {
+    id: 'guanajuato',
+    src: `${ASSET_ROOT}/Guanajuato_ads.mp4`,
+    poster: `${ASSET_ROOT}/Guanajuato_ads.jpg`,
+    duration: 'PT25S',
+    uploadDate: '2026-09-21',
+    vertical: true,
+    title: { es: 'Guanajuato', en: 'Guanajuato' },
+  },
+  {
+    id: 'una-pura-y-dos-con-sal',
+    src: `${ASSET_ROOT}/una_pura_clip.mp4`,
+    poster: `${ASSET_ROOT}/una_pura_clip.jpg`,
+    duration: 'PT25S',
+    uploadDate: '2026-09-21',
+    vertical: true,
+    title: { es: 'Una Pura y Dos Con Sal', en: 'Una Pura y Dos Con Sal' },
+  },
+  {
+    id: '17-anos',
+    src: `${ASSET_ROOT}/17anos_clip.mp4`,
+    poster: `${ASSET_ROOT}/17anos_clip.jpg`,
+    duration: 'PT49S',
+    uploadDate: '2026-09-21',
+    vertical: true,
+    title: { es: '17 Años', en: '17 Años' },
+  },
 ]
 
 const COPY = {
@@ -76,6 +107,7 @@ const COPY = {
     followLabel: 'Síguenos',
     youtube: 'YouTube',
     instagram: 'Instagram',
+    facebook: 'Facebook',
     breadcrumbHome: 'Inicio',
   },
   en: {
@@ -91,6 +123,7 @@ const COPY = {
     followLabel: 'Follow us',
     youtube: 'YouTube',
     instagram: 'Instagram',
+    facebook: 'Facebook',
     breadcrumbHome: 'Home',
   },
 } as const
@@ -108,7 +141,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 }
 
 const linkCls =
-  'text-sm font-medium text-burnished-gold underline underline-offset-4 hover:no-underline'
+  'inline-flex items-center gap-2 text-sm font-medium text-burnished-gold underline underline-offset-4 hover:no-underline'
+const iconCls = 'h-4 w-4'
 
 export default async function MediaPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params
@@ -119,7 +153,9 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
   const mediaUrl = alternatesFor('/media').languages[locale]!
   const homeUrl = alternatesFor('/').languages[locale]!
 
-  const hasSocial = Boolean(siteConfig.youtubeUrl || siteConfig.instagramUrl)
+  const hasSocial = Boolean(
+    siteConfig.youtubeUrl || siteConfig.instagramUrl || siteConfig.facebookUrl,
+  )
 
   return (
     <main id="main">
@@ -158,7 +194,12 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
             <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {MEDIA.map((item) => (
                 <li key={item.id}>
-                  <VideoFacade src={item.src} poster={item.poster} title={item.title[locale]} />
+                  <VideoFacade
+                    src={item.src}
+                    poster={item.poster}
+                    title={item.title[locale]}
+                    vertical={item.vertical}
+                  />
                 </li>
               ))}
             </ul>
@@ -179,6 +220,7 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
                 rel="noopener noreferrer"
                 className={linkCls}
               >
+                <YoutubeIcon className={iconCls} />
                 {t.youtube}
               </a>
             )}
@@ -189,7 +231,19 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
                 rel="noopener noreferrer"
                 className={linkCls}
               >
+                <InstagramIcon className={iconCls} />
                 {t.instagram}
+              </a>
+            )}
+            {siteConfig.facebookUrl && (
+              <a
+                href={siteConfig.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkCls}
+              >
+                <FacebookIcon className={iconCls} />
+                {t.facebook}
               </a>
             )}
           </div>

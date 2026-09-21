@@ -4,18 +4,20 @@ import { CtaBand } from '@/components/home/cta-band'
 import { Hero } from '@/components/home/hero'
 import { ServiceAreaGrid } from '@/components/home/service-area-grid'
 import { ServiceTeaser } from '@/components/home/service-teaser'
+import { VideoFacade } from '@/components/media/video-facade'
 import { Button } from '@/components/ui/button'
 import { JsonLd } from '@/components/ui/json-ld'
 import { Section } from '@/components/ui/section'
 import { ContactForm } from '@/app/[lang]/contact/contact-form'
 import { CITIES } from '@/lib/data/cities'
 import { GUIDES } from '@/lib/content/guides'
+import { siteConfig } from '@/lib/config/site'
 import { pricingLines } from '@/lib/data/pricing'
 import { REPERTOIRE } from '@/lib/data/repertoire'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isLocale } from '@/lib/i18n/locales'
-import { localizedPath } from '@/lib/i18n/paths'
-import { localBusiness } from '@/lib/seo/jsonld'
+import { alternatesFor, localizedPath } from '@/lib/i18n/paths'
+import { localBusiness, videoObject } from '@/lib/seo/jsonld'
 import { buildMetadata } from '@/lib/seo/metadata'
 
 export const dynamicParams = false
@@ -60,9 +62,57 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
 
   return (
     <main id="main">
-      <JsonLd data={localBusiness({ areaServed: CITIES.map((c) => c.name) })} />
+      <JsonLd
+        data={localBusiness({
+          areaServed: CITIES.map((c) => c.name),
+          sameAs: [siteConfig.youtubeUrl, siteConfig.instagramUrl, siteConfig.facebookUrl],
+        })}
+      />
 
       <Hero locale={locale} dict={dict} />
+
+      {/* Featured live clip — self-hosted vertical video, click-to-play */}
+      <Section>
+        <JsonLd
+          data={videoObject({
+            name: es ? '17 Años — Mariachi El Cuis en vivo' : '17 Años — Mariachi El Cuis live',
+            description: es
+              ? 'Mariachi El Cuis tocando 17 Años en vivo. Mariachi en Los Ángeles para bodas, quinceañeras y serenatas.'
+              : 'Mariachi El Cuis performing 17 Años live. Los Angeles mariachi for weddings, quinceañeras, and serenatas.',
+            contentUrl: 'https://mariachiassets.s3.us-west-1.amazonaws.com/17anos_clip.mp4',
+            thumbnailUrl: 'https://mariachiassets.s3.us-west-1.amazonaws.com/17anos_clip.jpg',
+            pageUrl: alternatesFor('/').languages[locale]!,
+            uploadDate: '2026-09-21',
+            duration: 'PT49S',
+          })}
+        />
+        <div className="flex flex-col items-center gap-8 md:flex-row md:justify-center md:gap-12">
+          <div className="max-w-md text-center md:text-left">
+            <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">
+              {es ? 'Míranos en vivo' : 'Watch us live'}
+            </h2>
+            <p className="mt-3 text-on-surface-variant">
+              {es
+                ? 'Así sonamos en tu evento: rancheras, boleros, huapangos y sones — y lo que el público pida.'
+                : 'This is how we sound at your event: rancheras, boleros, huapangos, and sones — plus whatever the crowd requests.'}
+            </p>
+            <Link
+              href={localizedPath('/media', locale)}
+              className="mt-4 inline-block text-sm font-medium text-burnished-gold underline underline-offset-4 hover:no-underline"
+            >
+              {es ? 'Ver más videos' : 'See more videos'}
+            </Link>
+          </div>
+          <div className="w-full max-w-[280px] shrink-0">
+            <VideoFacade
+              src="https://mariachiassets.s3.us-west-1.amazonaws.com/17anos_clip.mp4"
+              poster="https://mariachiassets.s3.us-west-1.amazonaws.com/17anos_clip.jpg"
+              title={es ? '17 Años — Mariachi El Cuis en vivo' : '17 Años — Mariachi El Cuis live'}
+              vertical
+            />
+          </div>
+        </div>
+      </Section>
 
       {/* Quick availability strip (Phase 2 adds the live form) */}
       <Section className="border-y border-charcoal-border bg-surface-container-lowest">
@@ -84,9 +134,21 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         </div>
       </Section>
 
-      <ServiceAreaGrid locale={locale} />
-
       <ServiceTeaser locale={locale} />
+
+            <Section>
+        <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">
+          {es ? 'Envíanos un mensaje' : 'Send us a message'}
+        </h2>
+        <p className="mt-3 max-w-2xl text-on-surface-variant">
+          {es
+            ? 'Cuéntanos sobre tu evento y te respondemos lo antes posible.'
+            : 'Tell us about your event and we will get back to you as soon as possible.'}
+        </p>
+        <div className="mt-6">
+          <ContactForm dict={dict} locale={locale} />
+        </div>
+      </Section>
 
       {/* Repertoire teaser */}
       <Section>
@@ -139,21 +201,13 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         </ul>
       </Section>
 
+
+
       <CtaBand locale={locale} dict={dict} />
 
-      <Section>
-        <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">
-          {es ? 'Envíanos un mensaje' : 'Send us a message'}
-        </h2>
-        <p className="mt-3 max-w-2xl text-on-surface-variant">
-          {es
-            ? 'Cuéntanos sobre tu evento y te respondemos lo antes posible.'
-            : 'Tell us about your event and we will get back to you as soon as possible.'}
-        </p>
-        <div className="mt-6">
-          <ContactForm dict={dict} locale={locale} />
-        </div>
-      </Section>
+
+
+            <ServiceAreaGrid locale={locale} />
     </main>
   )
 }

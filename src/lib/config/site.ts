@@ -30,6 +30,7 @@ export const siteConfig = {
   serviceCountyLabel: { es: 'Condado de Los Ángeles', en: 'Los Angeles County' },
   // TODO: owner — confirm the exact legal name used on contract countersignatures.
   ownerLegalName: 'Mariachi El Cuis',
-  youtubeUrl: undefined as string | undefined,
-  instagramUrl: undefined as string | undefined,
+  youtubeUrl: 'https://www.youtube.com/@mariachielcuis',
+  instagramUrl: 'https://www.instagram.com/mariachielcuis',
+  facebookUrl: 'https://www.facebook.com/profile.php?id=61594009573154',
 } as const

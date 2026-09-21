@@ -2,19 +2,22 @@
 import Image from 'next/image'
 import { useState } from 'react'
 
-type VideoFacadeProps =
+type VideoFacadeProps = (
   | { title: string; youtubeId: string; src?: never; poster?: never }
   | { title: string; src: string; poster: string; youtubeId?: never }
+) & { vertical?: boolean }
 
 export function VideoFacade(props: VideoFacadeProps) {
   const { title } = props
   const [playing, setPlaying] = useState(false)
+  // Shorts-style clips are 9:16; landscape clips keep the 16:9 default.
+  const aspectCls = props.vertical ? 'aspect-[9/16]' : 'aspect-video'
 
   if (playing) {
     if (props.youtubeId) {
       return (
         <iframe
-          className="aspect-video w-full rounded-xl"
+          className={`${aspectCls} w-full rounded-xl`}
           src={`https://www.youtube-nocookie.com/embed/${props.youtubeId}?autoplay=1`}
           title={title}
           allow="accelerated-download; autoplay; encrypted-media; picture-in-picture"
@@ -24,7 +27,7 @@ export function VideoFacade(props: VideoFacadeProps) {
     }
     return (
       <video
-        className="aspect-video w-full rounded-xl bg-charcoal-elevated"
+        className={`${aspectCls} w-full rounded-xl bg-charcoal-elevated`}
         src={props.src}
         poster={props.poster}
         controls
@@ -41,7 +44,7 @@ export function VideoFacade(props: VideoFacadeProps) {
     <button
       type="button"
       onClick={() => setPlaying(true)}
-      className="group relative flex aspect-video w-full items-center justify-center rounded-xl bg-charcoal-elevated"
+      className={`group relative flex ${aspectCls} w-full items-center justify-center rounded-xl bg-charcoal-elevated`}
       aria-label={`Play: ${title}`}
     >
       {props.youtubeId ? (

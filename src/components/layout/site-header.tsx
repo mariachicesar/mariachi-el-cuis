@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import logo from '@/assets/brand/logo.png'
 import { siteConfig } from '@/lib/config/site'
@@ -8,6 +7,7 @@ import type { Dictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/locales'
 import { localizedPath } from '@/lib/i18n/paths'
 import { LocaleSwitch } from './locale-switch'
+import { MobileMenu } from './mobile-menu'
 import { navItems } from './nav'
 
 export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary }) {
@@ -47,23 +47,7 @@ export function SiteHeader({ locale, dict }: { locale: Locale; dict: Dictionary 
         </div>
       </div>
 
-      <details className="border-t border-charcoal-border xl:hidden">
-        <summary className="flex cursor-pointer list-none items-center gap-2 px-6 py-3 text-sm text-on-surface [&::-webkit-details-marker]:hidden">
-          <Menu className="h-4 w-4" aria-hidden="true" />
-          {dict.nav.menu}
-        </summary>
-        <nav aria-label="Mobile menu" className="flex flex-col pb-3">
-          {items.map((item) => (
-            <Link
-              key={item.href}
-              href={link(item.href)}
-              className="px-6 py-2 text-sm text-on-surface transition-colors hover:text-burnished-gold"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </details>
+      <MobileMenu locale={locale} dict={dict} />
     </header>
   )
 }

@@ -5,6 +5,7 @@ import { features } from '@/lib/env'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/locales'
 import { localizedPath } from '@/lib/i18n/paths'
+import { FacebookIcon, InstagramIcon, YoutubeIcon } from '@/components/ui/social-icons'
 import { navItems } from './nav'
 import { PreferredSourceButton } from './preferred-source-button'
 
@@ -21,6 +22,41 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
         <div>
           <p className="font-display text-lg text-burnished-gold">{siteConfig.name}</p>
           <p className="mt-2 text-sm text-on-surface-variant">{dict.footer.tagline}</p>
+          <div className="mt-4 flex gap-4">
+            {siteConfig.youtubeUrl && (
+              <a
+                href={siteConfig.youtubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className="text-on-surface-variant transition-colors hover:text-burnished-gold"
+              >
+                <YoutubeIcon className="h-5 w-5" />
+              </a>
+            )}
+            {siteConfig.instagramUrl && (
+              <a
+                href={siteConfig.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="text-on-surface-variant transition-colors hover:text-burnished-gold"
+              >
+                <InstagramIcon className="h-5 w-5" />
+              </a>
+            )}
+            {siteConfig.facebookUrl && (
+              <a
+                href={siteConfig.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="text-on-surface-variant transition-colors hover:text-burnished-gold"
+              >
+                <FacebookIcon className="h-5 w-5" />
+              </a>
+            )}
+          </div>
         </div>
 
         <nav aria-label="Footer" className="flex flex-col gap-2">

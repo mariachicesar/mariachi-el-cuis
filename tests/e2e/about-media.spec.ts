@@ -15,18 +15,21 @@ test('media page ships no youtube iframe before interaction', async ({ request }
   expect(html).not.toContain('youtube-nocookie.com/embed')
 })
 
-test('media page lists 4 direct video clips with posters, no <video> before interaction', async ({
+test('media page lists 7 direct video clips with posters, no <video> before interaction', async ({
   page,
 }) => {
   await page.goto('/media')
   const items = page.locator('#main ul li')
-  await expect(items).toHaveCount(4)
+  await expect(items).toHaveCount(7)
   // Posters are plain <img> thumbnails; the real <video> only mounts on click.
   await expect(page.locator('#main video')).toHaveCount(0)
   await expect(page.getByRole('button', { name: /toma 1|take 1/i })).toBeVisible()
   await expect(page.getByRole('button', { name: /toma 2|take 2/i })).toBeVisible()
   await expect(page.getByRole('button', { name: /ay amigo/i })).toBeVisible()
   await expect(page.getByRole('button', { name: /sihualteco/i })).toBeVisible()
+  await expect(page.getByRole('button', { name: /guanajuato/i })).toBeVisible()
+  await expect(page.getByRole('button', { name: /una pura/i })).toBeVisible()
+  await expect(page.getByRole('button', { name: /17 años/i })).toBeVisible()
 })
 
 test('media page: clicking a poster mounts a native video element', async ({ page }) => {
