@@ -40,6 +40,17 @@ export async function suggestAddresses(query: string): Promise<string[]> {
     .slice(0, 5)
 }
 
+export function staticMapUrl(lat: number, lng: number): string {
+  const url = new URL('https://maps.googleapis.com/maps/api/staticmap')
+  url.searchParams.set('center', `${lat},${lng}`)
+  url.searchParams.set('zoom', '14')
+  url.searchParams.set('size', '600x300')
+  url.searchParams.set('scale', '2')
+  url.searchParams.set('markers', `color:gold|${lat},${lng}`)
+  url.searchParams.set('key', env.GOOGLE_MAPS_API_KEY!)
+  return url.toString()
+}
+
 export async function geocodeAddress(address: string): Promise<GeocodeResult | null> {
   const data = await requestGeocodes(address)
   if (!data) return null

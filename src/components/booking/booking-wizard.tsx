@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState, useTransition } from 'react'
 import { useFormStatus } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { getAddressSuggestionsAction } from '@/app/actions/address-suggestions'
+import { getAddressLocationAction } from '@/app/actions/address-location'
 import { getQuoteAction, type GetQuoteActionResult } from '@/app/actions/quote'
 import { checkAvailabilityAction, type CheckAvailabilityResult } from '@/app/actions/availability'
 import { sendEstimateEmailAction, type SendEstimateState } from '@/app/actions/estimate-email'
@@ -36,6 +37,7 @@ const COPY = {
     sevenSongs: (price: number) => `Paquete de 7 canciones ($${price})`,
     hourly: 'Por hora',
     address: 'Dirección del evento',
+    mapAlt: 'Mapa de la dirección del evento',
     selectAddress: 'Selecciona una dirección de la lista para continuar.',
     noAddresses: 'No encontramos direcciones que coincidan. Intenta agregar calle, ciudad o código postal.',
     checking: 'Calculando…',
@@ -91,6 +93,7 @@ const COPY = {
     sevenSongs: (price: number) => `7-songs package ($${price})`,
     hourly: 'Hourly',
     address: 'Event address',
+    mapAlt: 'Map of the event address',
     selectAddress: 'Select an address from the list to continue.',
     noAddresses: 'No matching addresses found. Try adding a street, city, or ZIP code.',
     checking: 'Checking…',
@@ -248,6 +251,7 @@ export function BookingWizard({
   const [phone, setPhone] = useState('')
 
   const [quote, setQuote] = useState<QuoteResult | null>(null)
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [quoteError, setQuoteError] = useState<Extract<GetQuoteActionResult, { ok: false }>['error'] | null>(null)
   const [availability, setAvailability] = useState<CheckAvailabilityResult>({ checked: false })
   const [isQuotePending, startQuoteTransition] = useTransition()
@@ -329,6 +333,24 @@ export function BookingWizard({
     }, effectDelayMs(isValidQuoteInput))
     return () => clearTimeout(handle)
   }, [features.maps, eventDate, startTime, durationHours, durationInput, packageType, address, addressSelected])
+
+  // Independent of the date/time/duration fields above — the map only needs
+  // a selected address, so it can render before the rest of the wizard is
+  // filled in (the price quote effect still gates on the full input set).
+  useEffect(() => {
+    const canGeocode = features.maps && addressSelected && address.trim().length >= 3
+
+    const handle = setTimeout(() => {
+      if (!canGeocode) {
+        setLocation(null)
+        return
+      }
+      getAddressLocationAction({ address })
+        .then((result) => setLocation(result.ok ? result.location : null))
+        .catch(() => setLocation(null))
+    }, effectDelayMs(canGeocode))
+    return () => clearTimeout(handle)
+  }, [features.maps, addressSelected, address])
 
   useEffect(() => {
     const canCheckAvailability = features.calendar && quote !== null && quote.status === 'ok'
@@ -558,6 +580,16 @@ export function BookingWizard({
           <p role="alert" className="mt-2 text-sm text-red-400">
             {quoteErrorMessage(t, quoteError)}
           </p>
+        )}
+        {location && (
+          // eslint-disable-next-line @next/next/no-img-element -- proxied, non-optimizable Static Maps image
+          <img
+            src={`/api/static-map?lat=${location.lat}&lng=${location.lng}`}
+            alt={t.mapAlt}
+            width={600}
+            height={300}
+            className="mt-3 w-full rounded border border-charcoal-border"
+          />
         )}
       </div>
 

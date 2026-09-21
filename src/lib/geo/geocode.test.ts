@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest'
-import { GeocodeConfigurationError, geocodeAddress, suggestAddresses } from './geocode'
+import { GeocodeConfigurationError, geocodeAddress, staticMapUrl, suggestAddresses } from './geocode'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -58,6 +58,13 @@ test('throws a configuration error when Google rejects the API key', async () =>
 test('returns null on a non-OK HTTP response', async () => {
   mockFetchOnce({}, false)
   expect(await geocodeAddress('anything')).toBeNull()
+})
+
+test('builds a static map URL with the marker centered on the coordinates', () => {
+  const url = new URL(staticMapUrl(34.0074, -118.2587))
+  expect(url.hostname).toBe('maps.googleapis.com')
+  expect(url.searchParams.get('center')).toBe('34.0074,-118.2587')
+  expect(url.searchParams.get('markers')).toBe('color:gold|34.0074,-118.2587')
 })
 
 test('county/state are null, not throwing, when components are missing', async () => {
