@@ -22,6 +22,9 @@ declare global {
 
 export const GA4_MEASUREMENT_ID = 'G-YGK2HZEWXD'
 
+// localStorage key set by visiting any page with ?internal=1 (see layout).
+export const INTERNAL_TRAFFIC_KEY = 'mec_internal_traffic'
+
 // Pushes a custom event onto the GTM dataLayer. The `|| []` guard means an
 // event fired before GTM evaluates is still queued for it to pick up.
 export function pushDataLayerEvent(event: string, data: Record<string, unknown> = {}) {

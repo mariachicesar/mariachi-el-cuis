@@ -13,7 +13,7 @@ import { SkipLink } from '@/components/layout/skip-link'
 import { ClarityScript } from '@/components/layout/clarity'
 import { siteConfig } from '@/lib/config/site'
 import { env } from '@/lib/env'
-import { GA4_MEASUREMENT_ID } from '@/lib/gtm'
+import { GA4_MEASUREMENT_ID, INTERNAL_TRAFFIC_KEY } from '@/lib/gtm'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isLocale } from '@/lib/i18n/locales'
 
@@ -66,12 +66,22 @@ export default async function RootLayout({
         <MobileTabBar locale={lang} dict={dict} />
         <ClarityScript projectId={env.NEXT_PUBLIC_CLARITY_PROJECT_ID} />
         {/* Init runs beforeInteractive so `config` is queued before any page
-            effect (e.g. a success page's generate_lead) can push an event. */}
+            effect (e.g. a success page's generate_lead) can push an event.
+            Visiting any page with ?internal=1 flags this browser as team
+            traffic (?internal=0 clears it). GA4's "Internal Traffic" data
+            filter drops hits tagged traffic_type=internal. */}
         <Script id="gtag-init" strategy="beforeInteractive">
           {`window.dataLayer = window.dataLayer || [];
 window.gtag = function gtag(){dataLayer.push(arguments);};
+var internal = false;
+try {
+  var flag = new URLSearchParams(location.search).get('internal');
+  if (flag === '1') localStorage.setItem('${INTERNAL_TRAFFIC_KEY}', '1');
+  if (flag === '0') localStorage.removeItem('${INTERNAL_TRAFFIC_KEY}');
+  internal = localStorage.getItem('${INTERNAL_TRAFFIC_KEY}') === '1';
+} catch (e) {}
 gtag('js', new Date);
-gtag('config', '${GA4_MEASUREMENT_ID}');`}
+gtag('config', '${GA4_MEASUREMENT_ID}', internal ? { traffic_type: 'internal' } : {});`}
         </Script>
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`}
