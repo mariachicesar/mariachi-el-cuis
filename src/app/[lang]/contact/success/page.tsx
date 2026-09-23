@@ -45,7 +45,7 @@ export default async function ContactSuccessPage({ params }: { params: Promise<{
         <p className="mt-4 max-w-2xl text-on-surface-variant">{t.body}</p>
         <p className="mt-4 text-on-surface-variant">{siteConfig.phoneDisplay}</p>
       </Section>
-      <TrackEvent event="contact_form_submit" />
+      <TrackEvent event="contact_form_submit" leadSource="contact_form" />
     </main>
   )
 }

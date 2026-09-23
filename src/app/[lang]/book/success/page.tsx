@@ -45,7 +45,7 @@ export default async function BookSuccessPage({ params }: { params: Promise<{ la
         <p className="mt-4 max-w-2xl text-on-surface-variant">{t.body}</p>
         <p className="mt-4 text-on-surface-variant">{siteConfig.phoneDisplay}</p>
       </Section>
-      <TrackEvent event="booking_confirmed" />
+      <TrackEvent event="booking_confirmed" leadSource="booking_deposit" metaLead />
     </main>
   )
 }

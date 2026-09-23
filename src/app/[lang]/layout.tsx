@@ -13,6 +13,7 @@ import { SkipLink } from '@/components/layout/skip-link'
 import { ClarityScript } from '@/components/layout/clarity'
 import { siteConfig } from '@/lib/config/site'
 import { env } from '@/lib/env'
+import { GA4_MEASUREMENT_ID } from '@/lib/gtm'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isLocale } from '@/lib/i18n/locales'
 
@@ -64,16 +65,18 @@ export default async function RootLayout({
         <SiteFooter locale={lang} dict={dict} />
         <MobileTabBar locale={lang} dict={dict} />
         <ClarityScript projectId={env.NEXT_PUBLIC_CLARITY_PROJECT_ID} />
+        {/* Init runs beforeInteractive so `config` is queued before any page
+            effect (e.g. a success page's generate_lead) can push an event. */}
+        <Script id="gtag-init" strategy="beforeInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+window.gtag = function gtag(){dataLayer.push(arguments);};
+gtag('js', new Date);
+gtag('config', '${GA4_MEASUREMENT_ID}');`}
+        </Script>
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-YGK2HZEWXD"
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`}
           strategy="afterInteractive"
         />
-        <Script id="gtag-init" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date);
-gtag('config', 'G-YGK2HZEWXD');`}
-        </Script>
       </body>
       <GoogleTagManager gtmId="GTM-W4RLHJDR" />
     </html>

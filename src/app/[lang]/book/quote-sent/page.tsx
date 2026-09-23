@@ -57,7 +57,7 @@ export default async function QuoteSentPage({ params }: { params: Promise<{ lang
           </Link>
         </p>
       </Section>
-      <TrackEvent event="estimate_sent" />
+      <TrackEvent event="estimate_sent" leadSource="quote_sent" />
     </main>
   )
 }
