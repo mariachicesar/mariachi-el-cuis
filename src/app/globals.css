@@ -31,6 +31,24 @@ body {
 
 h1, h2, h3, h4 { font-family: var(--font-display); }
 
+/* Admin price inputs: keep the numeric keyboard/validation but hide the up/down spinner. */
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinner {
+  -moz-appearance: textfield;
+}
+
+/* Date/time inputs: the native calendar/clock picker icon renders black by
+   default in some browsers even with color-scheme: dark, making it invisible
+   against our dark inputs — invert it so it's visible and clickable. */
+.date-time-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

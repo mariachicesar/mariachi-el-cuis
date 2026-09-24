@@ -78,12 +78,24 @@ export default function AdminBookingPage() {
 
         <label style={labelStyle}>
           Event date
-          <input style={inputStyle} type="date" name="eventDate" required />
+          <input
+            className="date-time-input"
+            style={{ ...inputStyle, colorScheme: 'dark' }}
+            type="date"
+            name="eventDate"
+            required
+          />
         </label>
 
         <label style={labelStyle}>
           Start time
-          <input style={inputStyle} type="time" name="startTime" required />
+          <input
+            className="date-time-input"
+            style={{ ...inputStyle, colorScheme: 'dark' }}
+            type="time"
+            name="startTime"
+            required
+          />
         </label>
 
         <label style={labelStyle}>
@@ -101,17 +113,41 @@ export default function AdminBookingPage() {
 
         <label style={labelStyle}>
           Total price ($)
-          <input style={inputStyle} type="number" name="total" min={0} step={1} required />
+          <input
+            className="no-spinner"
+            style={inputStyle}
+            type="number"
+            name="total"
+            min={0}
+            step={1}
+            required
+          />
         </label>
 
         <label style={labelStyle}>
           Deposit amount ($)
-          <input style={inputStyle} type="number" name="deposit" min={0} step={1} required />
+          <input
+            className="no-spinner"
+            style={inputStyle}
+            type="number"
+            name="deposit"
+            min={0}
+            step={1}
+            required
+          />
         </label>
 
         <label style={labelStyle}>
           Balance due ($)
-          <input style={inputStyle} type="number" name="balanceDue" min={0} step={1} required />
+          <input
+            className="no-spinner"
+            style={inputStyle}
+            type="number"
+            name="balanceDue"
+            min={0}
+            step={1}
+            required
+          />
         </label>
 
         <label style={labelStyle}>
