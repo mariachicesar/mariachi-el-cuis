@@ -69,3 +69,26 @@ export function metaTrack(event: string, { timeoutMs = 10_000, intervalMs = 250 
   attempt()
   return () => clearTimeout(timer)
 }
+
+// Fires one success page's conversion tracking:
+// - `event` onto the dataLayer, where GTM's Meta tags listen.
+// - `event` to GA4 by name. Google Ads imports GA4 key events by name, so each
+//   lead type needs its own event to carry its own value.
+// - GA4 `generate_lead` with `lead_source`, kept for GA4 reporting. Not a key
+//   event, so it isn't imported and doesn't double-count.
+// - Meta `Lead` when `metaLead` is set (see TrackEvent).
+// Returns a cleanup function for the Meta polling.
+export function trackConversion({
+  event,
+  leadSource,
+  metaLead = false,
+}: {
+  event: string
+  leadSource: string
+  metaLead?: boolean
+}): () => void {
+  pushDataLayerEvent(event)
+  gtagEvent(event, { lead_source: leadSource })
+  gtagEvent('generate_lead', { lead_source: leadSource })
+  return metaLead ? metaTrack('Lead') : () => {}
+}

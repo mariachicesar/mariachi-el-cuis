@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { gtagEvent, metaTrack, pushDataLayerEvent } from './gtm'
+import { gtagEvent, metaTrack, pushDataLayerEvent, trackConversion } from './gtm'
 
 type TestWindow = { dataLayer?: unknown[]; gtag?: unknown; fbq?: unknown }
 
@@ -60,5 +60,25 @@ describe('analytics helpers', () => {
     win.fbq = fbq
     vi.advanceTimersByTime(1000)
     expect(fbq).not.toHaveBeenCalled()
+  })
+
+  it('sends the named conversion and generate_lead to GA4, and the event to the dataLayer', () => {
+    const gtag = vi.fn()
+    win.gtag = gtag
+    trackConversion({ event: 'booking_confirmed', leadSource: 'booking_deposit' })
+    expect(win.dataLayer).toEqual([{ event: 'booking_confirmed' }])
+    expect(gtag).toHaveBeenCalledWith('event', 'booking_confirmed', { lead_source: 'booking_deposit' })
+    expect(gtag).toHaveBeenCalledWith('event', 'generate_lead', { lead_source: 'booking_deposit' })
+    expect(gtag).toHaveBeenCalledTimes(2)
+  })
+
+  it('fires Meta Lead only when metaLead is set', () => {
+    const fbq = vi.fn()
+    win.fbq = fbq
+    win.gtag = vi.fn()
+    trackConversion({ event: 'contact_form_submit', leadSource: 'contact_form' })
+    expect(fbq).not.toHaveBeenCalled()
+    trackConversion({ event: 'booking_confirmed', leadSource: 'booking_deposit', metaLead: true })
+    expect(fbq).toHaveBeenCalledWith('track', 'Lead')
   })
 })
