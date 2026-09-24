@@ -13,6 +13,8 @@ const schema = z.object({
   GOOGLE_CALENDAR_ID: z.string().min(1).optional(),
   STRIPE_SECRET_KEY: z.string().min(1).optional(),
   STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
+  ADMIN_USER: z.string().min(1).optional(),
+  ADMIN_PASSWORD: z.string().min(1).optional(),
 })
 
 // Some hosts (e.g. Vercel) can present a declared-but-unfilled env var as an
@@ -43,6 +45,8 @@ export function parseEnv(source: Record<string, string | undefined>) {
     GOOGLE_CALENDAR_ID: normalizeOptional(source.GOOGLE_CALENDAR_ID),
     STRIPE_SECRET_KEY: normalizeOptional(source.STRIPE_SECRET_KEY),
     STRIPE_WEBHOOK_SECRET: normalizeOptional(source.STRIPE_WEBHOOK_SECRET),
+    ADMIN_USER: normalizeOptional(source.ADMIN_USER),
+    ADMIN_PASSWORD: normalizeOptional(source.ADMIN_PASSWORD),
   })
   return {
     env,
@@ -56,6 +60,7 @@ export function parseEnv(source: Record<string, string | undefined>) {
           env.GOOGLE_CALENDAR_ID,
       ),
       stripe: Boolean(env.STRIPE_SECRET_KEY),
+      admin: Boolean(env.ADMIN_USER && env.ADMIN_PASSWORD),
       // Google only lists some sites in its source preferences tool; keep the
       // button hidden until mariachielcuis.com is eligible.
       preferredSource: env.NEXT_PUBLIC_GOOGLE_PREFERRED_SOURCE === 'true',
