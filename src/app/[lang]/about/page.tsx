@@ -1,17 +1,29 @@
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
+import groupPhoto from '@/assets/brand/mariachi-el-cuis-group-portrait.webp'
 import { MusicianFan } from '@/components/about/musician-fan'
+import { VideoFacade } from '@/components/media/video-facade'
 import { Button } from '@/components/ui/button'
 import { JsonLd } from '@/components/ui/json-ld'
 import { Section } from '@/components/ui/section'
 import { isLocale, type Locale } from '@/lib/i18n/locales'
 import { alternatesFor, localizedPath } from '@/lib/i18n/paths'
-import { breadcrumb } from '@/lib/seo/jsonld'
+import { breadcrumb, videoObject } from '@/lib/seo/jsonld'
 import { buildMetadata } from '@/lib/seo/metadata'
 
 export const dynamicParams = false
 
 export function generateStaticParams() {
   return [{ lang: 'es' }, { lang: 'en' }]
+}
+
+// Featured reel: web re-encode (720p H.264) of the "Hablando Claro" original
+// in the group's S3 bucket.
+const REEL = {
+  src: 'https://mariachiassets.s3.us-west-1.amazonaws.com/hablando_claro_reel.mp4',
+  poster: 'https://mariachiassets.s3.us-west-1.amazonaws.com/hablando_claro_reel.jpg',
+  duration: 'PT1M3S',
+  uploadDate: '2026-09-27',
 }
 
 const COPY = {
@@ -27,6 +39,14 @@ const COPY = {
     ctaHeading: '¿Tienes preguntas antes de reservar?',
     ctaBody: 'Escríbenos y con gusto te respondemos.',
     ctaLabel: 'Contáctanos',
+    groupAlt:
+      'Los cinco músicos de Mariachi El Cuis con traje de charro, sosteniendo violines, trompeta, guitarrón y vihuela.',
+    reelHeading: 'Míranos en acción',
+    reelBody:
+      'Hablando Claro — un vistazo a cómo suena Mariachi El Cuis en vivo en un evento en Los Ángeles.',
+    reelTitle: 'Hablando Claro — Mariachi El Cuis en vivo',
+    reelDescription:
+      'Mariachi El Cuis tocando en vivo en un evento en Los Ángeles. Mariachi para bodas, quinceañeras, serenatas y eventos en el Condado de Los Ángeles.',
     breadcrumbHome: 'Inicio',
   },
   en: {
@@ -41,6 +61,14 @@ const COPY = {
     ctaHeading: 'Have questions before you book?',
     ctaBody: "Reach out and we'll get back to you.",
     ctaLabel: 'Contact us',
+    groupAlt:
+      'The five musicians of Mariachi El Cuis in charro suits, holding violins, trumpet, guitarrón, and vihuela.',
+    reelHeading: 'See us in action',
+    reelBody:
+      'Hablando Claro — a look at how Mariachi El Cuis sounds live at an event in Los Angeles.',
+    reelTitle: 'Hablando Claro — Mariachi El Cuis live',
+    reelDescription:
+      'Mariachi El Cuis performing live at an event in Los Angeles. Mariachi for weddings, quinceañeras, serenatas, and events across Los Angeles County.',
     breadcrumbHome: 'Home',
   },
 } as const
@@ -87,12 +115,44 @@ export default async function AboutPage({ params }: { params: Promise<{ lang: st
       <Section className="border-b border-charcoal-border bg-surface-container-lowest">
         <h1 className="font-display text-3xl text-burnished-gold md:text-5xl">{t.title}</h1>
         <p className="mt-4 max-w-2xl text-on-surface-variant">{t.intro}</p>
+        <Image
+          src={groupPhoto}
+          alt={t.groupAlt}
+          priority
+          sizes="(max-width: 768px) 100vw, 768px"
+          className="mx-auto mt-8 h-auto w-full max-w-3xl"
+        />
       </Section>
 
       <Section>
         <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">{t.bioHeading}</h2>
         <p className="mt-4 max-w-2xl text-on-surface-variant">{t.bioBody}</p>
         <MusicianFan locale={locale} />
+      </Section>
+
+      <Section className="border-t border-charcoal-border">
+        <JsonLd
+          data={videoObject({
+            name: t.reelTitle,
+            description: t.reelDescription,
+            contentUrl: REEL.src,
+            thumbnailUrl: REEL.poster,
+            pageUrl: aboutUrl,
+            uploadDate: REEL.uploadDate,
+            duration: REEL.duration,
+          })}
+        />
+        <div className="flex flex-col items-center gap-8 md:flex-row md:justify-center md:gap-12">
+          <div className="max-w-md text-center md:text-left">
+            <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">
+              {t.reelHeading}
+            </h2>
+            <p className="mt-3 text-on-surface-variant">{t.reelBody}</p>
+          </div>
+          <div className="w-full max-w-[300px] shrink-0">
+            <VideoFacade src={REEL.src} poster={REEL.poster} title={t.reelTitle} vertical />
+          </div>
+        </div>
       </Section>
 
       <Section className="border-t border-charcoal-border bg-surface-container">
