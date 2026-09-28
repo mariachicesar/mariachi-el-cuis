@@ -49,3 +49,16 @@ test('services page states the new deposit rule, not the old flat $100', async (
   await expect(page.getByText('$100', { exact: false })).toHaveCount(0)
   await expect(page.getByText('$50', { exact: false }).first()).toBeVisible()
 })
+
+test('services page lists the three sound & extras packages in each language', async ({ page }) => {
+  await page.goto('/en/services')
+  await expect(page.getByRole('heading', { name: /sound & extras packages/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /^package [123]$/i })).toHaveCount(3)
+  await expect(page.getByText('+$70 extra')).toBeVisible()
+  await expect(page.getByText('+$150 extra')).toBeVisible()
+  await expect(page.getByRole('img', { name: /package 1 flyer/i })).toBeVisible()
+
+  await page.goto('/services')
+  await expect(page.getByRole('heading', { name: /paquetes de sonido y extras/i })).toBeVisible()
+  await expect(page.getByRole('img', { name: /volante del paquete 3/i })).toBeVisible()
+})

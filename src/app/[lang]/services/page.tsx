@@ -1,9 +1,11 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { CtaBand } from '@/components/home/cta-band'
 import { JsonLd } from '@/components/ui/json-ld'
 import { Section } from '@/components/ui/section'
 import { FAQ } from '@/lib/data/faq'
+import { PACKAGES } from '@/lib/data/packages'
 import { PRICING, pricingLines } from '@/lib/data/pricing'
 import { SERVICES } from '@/lib/data/services'
 import { getDictionary } from '@/lib/i18n/dictionaries'
@@ -48,6 +50,12 @@ const COPY = {
       perHour: ' por hora',
       none: '',
     },
+    packagesHeading: 'Paquetes de sonido y extras',
+    packagesIntro:
+      'Elige el equipo según el tamaño de tu evento. El costo extra se suma a tu cotización; avísanos qué paquete quieres al reservar.',
+    packageIncluded: 'Incluido',
+    packageExtra: (amount: number) => `+$${amount} extra`,
+    packageFlyerAlt: (title: string) => `Volante del ${title} con el equipo de sonido`,
     faqHeading: 'Preguntas comunes',
     faqNote: 'Las reglas de precio y de cancelación están completas en la lista de arriba.',
     faqLink: 'Ver todas las preguntas frecuentes',
@@ -82,6 +90,12 @@ const COPY = {
       perHour: '/hr',
       none: '',
     },
+    packagesHeading: 'Sound & extras packages',
+    packagesIntro:
+      "Pick the gear that fits the size of your event. The extra cost is added to your quote; just let us know which package you'd like when you book.",
+    packageIncluded: 'Included',
+    packageExtra: (amount: number) => `+$${amount} extra`,
+    packageFlyerAlt: (title: string) => `${title} flyer showing the sound equipment`,
     faqHeading: 'Common questions',
     faqNote: 'The full pricing and cancellation rules are in the list above.',
     faqLink: 'See all frequently asked questions',
@@ -243,6 +257,37 @@ export default async function ServicesPage({ params }: { params: Promise<{ lang:
       </Section>
 
       <Section>
+        <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">
+          {t.packagesHeading}
+        </h2>
+        <p className="mt-3 max-w-2xl text-on-surface-variant">{t.packagesIntro}</p>
+        <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {PACKAGES.map((pkg) => (
+            <li
+              key={pkg.id}
+              className="overflow-hidden rounded border border-charcoal-border bg-surface-container"
+            >
+              <Image
+                src={pkg.flyer[locale]}
+                alt={t.packageFlyerAlt(pkg.title[locale])}
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                className="h-auto w-full"
+              />
+              <div className="p-5">
+                <div className="flex items-baseline justify-between gap-4">
+                  <h3 className="font-display text-xl text-crema-white">{pkg.title[locale]}</h3>
+                  <p className="whitespace-nowrap font-semibold text-burnished-gold">
+                    {pkg.extra === 0 ? t.packageIncluded : t.packageExtra(pkg.extra)}
+                  </p>
+                </div>
+                <p className="mt-2 text-sm text-on-surface-variant">{pkg.summary[locale]}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section className="border-t border-charcoal-border">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <h2 className="font-display text-2xl text-burnished-gold md:text-3xl">{t.faqHeading}</h2>
           <Link href={localizedPath('/faq', locale)} className={linkCls}>
