@@ -33,6 +33,50 @@ const MEDIA: {
   title: Record<Locale, string>
 }[] = [
   {
+    id: 'musica-para-bailar',
+    src: `${ASSET_ROOT}/musica_para_bailar_reel.mp4`,
+    poster: `${ASSET_ROOT}/musica_para_bailar_reel.jpg`,
+    duration: 'PT50S',
+    uploadDate: '2026-09-27',
+    title: { es: 'Música para Bailar', en: 'Música para Bailar' },
+  },
+  {
+    id: 'puno-de-tierra',
+    src: `${ASSET_ROOT}/puno_de_tierra_reel.mp4`,
+    poster: `${ASSET_ROOT}/puno_de_tierra_reel.jpg`,
+    duration: 'PT1M24S',
+    uploadDate: '2026-09-27',
+    vertical: true,
+    title: { es: 'Puño de Tierra', en: 'Puño de Tierra' },
+  },
+  {
+    id: 'el-reloj',
+    src: `${ASSET_ROOT}/reloj_reel.mp4`,
+    poster: `${ASSET_ROOT}/reloj_reel.jpg`,
+    duration: 'PT1M30S',
+    uploadDate: '2026-09-27',
+    vertical: true,
+    title: { es: 'El Reloj', en: 'El Reloj' },
+  },
+  {
+    id: 'seis-pies-abajo',
+    src: `${ASSET_ROOT}/seis_pies_abajo_reel.mp4`,
+    poster: `${ASSET_ROOT}/seis_pies_abajo_reel.jpg`,
+    duration: 'PT54S',
+    uploadDate: '2026-09-27',
+    vertical: true,
+    title: { es: '6 Pies Abajo', en: '6 Pies Abajo' },
+  },
+  {
+    id: 'abrazado-de-un-poste',
+    src: `${ASSET_ROOT}/abrazado_de_un_poste_reel.mp4`,
+    poster: `${ASSET_ROOT}/abrazado_de_un_poste_reel.jpg`,
+    duration: 'PT35S',
+    uploadDate: '2026-09-27',
+    vertical: true,
+    title: { es: 'Abrazado de un Poste', en: 'Abrazado de un Poste' },
+  },
+  {
     id: 'no-llega-el-olvido-1',
     src: `${ASSET_BASE}/no-llega-el-olvido-1.mp4`,
     poster: `${ASSET_BASE}/no-llega-el-olvido-1.jpg`,
@@ -92,6 +136,10 @@ const MEDIA: {
     title: { es: '17 Años', en: '17 Años' },
   },
 ]
+
+// Newest first. Array.prototype.sort is stable, so clips sharing an
+// uploadDate keep their order in MEDIA.
+const MEDIA_NEWEST_FIRST = [...MEDIA].sort((a, b) => b.uploadDate.localeCompare(a.uploadDate))
 
 const COPY = {
   es: {
@@ -192,7 +240,7 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
               {t.videosHeading}
             </h2>
             <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {MEDIA.map((item) => (
+              {MEDIA_NEWEST_FIRST.map((item) => (
                 <li key={item.id}>
                   <VideoFacade
                     src={item.src}
@@ -200,6 +248,9 @@ export default async function MediaPage({ params }: { params: Promise<{ lang: st
                     title={item.title[locale]}
                     vertical={item.vertical}
                   />
+                  <h3 className="mt-3 font-display text-lg text-crema-white">
+                    {item.title[locale]}
+                  </h3>
                 </li>
               ))}
             </ul>
