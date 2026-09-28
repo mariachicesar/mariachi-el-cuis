@@ -14,7 +14,7 @@ const securityHeaders = [
       "base-uri 'self'",
       "form-action 'self'",
       "frame-ancestors 'self'",
-      "img-src 'self' data: https://i.ytimg.com https://mariachiassets.s3.us-west-1.amazonaws.com https://www.googletagmanager.com https://www.google-analytics.com https://www.facebook.com https://*.clarity.ms https://c.bing.com",
+      "img-src 'self' data: https://i.ytimg.com https://mariachiassets.s3.us-west-1.amazonaws.com https://www.googletagmanager.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://*.g.doubleclick.net https://www.facebook.com https://*.clarity.ms https://c.bing.com",
       "media-src 'self' https://mariachiassets.s3.us-west-1.amazonaws.com",
       "font-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
@@ -24,7 +24,9 @@ const securityHeaders = [
       //   image beacons to www.facebook.com/tr (covered by img-src above).
       // clarity.ms: Microsoft Clarity analytics; c.bing.com is its tracking pixel.
       "script-src 'self' 'unsafe-inline' https://news.google.com https://www.googletagmanager.com https://connect.facebook.net https://*.clarity.ms" + (process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''),
-      "connect-src 'self' https://news.google.com https://www.google.com https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://connect.facebook.net https://www.facebook.com https://*.clarity.ms",
+      // GA4 collects via *.google-analytics.com, (*.)analytics.google.com and
+      //   stats.g.doubleclick.net (Google's documented CSP for gtag.js).
+      "connect-src 'self' https://news.google.com https://www.google.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://connect.facebook.net https://www.facebook.com https://*.clarity.ms",
       "frame-src https://www.youtube-nocookie.com https://news.google.com",
       "object-src 'none'",
     ].join('; '),
