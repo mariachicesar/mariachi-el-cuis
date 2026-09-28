@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { timingSafeEqual } from 'node:crypto'
+import { isMauiTripOver, MAUI_PATHS } from '@/lib/data/maui'
 import { LOCALES } from '@/lib/i18n/locales'
 import { env } from '@/lib/env'
 
@@ -58,6 +59,17 @@ export function proxy(request: NextRequest) {
   if (pathname === '/admin' || pathname.startsWith('/admin/')) {
     const denied = checkAdminAuth(request)
     if (denied) return denied
+  }
+
+  // The Maui trip page is statically rendered, so its expiry has to be
+  // enforced per request here rather than inside the page.
+  if (pathname === MAUI_PATHS.es || pathname === MAUI_PATHS.en) {
+    if (isMauiTripOver()) {
+      const home = request.nextUrl.clone()
+      home.pathname = pathname === MAUI_PATHS.en ? '/en' : '/'
+      home.search = ''
+      return NextResponse.redirect(home, 307)
+    }
   }
 
   if (
