@@ -1,5 +1,4 @@
 'use client'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { DEFAULT_LOCALE, LOCALES, type Locale } from '@/lib/i18n/locales'
 
@@ -15,8 +14,12 @@ export function LocaleSwitch({ locale }: { locale: Locale }) {
     <div className="flex items-center gap-3 text-xs">
       {LOCALES.map((l) => {
         const href = l === DEFAULT_LOCALE ? bare : `/${l}${bare === '/' ? '' : bare}`
+        // Plain <a>, not <Link>: switching language swaps the [lang] layout that
+        // renders <html> and the gtag-init script. A client-side transition
+        // re-renders that inline <script> (React warns it never executes), so
+        // a full page load is the clean way to change language.
         return (
-          <Link
+          <a
             key={l}
             href={href}
             aria-current={l === locale ? 'page' : undefined}
@@ -25,7 +28,7 @@ export function LocaleSwitch({ locale }: { locale: Locale }) {
             }`}
           >
             {LOCALE_LABEL[l]}
-          </Link>
+          </a>
         )
       })}
     </div>

@@ -22,8 +22,22 @@ test('header shows the real logo image, not text', async ({ page }) => {
 
 test('locale switch preserves the path', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'en', exact: true }).click()
-  await expect(page).toHaveURL('http://localhost:3000/en')
-  await page.getByRole('link', { name: 'es', exact: true }).click()
-  await expect(page).toHaveURL('http://localhost:3000/')
+  await page.getByRole('link', { name: 'English', exact: true }).first().click()
+  await expect(page).toHaveURL(/\/en$/)
+  await page.getByRole('link', { name: 'Español', exact: true }).first().click()
+  await expect(page).toHaveURL(/:\d+\/$/)
+})
+
+test('locale switch is a full page load (no client re-render of the root layout)', async ({
+  page,
+}) => {
+  const scriptWarnings: string[] = []
+  page.on('console', (m) => {
+    if (/script tag while rendering/i.test(m.text())) scriptWarnings.push(m.text())
+  })
+  await page.goto('/services')
+  await page.getByRole('link', { name: 'English', exact: true }).first().click()
+  await expect(page).toHaveURL(/\/en\/services$/)
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+  expect(scriptWarnings).toEqual([])
 })
