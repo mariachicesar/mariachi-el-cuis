@@ -50,13 +50,13 @@ const MEDIA: {
     title: { es: 'Puño de Tierra', en: 'Puño de Tierra' },
   },
   {
-    id: 'el-reloj',
+    id: 'reloj',
     src: `${ASSET_ROOT}/reloj_reel.mp4`,
     poster: `${ASSET_ROOT}/reloj_reel.jpg`,
     duration: 'PT1M30S',
     uploadDate: '2026-09-27',
     vertical: true,
-    title: { es: 'El Reloj', en: 'El Reloj' },
+    title: { es: 'Reloj', en: 'Reloj' },
   },
   {
     id: 'seis-pies-abajo',
