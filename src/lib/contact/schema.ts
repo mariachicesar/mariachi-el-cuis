@@ -27,6 +27,8 @@ export const contactSchema = z.object({
     .max(2000, 'Message must be at most 2000 characters.'),
   website: z.literal(''), // honeypot: real users never fill this
   locale: z.enum(['es', 'en']),
+  // Which landing page the lead came from; tags the notification subject.
+  source: z.enum(['maui']).optional(),
 })
 
 export type ContactInput = z.infer<typeof contactSchema>

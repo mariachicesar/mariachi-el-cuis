@@ -68,7 +68,18 @@ function SubmitButton({ label, pendingLabel }: { label: string; pendingLabel: st
   )
 }
 
-export function ContactForm({ dict, locale }: { dict: Dictionary; locale: Locale }) {
+export function ContactForm({
+  dict,
+  locale,
+  source,
+  messagePlaceholder,
+}: {
+  dict: Dictionary
+  locale: Locale
+  /** Landing page the lead came from; tags the notification email subject. */
+  source?: 'maui'
+  messagePlaceholder?: string
+}) {
   const [state, formAction] = useActionState(submitContact, initialState)
   const t = COPY[locale]
   const router = useRouter()
@@ -83,6 +94,7 @@ export function ContactForm({ dict, locale }: { dict: Dictionary; locale: Locale
     <div>
       <form action={formAction} noValidate className="max-w-xl space-y-5">
         <input type="hidden" name="locale" value={locale} />
+        {source && <input type="hidden" name="source" value={source} />}
 
         {/*
           Honeypot: `aria-hidden="true"` removes the whole wrapper from the
@@ -176,6 +188,7 @@ export function ContactForm({ dict, locale }: { dict: Dictionary; locale: Locale
             id="contact-message"
             name="message"
             rows={5}
+            placeholder={messagePlaceholder}
             className={inputCls}
             aria-describedby={state.fieldErrors?.message ? 'contact-message-error' : undefined}
             aria-invalid={state.fieldErrors?.message ? 'true' : undefined}

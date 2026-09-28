@@ -22,6 +22,7 @@ export async function submitContact(
     message: formData.get('message'),
     website: formData.get('website') ?? '',
     locale: formData.get('locale'),
+    source: formData.get('source') ?? undefined,
   })
 
   if (!parsed.success) {
@@ -38,14 +39,15 @@ export async function submitContact(
     return { ok: false, error: 'not_configured' }
   }
 
-  const { name, email, phone, message } = parsed.data
+  const { name, email, phone, message, source } = parsed.data
+  const tag = source === 'maui' ? '[Maui] ' : ''
   try {
     const resend = new Resend(env.RESEND_API_KEY)
     await resend.emails.send({
       from: siteConfig.emailFrom,
       to: env.CONTACT_TO_EMAIL!,
       replyTo: email,
-      subject: `Website contact — ${name}`,
+      subject: `${tag}Website contact — ${name}`,
       text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone || '—'}\n\n${message}`,
     })
     return { ok: true }
