@@ -16,6 +16,7 @@ import type { QuoteResult } from '@/lib/quote/types'
 import { siteConfig } from '@/lib/config/site'
 import type { Locale } from '@/lib/i18n/locales'
 import { PRICING } from '@/lib/data/pricing'
+import { trackBookingStep } from '@/lib/booking-funnel'
 import {
   effectDelayMs,
   formatTime12Hour,
@@ -43,7 +44,10 @@ const COPY = {
     checking: 'Calculando…',
     available: 'Disponible',
     unavailable: 'Esa fecha y hora ya está reservada — intenta otra.',
-    total: 'Total estimado',
+    total: 'Tu precio',
+    estimateNote: 'Precio estimado, sujeto a aprobación.',
+    depositLine: (deposit: number) => `Aparta tu fecha con $${deposit} de depósito.`,
+    secureNote: '🔒 Pago seguro · Tu fecha queda apartada · Confirmación por correo',
     deposit: 'Depósito',
     balance: 'Saldo (se paga el día del evento)',
     contactMethod: '¿Cómo prefieres que te contactemos?',
@@ -99,7 +103,10 @@ const COPY = {
     checking: 'Checking…',
     available: 'Available',
     unavailable: 'That date and time is already booked — try another.',
-    total: 'Estimated total',
+    total: 'Your price',
+    estimateNote: 'Estimated price, subject to approval.',
+    depositLine: (deposit: number) => `Hold your date with a $${deposit} deposit.`,
+    secureNote: '🔒 Secure payment · Your date is held · Confirmation by email',
     deposit: 'Deposit',
     balance: 'Balance (paid on the event day)',
     contactMethod: 'How should we reach you?',
@@ -382,6 +389,11 @@ export function BookingWizard({
   }, [estimateState, router, locale])
 
   const isSlotUnavailable = availability.checked && availability.available === false
+  const isPriceShown = quote?.status === 'ok' && !isSlotUnavailable
+
+  useEffect(() => {
+    if (isPriceShown) trackBookingStep('booking_price_shown')
+  }, [isPriceShown])
   const checkoutFieldErrors =
     checkoutState.error === 'validation' ? checkoutState.fieldErrors : undefined
   const checkoutReady =
@@ -403,7 +415,7 @@ export function BookingWizard({
   )
 
   return (
-    <div className="max-w-xl space-y-6">
+    <div className="max-w-xl space-y-6" onFocusCapture={() => trackBookingStep('booking_form_start')}>
       {/*
         The date/time/package/address fields are core wizard inputs that do
         not themselves depend on Google Maps — only the geocoded price quote
@@ -632,14 +644,14 @@ export function BookingWizard({
                 </div>
               ) : (
                 <>
-                  <p>
-                    {t.total}: ${quote.total}
+                  <p className="text-sm font-semibold uppercase tracking-wider text-on-surface-variant">
+                    {t.total}
                   </p>
-                  <p>
-                    {t.deposit}: ${quote.deposit}
-                  </p>
-                  <p>
-                    {t.balance}: ${quote.balanceDue}
+                  <p className="font-display text-4xl text-burnished-gold">${quote.total}</p>
+                  <p className="mt-1 text-sm text-on-surface-variant">{t.estimateNote}</p>
+                  <p className="mt-3 font-semibold text-crema-white">{t.depositLine(quote.deposit)}</p>
+                  <p className="text-sm text-on-surface-variant">
+                    {t.deposit}: ${quote.deposit} · {t.balance}: ${quote.balanceDue}
                   </p>
                   {features.calendar ? (
                     availability.checked && (
@@ -791,7 +803,11 @@ export function BookingWizard({
               {isSlotUnavailable ? (
                 <p className="mt-4 text-sm font-semibold text-red-400">{t.reserveUnavailable}</p>
               ) : (
-                <form action={checkoutFormAction} className="mt-4 space-y-4">
+                <form
+                  action={checkoutFormAction}
+                  onSubmit={() => trackBookingStep('booking_checkout_start')}
+                  className="mt-4 space-y-4"
+                >
                   {hiddenQuoteFields}
                   <input type="hidden" name="email" value={email} />
                   <input type="hidden" name="name" value={name} />
@@ -850,6 +866,7 @@ export function BookingWizard({
                     pendingLabel={t.reservePending}
                     disabled={isQuotePending || !checkoutReady}
                   />
+                  <p className="text-sm text-on-surface-variant">{t.secureNote}</p>
                   {checkoutState.error && (
                     <p className="mt-2 text-sm text-red-400">
                       {checkoutErrorMessage(t, checkoutState.error)}
