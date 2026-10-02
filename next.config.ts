@@ -38,7 +38,17 @@ const nextConfig: NextConfig = {
   pageExtensions: ['ts', 'tsx', 'mdx'],
   images: { formats: ['image/avif', 'image/webp'] },
   async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }]
+    return [
+      { source: '/:path*', headers: securityHeaders },
+      // Link-only restaurant pitch: noindex at the HTTP level too, so it holds
+      // even for crawlers that skip the <meta name="robots"> tag. Not
+      // Disallowed in robots.txt on purpose: a blocked crawler can't see the
+      // noindex and may still list the bare URL if someone links to it.
+      ...['/restaurantes', '/en/restaurantes'].map((source) => ({
+        source,
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' }],
+      })),
+    ]
   },
 }
 

@@ -3,6 +3,9 @@ import { z } from 'zod'
 // NOTE: zod v4 deprecated `z.string().email()` in favor of the top-level
 // `z.email()` — the old form still works but emits a console deprecation
 // warning that would pollute otherwise-pristine test output.
+// Unlisted landing pages whose leads get tagged in the notification subject.
+export const CONTACT_SOURCES = ['maui', 'restaurants'] as const
+
 export const contactSchema = z.object({
   name: z
     .string()
@@ -28,7 +31,9 @@ export const contactSchema = z.object({
   website: z.literal(''), // honeypot: real users never fill this
   locale: z.enum(['es', 'en']),
   // Which landing page the lead came from; tags the notification subject.
-  source: z.enum(['maui']).optional(),
+  source: z.enum(CONTACT_SOURCES).optional(),
 })
+
+export type ContactSource = (typeof CONTACT_SOURCES)[number]
 
 export type ContactInput = z.infer<typeof contactSchema>

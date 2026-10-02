@@ -5,6 +5,7 @@ import { useFormStatus } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { submitContact, type ContactActionState } from '@/app/actions/contact'
 import { siteConfig } from '@/lib/config/site'
+import type { ContactSource } from '@/lib/contact/schema'
 import { localizedPath } from '@/lib/i18n/paths'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/locales'
@@ -77,7 +78,7 @@ export function ContactForm({
   dict: Dictionary
   locale: Locale
   /** Landing page the lead came from; tags the notification email subject. */
-  source?: 'maui'
+  source?: ContactSource
   messagePlaceholder?: string
 }) {
   const [state, formAction] = useActionState(submitContact, initialState)

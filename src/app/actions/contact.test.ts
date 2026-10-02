@@ -41,6 +41,13 @@ test('a Maui landing-page lead gets a [Maui] subject tag', async () => {
   expect(sendMock.mock.calls[0]![0].subject).toBe('[Maui] Website contact — Leilani')
 })
 
+test('a restaurant-partnership lead gets a [Restaurant] subject tag', async () => {
+  const { submitContact } = await import('./contact')
+  const result = await submitContact({ ok: false }, formData({ ...base, source: 'restaurants' }))
+  expect(result).toEqual({ ok: true })
+  expect(sendMock.mock.calls[0]![0].subject).toBe('[Restaurant] Website contact — Leilani')
+})
+
 test('a regular contact lead keeps the plain subject', async () => {
   const { submitContact } = await import('./contact')
   const result = await submitContact({ ok: false }, formData(base))

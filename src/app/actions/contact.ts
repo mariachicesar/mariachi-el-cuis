@@ -1,9 +1,14 @@
 'use server'
 
 import { Resend } from 'resend'
-import { contactSchema } from '@/lib/contact/schema'
+import { contactSchema, type ContactSource } from '@/lib/contact/schema'
 import { env, features } from '@/lib/env'
 import { siteConfig } from '@/lib/config/site'
+
+const SOURCE_TAGS: Record<ContactSource, string> = {
+  maui: '[Maui] ',
+  restaurants: '[Restaurant] ',
+}
 
 export type ContactActionState = {
   ok: boolean
@@ -40,7 +45,7 @@ export async function submitContact(
   }
 
   const { name, email, phone, message, source } = parsed.data
-  const tag = source === 'maui' ? '[Maui] ' : ''
+  const tag = source ? SOURCE_TAGS[source] : ''
   try {
     const resend = new Resend(env.RESEND_API_KEY)
     await resend.emails.send({
