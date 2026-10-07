@@ -70,8 +70,8 @@ export async function generateMetadata({
   const title = cityTitle(locale, c.name)
   const description =
     locale === 'es'
-      ? `Mariachi El Cuis toca en ${c.name} y alrededores. ${c.blurb.es}`
-      : `Mariachi El Cuis performs in ${c.name} and nearby. ${c.blurb.en}`
+      ? `Mariachi en ${c.name} para cumpleaños, bodas, XV años y serenatas. $550 la hora. Los músicos que contratas son los que llegan. Cotiza por WhatsApp.`
+      : `Mariachi in ${c.name} for birthdays, weddings, quinceañeras & serenatas. $550/hr. The musicians you book are the ones who show up. Quote by WhatsApp.`
   return buildMetadata({ locale, path: `/mariachi/${c.slug}`, title, description })
 }
 

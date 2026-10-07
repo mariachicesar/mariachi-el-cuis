@@ -135,8 +135,8 @@ export const CITIES: City[] = [
     slug: 'los-angeles', name: 'Los Angeles', lat: 34.0074, lng: -118.2587,
     neighborhoods: ['Downtown', 'South LA', 'Historic South-Central'],
     blurb: {
-      es: 'Nuestra base está en el 90011, en el sur de Los Ángeles. Tocamos en todo el centro, en South LA y en los barrios históricos que rodean nuestra sede.',
-      en: 'Our home base is 90011 in South Los Angeles. We play across Downtown, South LA, and the historic neighborhoods surrounding our headquarters.',
+      es: 'Tocamos en todo el centro, en South LA y en los barrios históricos alrededor de nuestra sede en el sur de Los Ángeles.',
+      en: 'We play across Downtown, South LA, and the historic neighborhoods around our headquarters in South Los Angeles.',
     },
   },
   {
