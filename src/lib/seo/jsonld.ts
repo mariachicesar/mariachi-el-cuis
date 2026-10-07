@@ -157,6 +157,7 @@ export function article(opts: {
     url: opts.url,
     datePublished: opts.datePublished,
     dateModified: opts.dateModified,
+    image: new URL('/opengraph-image', siteConfig.url).toString(),
     author: ORG,
     publisher: ORG,
   }

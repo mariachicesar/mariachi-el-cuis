@@ -5,27 +5,27 @@ export const GUIDES = [
   {
     slug: 'mariachi-cost-los-angeles',
     datePublished: '2026-09-10',
-    dateModified: '2026-09-10',
+    dateModified: '2026-10-07',
     title: {
       es: '¿Cuánto cuesta un mariachi en Los Ángeles?',
       en: 'How much does a mariachi cost in Los Angeles?',
     },
     description: {
-      es: 'Precios reales por hora y por paquete, mínimos por distancia y cómo funciona el depósito.',
-      en: 'Real hourly and package pricing, distance minimums, and how the deposit works.',
+      es: 'Mariachi en Los Ángeles: $550 la hora en fin de semana, $500 entre semana o 7 canciones por $380, ideal para una serenata. Depósito y cancelación.',
+      en: 'Mariachi in Los Angeles: $550/hr on weekends, $500/hr on weekdays, or 7 songs for $380, ideal for a serenata. Deposit and cancellation explained.',
     },
   },
   {
     slug: 'quinceanera-song-guide',
     datePublished: '2026-09-10',
-    dateModified: '2026-09-10',
+    dateModified: '2026-10-07',
     title: {
-      es: 'Guía de canciones para quinceañera',
-      en: 'Quinceañera song guide',
+      es: 'Canciones de mariachi para quinceañera',
+      en: 'Mariachi songs for a quinceañera',
     },
     description: {
-      es: 'El vals, el baile sorpresa y las rancheras que no pueden faltar.',
-      en: 'The vals, the surprise dance, and the rancheras you cannot skip.',
+      es: 'Canciones de mariachi para la misa, el vals, el baile sorpresa y la fiesta de tus XV años, y cuánto tiempo reservar.',
+      en: 'Mariachi songs for the Mass, the vals, the surprise dance, and the party, plus how long to book for a quinceañera.',
     },
   },
   {
@@ -67,27 +67,27 @@ export const GUIDES = [
   {
     slug: 'mariachi-funeral-songs',
     datePublished: '2026-09-15',
-    dateModified: '2026-09-15',
+    dateModified: '2026-10-07',
     title: {
-      es: 'Canciones de mariachi para funerales y homenajes',
-      en: 'Mariachi songs for funerals and memorials',
+      es: 'Canciones de mariachi para velorio y funeral',
+      en: 'Mariachi songs for funerals and burials',
     },
     description: {
-      es: 'Canciones respetuosas para despedir a mamá, papá o un ser querido y cómo planear el homenaje.',
-      en: 'Respectful songs for honoring a mother, father, or loved one and how to plan the tribute.',
+      es: 'Yo Te Extrañaré, Nadie Es Eterno, Amor de Madre, Mi Viejo y más para despedir a mamá, papá o un ser querido. Mariachi en LA con poco aviso.',
+      en: 'Yo Te Extrañaré, Nadie Es Eterno, Mi Viejo and more for a viewing, Mass, or burial. Live mariachi in LA County, often on short notice.',
     },
   },
   {
     slug: 'best-mariachi-songs-by-occasion',
     datePublished: '2026-09-15',
-    dateModified: '2026-09-15',
+    dateModified: '2026-10-07',
     title: {
-      es: 'Las mejores canciones de mariachi para cada ocasión',
+      es: 'Lista de canciones de mariachi por ocasión',
       en: 'Best mariachi songs for every occasion',
     },
     description: {
-      es: 'Ideas de canciones para cumpleaños, serenatas, bodas, fiestas y momentos de despedida.',
-      en: 'Song ideas for birthdays, serenades, weddings, parties, and moments of remembrance.',
+      es: 'Lista de canciones de mariachi para pedir: alegres para cumpleaños y fiestas, románticas para serenatas y bodas, y para quinceañeras y despedidas.',
+      en: 'A list of the best mariachi songs to request for birthdays, serenades, weddings, quinceañeras, parties, and funerals.',
     },
   },
 ] as const
