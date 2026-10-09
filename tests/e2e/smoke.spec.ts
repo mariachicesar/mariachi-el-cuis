@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 import { checkA11y } from './axe'
 
 test('home renders and is accessible', async ({ page }) => {
-  await page.goto('/es')
+  await page.goto('/')
   await expect(page.locator('body')).toBeVisible()
   await checkA11y(page)
 })

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('security headers present on a page response', async ({ request }) => {
-  const res = await request.get('/es')
+  const res = await request.get('/')
   const h = res.headers()
   expect(h['strict-transport-security']).toContain('max-age=')
   expect(h['x-content-type-options']).toBe('nosniff')

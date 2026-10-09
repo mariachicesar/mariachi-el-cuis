@@ -27,3 +27,19 @@ test('after the trip ends, /hawaii and /en/hawaii redirect home in their languag
   expect(en.status).toBe(307)
   expect(new URL(en.headers.get('location')!).pathname).toBe('/en')
 })
+
+test('/es-prefixed URLs 308 to the unprefixed Spanish URL (query kept)', async () => {
+  const root = await run('/es')
+  expect(root.status).toBe(308)
+  expect(new URL(root.headers.get('location')!).pathname).toBe('/')
+  const book = await run('/es/book?utm_source=google')
+  expect(book.status).toBe(308)
+  const loc = new URL(book.headers.get('location')!)
+  expect(loc.pathname).toBe('/book')
+  expect(loc.search).toBe('?utm_source=google')
+})
+
+test('paths that merely start with "es" are not redirected', async () => {
+  const res = await run('/especial')
+  expect(res.headers.get('x-middleware-rewrite')).toContain('/es/especial')
+})

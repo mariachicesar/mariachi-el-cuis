@@ -34,3 +34,9 @@ test('404 route returns 404 with an h1', async ({ page }) => {
   expect(res?.status()).toBe(404)
   await expect(page.locator('#main h1')).toBeVisible()
 })
+
+test('/es duplicates redirect to the unprefixed Spanish URL', async ({ request }) => {
+  const res = await request.get('/es/book', { maxRedirects: 0 })
+  expect(res.status()).toBe(308)
+  expect(new URL(res.headers()['location']!, 'https://x').pathname).toBe('/book')
+})

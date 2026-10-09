@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { timingSafeEqual } from 'node:crypto'
 import { isMauiTripOver, MAUI_PATHS } from '@/lib/data/maui'
-import { LOCALES } from '@/lib/i18n/locales'
+import { DEFAULT_LOCALE, LOCALES } from '@/lib/i18n/locales'
 import { env } from '@/lib/env'
 
 const PUBLIC_FILE = /\.[a-z0-9]+$/i
@@ -82,6 +82,13 @@ export function proxy(request: NextRequest) {
   if (pathname !== '/' && PUBLIC_FILE.test(pathname)) return NextResponse.next()
 
   const first = pathname.split('/')[1] ?? ''
+  // Spanish lives at the unprefixed URL; /es/... is only an internal rewrite
+  // target. Redirect it so Google doesn't see a duplicate of every page.
+  if (first === DEFAULT_LOCALE) {
+    const url = request.nextUrl.clone()
+    url.pathname = pathname.slice(`/${DEFAULT_LOCALE}`.length) || '/'
+    return NextResponse.redirect(url, 308)
+  }
   // /en/... already maps to [lang]=en
   if ((LOCALES as readonly string[]).includes(first)) return NextResponse.next()
 
