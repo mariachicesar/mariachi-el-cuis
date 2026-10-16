@@ -16,6 +16,14 @@ export function GET() {
 - WhatsApp: ${siteConfig.whatsappUrl}
 - Email: ${siteConfig.email}
 - Service area: ${siteConfig.serviceCountyLabel.en} only
+- Based in: South Los Angeles (ZIP ${siteConfig.baseZip})
+- Languages: Spanish and English
+
+## What makes us different
+- No substitutes: the Mariachi El Cuis musicians you book are the ones who show up.
+- A 5-musician group that plays together (weekday 7-song serenatas are performed by 4 musicians).
+- Small, quality-first group focused on birthdays, serenatas (Las Mañanitas), quinceañeras, weddings, and memorials.
+- Song requests welcome; see the repertoire page.
 
 ## Pricing
 ${pricingLines('en').map((l) => `- ${l}`).join('\n')}

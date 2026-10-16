@@ -1,9 +1,10 @@
 import { CITIES } from '@/lib/data/cities'
 import { GUIDES } from '@/lib/content/guides'
+import { OKTOBER_FIESTA_PATH } from '@/lib/data/oktober-fiesta'
 
 export const STATIC_PATHS = [
   '/', '/services', '/faq', '/book', '/repertoire', '/about', '/media', '/contact',
-  '/guides', '/terms', '/privacy',
+  '/guides', '/terms', '/privacy', OKTOBER_FIESTA_PATH,
 ] as const
 
 export function allIndexablePaths(): string[] {

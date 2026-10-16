@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { OktoberFiestaStrip } from '@/components/events/oktober-fiesta-strip'
 import { CtaBand } from '@/components/home/cta-band'
 import { Hero } from '@/components/home/hero'
 import { ServiceAreaGrid } from '@/components/home/service-area-grid'
@@ -11,16 +12,17 @@ import { Section } from '@/components/ui/section'
 import { ContactForm } from '@/app/[lang]/contact/contact-form'
 import { CITIES } from '@/lib/data/cities'
 import { GUIDES } from '@/lib/content/guides'
-import { siteConfig } from '@/lib/config/site'
 import { pricingLines } from '@/lib/data/pricing'
 import { REPERTOIRE } from '@/lib/data/repertoire'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isLocale } from '@/lib/i18n/locales'
 import { alternatesFor, localizedPath } from '@/lib/i18n/paths'
-import { localBusiness, videoObject } from '@/lib/seo/jsonld'
+import { PROFILE_URLS, localBusiness, videoObject } from '@/lib/seo/jsonld'
 import { buildMetadata } from '@/lib/seo/metadata'
 
 export const dynamicParams = false
+// Hourly, so the Oktober-Fiesta strip flips to its post-event wording on its own.
+export const revalidate = 3600
 
 export function generateStaticParams() {
   return [{ lang: 'es' }, { lang: 'en' }]
@@ -65,10 +67,11 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <JsonLd
         data={localBusiness({
           areaServed: CITIES.map((c) => c.name),
-          sameAs: [siteConfig.youtubeUrl, siteConfig.instagramUrl, siteConfig.facebookUrl],
+          sameAs: PROFILE_URLS,
         })}
       />
 
+      <OktoberFiestaStrip locale={locale} />
       <Hero locale={locale} dict={dict} />
 
       {/* Featured live clip — self-hosted vertical video, click-to-play */}

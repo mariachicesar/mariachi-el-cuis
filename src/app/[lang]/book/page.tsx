@@ -100,6 +100,25 @@ export default async function BookPage({ params }: { params: Promise<{ lang: str
             ))}
           </ul>
 
+          {/* Phones stack the aside below the whole wizard, which hid WhatsApp
+              (how most clients reach us) far down the page. Repeat the two
+              contact buttons here on small screens only. */}
+          <div data-track-location="book_hero" className="mt-5 flex flex-wrap gap-3 lg:hidden">
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonClasses('primary', 'min-h-11')}
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              {p.whatsappLabel}
+            </a>
+            <a href={`tel:${siteConfig.phoneTel}`} className={buttonClasses('ghost', 'min-h-11')}>
+              <Phone className="h-4 w-4" aria-hidden="true" />
+              {p.callLabel}
+            </a>
+          </div>
+
           <div className="mt-8 grid gap-12 lg:grid-cols-[minmax(0,36rem)_minmax(0,1fr)]">
             <BookingWizard locale={locale} features={features} />
 

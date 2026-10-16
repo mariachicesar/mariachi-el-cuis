@@ -10,7 +10,7 @@ import { haversineMiles } from '@/lib/geo/distance'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isLocale, type Locale } from '@/lib/i18n/locales'
 import { alternatesFor, localizedPath } from '@/lib/i18n/paths'
-import { breadcrumb, faqPage, localBusiness } from '@/lib/seo/jsonld'
+import { PROFILE_URLS, breadcrumb, faqPage, localBusiness } from '@/lib/seo/jsonld'
 import { buildMetadata } from '@/lib/seo/metadata'
 
 export const dynamicParams = false
@@ -101,7 +101,7 @@ export default async function CityPage({
 
   return (
     <main id="main">
-      <JsonLd data={localBusiness({ areaServed: [c.name, ...c.neighborhoods] })} />
+      <JsonLd data={localBusiness({ areaServed: [c.name, ...c.neighborhoods], sameAs: PROFILE_URLS })} />
       <JsonLd data={faqPage(faqVisible.map((f) => ({ q: f.q[locale], a: f.a[locale] })))} />
       <JsonLd
         data={breadcrumb([

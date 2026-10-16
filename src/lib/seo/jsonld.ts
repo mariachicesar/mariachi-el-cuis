@@ -34,6 +34,17 @@ const OPENING_HOURS = [
   },
 ]
 
+// Every public profile of the business, so search engines and AI assistants
+// can tie the directory listings and the website to one entity.
+export const PROFILE_URLS = [
+  siteConfig.youtubeUrl,
+  siteConfig.instagramUrl,
+  siteConfig.facebookUrl,
+  siteConfig.gigsaladUrl,
+  siteConfig.yelpUrl,
+  siteConfig.googleMapsUrl,
+]
+
 export function localBusiness(opts: { areaServed: string[]; sameAs?: string[] }) {
   return {
     '@context': 'https://schema.org',
@@ -184,5 +195,57 @@ export function videoObject(opts: {
     duration: opts.duration,
     inLanguage: 'es',
     creator: ORG,
+  }
+}
+
+export function musicEvent(opts: {
+  name: string
+  description: string
+  url: string
+  image: string
+  startDate: string
+  endDate: string
+  location: {
+    name: string
+    streetAddress: string
+    addressLocality: string
+    addressRegion: string
+    postalCode: string
+  }
+  organizer: { name: string; url: string }
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'MusicEvent',
+    name: opts.name,
+    description: opts.description,
+    url: opts.url,
+    image: [opts.image],
+    startDate: opts.startDate,
+    endDate: opts.endDate,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    isAccessibleForFree: true,
+    location: {
+      '@type': 'Place',
+      name: opts.location.name,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: opts.location.streetAddress,
+        addressLocality: opts.location.addressLocality,
+        addressRegion: opts.location.addressRegion,
+        postalCode: opts.location.postalCode,
+        addressCountry: 'US',
+      },
+    },
+    offers: {
+      '@type': 'Offer',
+      price: 0,
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+      url: opts.url,
+    },
+    organizer: { '@type': 'Organization', name: opts.organizer.name, url: opts.organizer.url },
+    performer: { '@type': 'MusicGroup', name: siteConfig.name, url: siteConfig.url },
   }
 }
