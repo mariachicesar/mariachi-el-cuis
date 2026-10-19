@@ -29,10 +29,8 @@ test('English event page shows the brand promise, booking CTA and share buttons,
   await expect(page.locator('#main')).not.toContainText(/minimum/i)
 })
 
-test('event page is in the sitemap and linked from the home page', async ({ page, request }) => {
+test('event page stays in the sitemap after the event', async ({ request }) => {
   const sitemap = await (await request.get('/sitemap.xml')).text()
   expect(sitemap).toContain('/eventos/oktober-fiesta-2026')
   expect(sitemap).toContain('/en/eventos/oktober-fiesta-2026')
-  await page.goto('/en')
-  await expect(page.locator('#main a[href="/en/eventos/oktober-fiesta-2026"]')).toBeVisible()
 })

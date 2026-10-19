@@ -12,7 +12,13 @@ export type DepositCheckoutInput = {
   cancelUrl: string
   customerEmail: string
   metadata: Record<string, string>
+  /** Minutes until the Checkout link stops working. Stripe allows 30 min – 24 h. */
+  expiresInMinutes?: number
 }
+
+// Public /book flow: the customer is paying right now, so a short window
+// releases the calendar hold quickly if they abandon checkout.
+const DEFAULT_EXPIRY_MINUTES = 30
 
 export async function createDepositCheckoutSession(
   input: DepositCheckoutInput,
@@ -23,7 +29,7 @@ export async function createDepositCheckoutSession(
     customer_email: input.customerEmail,
     success_url: input.successUrl,
     cancel_url: input.cancelUrl,
-    expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+    expires_at: Math.floor(Date.now() / 1000) + (input.expiresInMinutes ?? DEFAULT_EXPIRY_MINUTES) * 60,
     metadata: input.metadata,
     line_items: [
       {

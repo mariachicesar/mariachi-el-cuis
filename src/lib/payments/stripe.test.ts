@@ -34,6 +34,30 @@ test('createDepositCheckoutSession sends the deposit in cents and returns the se
   expect(args.metadata).toEqual({ foo: 'bar' })
 })
 
+test('createDepositCheckoutSession defaults to a 30-minute expiry and honors expiresInMinutes', async () => {
+  const { createDepositCheckoutSession } = await import('./stripe')
+  sessionsCreate.mockResolvedValue({ url: 'https://checkout.stripe.com/session-2' })
+  const base = {
+    depositUsd: 100,
+    successUrl: 'https://example.com/success',
+    cancelUrl: 'https://example.com/cancel',
+    customerEmail: 'a@b.com',
+    metadata: {},
+  }
+  sessionsCreate.mockClear()
+
+  const now = Math.floor(Date.now() / 1000)
+  await createDepositCheckoutSession(base)
+  await createDepositCheckoutSession({ ...base, expiresInMinutes: 8 * 60 })
+
+  const [defaultArgs] = sessionsCreate.mock.calls[0]!
+  const [eightHourArgs] = sessionsCreate.mock.calls[1]!
+  expect(defaultArgs.expires_at - now).toBeGreaterThanOrEqual(30 * 60)
+  expect(defaultArgs.expires_at - now).toBeLessThan(31 * 60)
+  expect(eightHourArgs.expires_at - now).toBeGreaterThanOrEqual(8 * 60 * 60)
+  expect(eightHourArgs.expires_at - now).toBeLessThan(8 * 60 * 60 + 60)
+})
+
 test('createDepositCheckoutSession throws if Stripe returns no url', async () => {
   const { createDepositCheckoutSession } = await import('./stripe')
   sessionsCreate.mockResolvedValue({ url: null })

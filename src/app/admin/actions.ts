@@ -13,21 +13,45 @@ import { PaymentLinkEmail } from '@/emails/payment-link'
 import { siteConfig } from '@/lib/config/site'
 import { env, features } from '@/lib/env'
 
-const inputSchema = z.object({
-  name: z.string().trim().min(2).max(100),
-  email: z.email(),
-  phone: z.string().trim().min(7).max(20),
-  address: z.string().trim().min(5).max(200),
-  eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  startTime: z.string().regex(/^\d{2}:\d{2}$/),
-  durationHours: z.coerce.number().min(1).max(12),
-  packageType: z.enum(['seven_songs', 'hourly']),
-  total: z.coerce.number().min(0),
-  deposit: z.coerce.number().min(0),
-  balanceDue: z.coerce.number().min(0),
-  signatureName: z.string().trim().min(2).max(100),
-  locale: z.enum(['es', 'en']),
-})
+// Unset form fields arrive as null/'' — treat both as missing rather than letting z.coerce turn them into 0.
+const optionalMoney = z.preprocess(
+  (v) => (v === null || v === '' ? undefined : v),
+  z.coerce.number().min(0).optional(),
+)
+
+const inputSchema = z
+  .object({
+    name: z.string().trim().min(2).max(100),
+    email: z.email(),
+    phone: z.string().trim().min(7).max(20),
+    address: z.string().trim().min(5).max(200),
+    eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    startTime: z.string().regex(/^\d{2}:\d{2}$/),
+    durationHours: z.coerce.number().min(1).max(12),
+    packageType: z.enum(['seven_songs', 'hourly']),
+    total: z.coerce.number().min(0),
+    hourlyRate: optionalMoney,
+    deposit: z.coerce.number().min(0),
+    balanceDue: z.coerce.number().min(0),
+    signatureName: z.string().trim().min(2).max(100),
+    locale: z.enum(['es', 'en']),
+  })
+  .refine((d) => d.packageType !== 'hourly' || d.hourlyRate !== undefined, {
+    path: ['hourlyRate'],
+    message: 'Price per hour is required for hourly bookings',
+  })
+  // Hourly bookings: recompute the total server-side from rate × hours
+  // instead of trusting the read-only total the form displays.
+  .transform((d) =>
+    d.packageType === 'hourly' && d.hourlyRate !== undefined
+      ? { ...d, total: Math.round(d.hourlyRate * d.durationHours * 100) / 100 }
+      : d,
+  )
+
+function priceLines(d: z.output<typeof inputSchema>): string {
+  const rate = d.packageType === 'hourly' && d.hourlyRate !== undefined ? `Price per hour: $${d.hourlyRate}\n` : ''
+  return `${rate}Total: $${d.total}`
+}
 
 export type AdminActionState = {
   ok: boolean
@@ -47,6 +71,7 @@ function parse(formData: FormData) {
     durationHours: formData.get('durationHours'),
     packageType: formData.get('packageType'),
     total: formData.get('total'),
+    hourlyRate: formData.get('hourlyRate'),
     deposit: formData.get('deposit'),
     balanceDue: formData.get('balanceDue'),
     signatureName: formData.get('signatureName'),
@@ -73,7 +98,7 @@ export async function sendAgreementAction(
     const endUtc = new Date(startUtc.getTime() + d.durationHours * 60 * 60 * 1000)
     calendarEventId = await createHoldEvent({
       summary: `Booking confirmed — ${d.name}`,
-      description: `Package: ${d.packageType}\nHours: ${d.durationHours}\nAddress: ${d.address}\nPhone: ${d.phone}\nDeposit paid: $${d.deposit}\nBalance due: $${d.balanceDue}\nBooked by phone, signed by ${d.signatureName}`,
+      description: `Package: ${d.packageType}\nHours: ${d.durationHours}\n${priceLines(d)}\nAddress: ${d.address}\nPhone: ${d.phone}\nDeposit paid: $${d.deposit}\nBalance due: $${d.balanceDue}\nBooked by phone, signed by ${d.signatureName}`,
       location: d.address,
       startUtc,
       endUtc,
@@ -160,7 +185,7 @@ export async function sendPaymentLinkAction(
     const endUtc = new Date(startUtc.getTime() + d.durationHours * 60 * 60 * 1000)
     calendarEventId = await createHoldEvent({
       summary: `HOLD — awaiting deposit — ${d.name}`,
-      description: `Package: ${d.packageType}\nHours: ${d.durationHours}\nAddress: ${d.address}\nPhone: ${d.phone}\nBooked by phone`,
+      description: `Package: ${d.packageType}\nHours: ${d.durationHours}\n${priceLines(d)}\nDeposit due: $${d.deposit}\nAddress: ${d.address}\nPhone: ${d.phone}\nBooked by phone`,
       location: d.address,
       startUtc,
       endUtc,
@@ -173,6 +198,8 @@ export async function sendPaymentLinkAction(
     customerEmail: d.email,
     successUrl: `${env.NEXT_PUBLIC_SITE_URL}${localePrefix}/book/success?session_id={CHECKOUT_SESSION_ID}`,
     cancelUrl: `${env.NEXT_PUBLIC_SITE_URL}${localePrefix}/book`,
+    // Emailed links sit in an inbox until the customer gets to them.
+    expiresInMinutes: 8 * 60,
     metadata: {
       calendarEventId,
       eventDate: d.eventDate,

@@ -13,7 +13,7 @@ const COPY = {
     deposit: 'Depósito a pagar',
     balance: 'Saldo (se paga el día del evento)',
     button: 'Pagar depósito',
-    expires: 'Este enlace de pago expira en 30 minutos. Si expira, contáctanos para generar uno nuevo.',
+    expires: 'Este enlace de pago expira en 8 horas. Si expira, contáctanos para generar uno nuevo.',
   },
   en: {
     preview: 'Pay your deposit to confirm your booking',
@@ -25,7 +25,7 @@ const COPY = {
     deposit: 'Deposit due',
     balance: 'Balance (paid on the event day)',
     button: 'Pay deposit',
-    expires: 'This payment link expires in 30 minutes. If it expires, contact us for a new one.',
+    expires: 'This payment link expires in 8 hours. If it expires, contact us for a new one.',
   },
 } as const
 

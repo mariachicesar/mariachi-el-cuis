@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { OktoberFiestaStrip } from '@/components/events/oktober-fiesta-strip'
+import { NextEventStrip } from '@/components/events/next-event-strip'
 import { CtaBand } from '@/components/home/cta-band'
 import { Hero } from '@/components/home/hero'
 import { ServiceAreaGrid } from '@/components/home/service-area-grid'
@@ -71,7 +71,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         })}
       />
 
-      <OktoberFiestaStrip locale={locale} />
+      <NextEventStrip locale={locale} />
       <Hero locale={locale} dict={dict} />
 
       {/* Featured live clip — self-hosted vertical video, click-to-play */}
