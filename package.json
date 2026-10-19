@@ -14,6 +14,7 @@
     "test:e2e": "playwright test",
     "lhci": "lhci autorun",
     "calendar:auth": "node scripts/google-calendar-auth.mjs",
+    "qr:links": "node scripts/build-links-qr.mjs",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/webhooks/stripe"
   },
   "dependencies": {
@@ -52,6 +53,7 @@
     "eslint-config-next": "16.3.4",
     "globals": "^17.12.0",
     "open": "^11.0.3",
+    "qrcode": "1.5.4",
     "tailwindcss": "^4",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.70.0",

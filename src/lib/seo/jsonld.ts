@@ -40,6 +40,7 @@ export const PROFILE_URLS = [
   siteConfig.youtubeUrl,
   siteConfig.instagramUrl,
   siteConfig.facebookUrl,
+  siteConfig.tiktokUrl,
   siteConfig.gigsaladUrl,
   siteConfig.yelpUrl,
   siteConfig.googleMapsUrl,

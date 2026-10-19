@@ -33,7 +33,10 @@ export const siteConfig = {
   youtubeUrl: 'https://www.youtube.com/@mariachielcuis',
   instagramUrl: 'https://www.instagram.com/mariachielcuis',
   facebookUrl: 'https://www.facebook.com/profile.php?id=61594009573154',
+  tiktokUrl: 'https://www.tiktok.com/@mariachielcuis',
   gigsaladUrl: 'https://www.gigsalad.com/mariachi_el_cuis_los_angeles',
   yelpUrl: 'https://www.yelp.com/biz/mariachi-el-cuis-los-angeles',
   googleMapsUrl: 'https://maps.app.goo.gl/VhhZW7WD6PhAT546A',
+  // Opens the "write a review" dialog on our Google Business Profile directly.
+  googleReviewUrl: 'https://g.page/r/CRsrQJSvdFsUEBM/review',
 } as const
