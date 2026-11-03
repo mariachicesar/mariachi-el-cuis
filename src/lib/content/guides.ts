@@ -1,31 +1,40 @@
 import type { ComponentType } from 'react'
+import { PRICING } from '@/lib/data/pricing'
 import type { Locale } from '@/lib/i18n/locales'
 
 export const GUIDES = [
   {
     slug: 'mariachi-cost-los-angeles',
     datePublished: '2026-09-10',
-    dateModified: '2026-10-07',
+    dateModified: '2026-11-02',
     title: {
       es: '¿Cuánto cuesta un mariachi en Los Ángeles?',
       en: 'How much does a mariachi cost in Los Angeles?',
     },
+    seoTitle: {
+      es: '¿Cuánto Cuesta un Mariachi en Los Ángeles? Precios 2026',
+      en: 'How Much Does a Mariachi Cost in Los Angeles? 2026 Prices',
+    },
     description: {
-      es: 'Mariachi en Los Ángeles: $550 la hora en fin de semana, $500 entre semana o 7 canciones por $380, ideal para una serenata. Depósito y cancelación.',
-      en: 'Mariachi in Los Angeles: $550/hr on weekends, $500/hr on weekdays, or 7 songs for $380, ideal for a serenata. Deposit and cancellation explained.',
+      es: `Precios fijos, no "desde": $${PRICING.hourlyWeekend} la hora o serenata de 7 canciones por $${PRICING.sevenSongsFlat} entre semana ($${PRICING.weekendSevenSongsFlat} en fin de semana). Depósito, mínimos y cancelación explicados.`,
+      en: `Fixed prices, not "starting at": $${PRICING.hourlyWeekend}/hr, or a 7-song serenata for $${PRICING.sevenSongsFlat} on weekdays ($${PRICING.weekendSevenSongsFlat} on weekends). Deposit, minimums, and cancellation explained.`,
     },
   },
   {
     slug: 'quinceanera-song-guide',
     datePublished: '2026-09-10',
-    dateModified: '2026-10-07',
+    dateModified: '2026-11-02',
     title: {
       es: 'Canciones de mariachi para quinceañera',
       en: 'Mariachi songs for a quinceañera',
     },
+    seoTitle: {
+      es: 'Canciones de Mariachi para Quinceañera (XV Años): Vals y Fiesta',
+      en: 'Mariachi Songs for a Quinceañera: Mass, Vals & Party List',
+    },
     description: {
-      es: 'Canciones de mariachi para la misa, el vals, el baile sorpresa y la fiesta de tus XV años, y cuánto tiempo reservar.',
-      en: 'Mariachi songs for the Mass, the vals, the surprise dance, and the party, plus how long to book for a quinceañera.',
+      es: 'Qué canciones pedirle al mariachi en tus 15 años: Ave María en la misa, De Niña a Mujer para el vals y El Rey o El Son de la Negra para la fiesta. Más cuántas horas reservar.',
+      en: 'The mariachi songs to request at a quinceañera: Ave María at the Mass, De Niña a Mujer for the vals, El Rey and El Son de la Negra for the party, plus how long to book.',
     },
   },
   {
@@ -41,53 +50,69 @@ export const GUIDES = [
   {
     slug: 'wedding-mariachi-timeline',
     datePublished: '2026-09-10',
-    dateModified: '2026-09-10',
+    dateModified: '2026-11-02',
     title: {
       es: 'El mariachi en la línea de tiempo de tu boda',
       en: 'Where a mariachi fits in your wedding timeline',
     },
+    seoTitle: {
+      es: 'Mariachi para Boda: Cuándo Tocar en la Ceremonia y la Recepción',
+      en: 'Mariachi Wedding Timeline: Ceremony, Cocktail Hour & Entrance',
+    },
     description: {
-      es: 'Ceremonia, hora del coctel y entrada a la recepción: cuándo suena el mariachi.',
-      en: 'Ceremony, cocktail hour, and reception entrance: when the mariachi plays.',
+      es: 'Cuándo debe sonar el mariachi en tu boda: la ceremonia, la hora del coctel y la entrada a la recepción, y cuántas horas reservar para cubrir los tres momentos.',
+      en: 'When the mariachi should play at your wedding: the ceremony, cocktail hour, and reception entrance, and how many hours to book to cover all three.',
     },
   },
   {
     slug: 'how-to-hire-a-mariachi-band',
     datePublished: '2026-09-15',
-    dateModified: '2026-09-15',
+    dateModified: '2026-11-02',
     title: {
       es: 'Cómo contratar un mariachi en Los Ángeles',
       en: 'How to hire a mariachi band in Los Angeles',
     },
+    seoTitle: {
+      es: 'Cómo Contratar un Mariachi en Los Ángeles (Sin Sorpresas)',
+      en: 'How to Hire a Mariachi Band in Los Angeles (No Surprises)',
+    },
     description: {
-      es: 'Qué preguntar, cómo comparar cotizaciones y qué confirmar antes de apartar un mariachi.',
-      en: 'What to ask, how to compare quotes, and what to confirm before booking a mariachi band.',
+      es: 'Qué preguntar, cómo comparar cotizaciones y cómo asegurarte de que los músicos que contratas son los que llegan. Lista de verificación antes de apartar un mariachi.',
+      en: 'What to ask, how to compare quotes, and how to make sure the musicians you book are the ones who show up. A checklist before you hire a mariachi band.',
     },
   },
   {
     slug: 'mariachi-funeral-songs',
     datePublished: '2026-09-15',
-    dateModified: '2026-10-07',
+    dateModified: '2026-11-02',
     title: {
       es: 'Canciones de mariachi para velorio y funeral',
       en: 'Mariachi songs for funerals and burials',
     },
+    seoTitle: {
+      es: 'Canciones de Mariachi para Funeral y Velorio (Mamá y Papá)',
+      en: 'Mariachi Songs for a Funeral: For Mom, Dad & Loved Ones',
+    },
     description: {
-      es: 'Yo Te Extrañaré, Nadie Es Eterno, Amor de Madre, Mi Viejo y más para despedir a mamá, papá o un ser querido. Mariachi en LA con poco aviso.',
-      en: 'Yo Te Extrañaré, Nadie Es Eterno, Mi Viejo and more for a viewing, Mass, or burial. Live mariachi in LA County, often on short notice.',
+      es: 'Las canciones que más piden las familias para despedir a mamá, papá o un ser querido: Amor de Madre, Mi Viejo, Yo Te Extrañaré y más. Mariachi en velorios y sepelios de LA, con poco aviso.',
+      en: 'The songs families request most to say goodbye: Mi Viejo, Yo Te Extrañaré, Nadie Es Eterno and more for the viewing, Mass, or burial. Live mariachi across LA County, often on short notice.',
     },
   },
   {
     slug: 'best-mariachi-songs-by-occasion',
     datePublished: '2026-09-15',
-    dateModified: '2026-10-07',
+    dateModified: '2026-11-02',
     title: {
       es: 'Lista de canciones de mariachi por ocasión',
       en: 'Best mariachi songs for every occasion',
     },
+    seoTitle: {
+      es: 'Canciones de Mariachi para Pedir: Lista por Ocasión',
+      en: 'Best Mariachi Songs to Request: A List for Every Occasion',
+    },
     description: {
-      es: 'Lista de canciones de mariachi para pedir: alegres para cumpleaños y fiestas, románticas para serenatas y bodas, y para quinceañeras y despedidas.',
-      en: 'A list of the best mariachi songs to request for birthdays, serenades, weddings, quinceañeras, parties, and funerals.',
+      es: 'Qué canciones pedirle al mariachi: alegres para cumpleaños y fiestas, románticas para serenatas y bodas, y las de quinceañera y despedida. La lista de músicos que tocan cada semana en LA.',
+      en: 'What to ask the mariachi to play: Las Mañanitas and party songs for birthdays, boleros for serenades and weddings, plus quinceañera and farewell picks from musicians who play LA every week.',
     },
   },
 ] as const

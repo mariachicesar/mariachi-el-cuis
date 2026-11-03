@@ -4,8 +4,8 @@ export const FAQ: FaqItem[] = [
   {
     q: { es: '¿Cómo funcionan los precios?', en: 'How does pricing work?' },
     a: {
-      es: 'De lunes a viernes, dentro de 25 millas del 90011, ofrecemos un paquete de 7 canciones por $380 o $500 por hora, sin mínimo de horas dentro de 15 millas. Sábados y domingos son $550 por hora, comenzando a las 3:00 PM o más tarde.',
-      en: 'Monday to Friday, within 25 miles of 90011, we offer a 7-song package for $380 or $500 per hour, with no hour minimum within 15 miles. Saturday and Sunday are $550 per hour, starting at 3:00 PM or later.',
+      es: 'De lunes a viernes, dentro de 25 millas del 90011, ofrecemos un paquete de 7 canciones por $430 o $550 por hora, sin mínimo de horas dentro de 15 millas. Sábados y domingos son $550 por hora, comenzando a las 3:00 PM o más tarde.',
+      en: 'Monday to Friday, within 25 miles of 90011, we offer a 7-song package for $430 or $550 per hour, with no hour minimum within 15 miles. Saturday and Sunday are $550 per hour, starting at 3:00 PM or later.',
     },
   },
   {

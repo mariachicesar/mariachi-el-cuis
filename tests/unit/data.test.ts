@@ -5,9 +5,9 @@ import { FAQ } from '@/lib/data/faq'
 import { REPERTOIRE } from '@/lib/data/repertoire'
 
 test('pricing matches the spec', () => {
-  expect(PRICING.hourlyWeekday).toBe(500)
+  expect(PRICING.hourlyWeekday).toBe(550)
   expect(PRICING.hourlyWeekend).toBe(550)
-  expect(PRICING.sevenSongsFlat).toBe(380)
+  expect(PRICING.sevenSongsFlat).toBe(430)
   expect(PRICING.weekdayRadiusMi).toBe(25)
   expect(PRICING.depositPerHour).toBe(50)
   expect(PRICING.rushFlatDeposit).toBe(150)

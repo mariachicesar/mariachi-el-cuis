@@ -6,6 +6,12 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     h2: (p) => <h2 className="mt-10 font-display text-2xl text-crema-white" {...p} />,
     p: (p) => <p className="mt-4 text-on-surface-variant" {...p} />,
     ul: (p) => <ul className="mt-4 list-disc space-y-2 pl-6 text-on-surface-variant" {...p} />,
+    blockquote: (p) => (
+      <blockquote
+        className="mt-6 rounded border-l-4 border-burnished-gold bg-surface-container px-5 py-1"
+        {...p}
+      />
+    ),
     a: (p) => <a className="text-burnished-gold underline" {...p} />,
     ...components,
   }

@@ -13,6 +13,6 @@ test('guides listing + an article render with Article schema', async ({ page }) 
 
 test('cost article states the real prices', async ({ page }) => {
   await page.goto('/en/guides/mariachi-cost-los-angeles')
-  await expect(page.getByText('$380')).toBeVisible()
-  await expect(page.getByText('$550')).toBeVisible()
+  await expect(page.getByText('$430')).toBeVisible()
+  await expect(page.getByText('$550').first()).toBeVisible()
 })

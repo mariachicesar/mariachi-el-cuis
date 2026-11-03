@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { GuideCta } from '@/components/guides/guide-cta'
 import { JsonLd } from '@/components/ui/json-ld'
 import { Section } from '@/components/ui/section'
 import { GUIDES, getGuide, getGuideContent } from '@/lib/content/guides'
@@ -31,7 +32,9 @@ export async function generateMetadata({
   return buildMetadata({
     locale,
     path: `/guides/${guide.slug}`,
-    title: guide.title[locale],
+    // Search-result title is tuned for CTR; the on-page H1 lives in the MDX.
+    title: 'seoTitle' in guide ? guide.seoTitle[locale] : guide.title[locale],
+    titleAbsolute: 'seoTitle' in guide,
     description: guide.description[locale],
   })
 }
@@ -76,6 +79,7 @@ export default async function GuideArticlePage({
         <article className="max-w-3xl">
           <GuideContent />
         </article>
+        <GuideCta slug={guide.slug} locale={locale} />
       </Section>
     </main>
   )

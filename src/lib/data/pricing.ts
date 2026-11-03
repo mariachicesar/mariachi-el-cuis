@@ -1,8 +1,8 @@
 import type { Locale } from '@/lib/i18n/locales'
 
 export const PRICING = {
-  sevenSongsFlat: 380,
-  hourlyWeekday: 500,
+  sevenSongsFlat: 430,
+  hourlyWeekday: 550,
   hourlyWeekend: 550,
   weekdayRadiusMi: 25,
   minimumTable: [

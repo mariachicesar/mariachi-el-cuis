@@ -34,30 +34,30 @@ test('out-of-county is contact_required/out_of_area', () => {
   })
 })
 
-test('weekday, seven_songs, within 25mi: $380 flat, 1h block, $50 deposit', () => {
+test('weekday, seven_songs, within 25mi: $430 flat, 1h block, $50 deposit', () => {
   const q = getQuote(input({}))
   expect(q).toMatchObject({
     status: 'ok',
-    total: 380,
+    total: 430,
     enforcedHours: 1,
     deposit: 50,
-    balanceDue: 330,
+    balanceDue: 380,
     calendarBlockMinutes: 120,
-    lineItems: [{ key: 'seven_songs', amount: 380 }],
+    lineItems: [{ key: 'seven_songs', amount: 430 }],
   })
 })
 
 test('weekday, hourly, within 25mi: no minimum enforced', () => {
   const q = getQuote(input({ packageType: 'hourly', durationHours: 1, distanceMi: 20 }))
-  expect(q).toMatchObject({ status: 'ok', enforcedHours: 1, total: 500, deposit: 50 })
+  expect(q).toMatchObject({ status: 'ok', enforcedHours: 1, total: 550, deposit: 50 })
 })
 
 test('weekday, seven_songs requested but distance > 25mi: forced to hourly', () => {
   const q = getQuote(input({ packageType: 'seven_songs', distanceMi: 26, durationHours: 3 }))
   expect(q).toMatchObject({
     status: 'ok',
-    lineItems: [{ key: 'hourly_rate', amount: 1500 }],
-    total: 1500,
+    lineItems: [{ key: 'hourly_rate', amount: 1650 }],
+    total: 1650,
   })
 })
 

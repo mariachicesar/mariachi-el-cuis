@@ -51,9 +51,9 @@ test('service offer catalog mirrors PRICING constants', () => {
   const ld = service({ locale: 'en', url: 'https://mariachielcuis.com/en/services' }) as any
   const offers = ld.hasOfferCatalog.itemListElement
   expect(offers).toHaveLength(3)
-  expect(offers[0].priceSpecification.price).toBe(380)
+  expect(offers[0].priceSpecification.price).toBe(430)
   expect(offers[1].priceSpecification).toMatchObject({
-    price: 500,
+    price: 550,
     priceCurrency: 'USD',
     unitCode: 'HUR',
   })

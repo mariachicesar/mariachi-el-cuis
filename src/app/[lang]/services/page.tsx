@@ -7,6 +7,7 @@ import { Section } from '@/components/ui/section'
 import { FAQ } from '@/lib/data/faq'
 import { PACKAGES } from '@/lib/data/packages'
 import { PRICING, pricingLines } from '@/lib/data/pricing'
+import { OCCASION_FOR_SERVICE } from '@/lib/data/occasions'
 import { SERVICES } from '@/lib/data/services'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isLocale, type Locale } from '@/lib/i18n/locales'
@@ -184,7 +185,18 @@ export default async function ServicesPage({ params }: { params: Promise<{ lang:
               key={item.slug}
               className="rounded border border-charcoal-border bg-surface-container p-5"
             >
-              <h3 className="font-display text-xl text-crema-white">{item.title[locale]}</h3>
+              <h3 className="font-display text-xl text-crema-white">
+                {OCCASION_FOR_SERVICE[item.slug] ? (
+                  <Link
+                    href={localizedPath(`/services/${OCCASION_FOR_SERVICE[item.slug]}`, locale)}
+                    className="hover:text-burnished-gold"
+                  >
+                    {item.title[locale]} →
+                  </Link>
+                ) : (
+                  item.title[locale]
+                )}
+              </h3>
               <p className="mt-2 text-sm text-on-surface-variant">{item.summary[locale]}</p>
               <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-muted-silver">
                 {t.occasionsLabel}

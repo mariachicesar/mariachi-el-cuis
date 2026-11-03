@@ -5,7 +5,7 @@ import { JsonLd } from '@/components/ui/json-ld'
 import { Section } from '@/components/ui/section'
 import { CITIES, cityDistanceMi, getCity, type City } from '@/lib/data/cities'
 import { FAQ } from '@/lib/data/faq'
-import { pricingLines } from '@/lib/data/pricing'
+import { PRICING, pricingLines } from '@/lib/data/pricing'
 import { haversineMiles } from '@/lib/geo/distance'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { isLocale, type Locale } from '@/lib/i18n/locales'
@@ -22,8 +22,8 @@ export function generateStaticParams() {
   ])
 }
 
-/** Shared between generateMetadata and the page body so the <title> and the
- * breadcrumb's second item never drift apart. */
+/** The on-page H1 and breadcrumb name. The <title> in generateMetadata is a
+ * longer, CTR-oriented variant. */
 function cityTitle(locale: Locale, name: string): string {
   return locale === 'es' ? `Mariachi en ${name}` : `Mariachi in ${name}`
 }
@@ -67,12 +67,16 @@ export async function generateMetadata({
   const locale: Locale = isLocale(lang) ? lang : 'es'
   const c = getCity(city)
   if (!c) return {}
-  const title = cityTitle(locale, c.name)
+  // Search-result title is tuned for CTR (occasions people search for); the H1 stays short.
+  const title =
+    locale === 'es'
+      ? `Mariachi en ${c.name} | Serenatas, XV Años y Bodas`
+      : `Mariachi in ${c.name} | Serenatas, Quinceañeras & Weddings`
   const description =
     locale === 'es'
-      ? `Mariachi en ${c.name} para cumpleaños, bodas, XV años y serenatas. $550 la hora. Los músicos que contratas son los que llegan. Cotiza por WhatsApp.`
-      : `Mariachi in ${c.name} for birthdays, weddings, quinceañeras & serenatas. $550/hr. The musicians you book are the ones who show up. Quote by WhatsApp.`
-  return buildMetadata({ locale, path: `/mariachi/${c.slug}`, title, description })
+      ? `Mariachi en ${c.name}: serenata de 7 canciones por $${PRICING.sevenSongsFlat} o $${PRICING.hourlyWeekend} la hora, precio fijo. Los músicos que contratas son los que llegan, sin sustitutos. Cotiza en 1 minuto.`
+      : `Mariachi in ${c.name}: a 7-song serenata for $${PRICING.sevenSongsFlat} or $${PRICING.hourlyWeekend}/hr, fixed price. The musicians you book are the ones who show up, no substitutes. Quote in 1 minute.`
+  return buildMetadata({ locale, path: `/mariachi/${c.slug}`, title, titleAbsolute: true, description })
 }
 
 export default async function CityPage({

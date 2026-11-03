@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Section } from '@/components/ui/section'
+import { OCCASION_FOR_SERVICE } from '@/lib/data/occasions'
 import { SERVICES } from '@/lib/data/services'
 import type { Locale } from '@/lib/i18n/locales'
 import { localizedPath } from '@/lib/i18n/paths'
@@ -26,7 +27,18 @@ export function ServiceTeaser({ locale }: { locale: Locale }) {
             key={serviceItem.slug}
             className="rounded border border-charcoal-border bg-surface-container p-5"
           >
-            <h3 className="font-display text-xl text-crema-white">{serviceItem.title[locale]}</h3>
+            <h3 className="font-display text-xl text-crema-white">
+              {OCCASION_FOR_SERVICE[serviceItem.slug] ? (
+                <Link
+                  href={localizedPath(`/services/${OCCASION_FOR_SERVICE[serviceItem.slug]}`, locale)}
+                  className="hover:text-burnished-gold"
+                >
+                  {serviceItem.title[locale]} →
+                </Link>
+              ) : (
+                serviceItem.title[locale]
+              )}
+            </h3>
             <p className="mt-2 text-sm text-on-surface-variant">{serviceItem.summary[locale]}</p>
           </li>
         ))}
