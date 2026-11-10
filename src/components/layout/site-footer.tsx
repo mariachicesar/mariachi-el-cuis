@@ -5,7 +5,7 @@ import { features } from '@/lib/env'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/locales'
 import { localizedPath } from '@/lib/i18n/paths'
-import { FacebookIcon, InstagramIcon, YoutubeIcon } from '@/components/ui/social-icons'
+import { FacebookIcon, InstagramIcon, TiktokIcon, YoutubeIcon } from '@/components/ui/social-icons'
 import { navItems } from './nav'
 import { PreferredSourceButton } from './preferred-source-button'
 
@@ -54,6 +54,17 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
                 className="text-on-surface-variant transition-colors hover:text-burnished-gold"
               >
                 <FacebookIcon className="h-5 w-5" />
+              </a>
+            )}
+            {siteConfig.tiktokUrl && (
+              <a
+                href={siteConfig.tiktokUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="TikTok"
+                className="text-on-surface-variant transition-colors hover:text-burnished-gold"
+              >
+                <TiktokIcon className="h-5 w-5" />
               </a>
             )}
           </div>
